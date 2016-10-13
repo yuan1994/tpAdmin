@@ -35,7 +35,13 @@ class Generate{
         $this->module = request()->module();
         $controllers = explode(".",$this->post['controller_name']);
         $this->controller = array_pop($controllers);
+        if (in_array($this->controller,["AdminGroup","AdminNode","AdminRole","AdminUser","AdminNodeLoad","Common","Demo","Generate","Index","LogLogin","Ueditor"])){
+            ajax_return_adv_error("不允许生成该控制器");
+        }
         $this->controller_lower = Loader::parseName($this->controller);
+        if (in_array($this->controller_lower,["admin_group","admin_node","admin_role","admin_user","admin_node_load","common","demo","generate","index","log_login","ueditor"])){
+            ajax_return_adv_error("不允许生成该控制器");
+        }
         //分级控制器目录，仅用于controller和view
         //http://www.kancloud.cn/manual/thinkphp5/118054
         if ($controllers){

@@ -21,4 +21,28 @@ class AdminGroup extends Controller{
     public function _empty(){
         return $this->fetch();
     }
+
+    /**
+     * 禁用限制
+     */
+    protected function _before_forbid(){
+        //禁止禁用Admin模块,权限设置节点
+        $this->_filter_id([1,2],'该记录不能被禁用');
+    }
+
+    /**
+     * 删除限制
+     */
+    protected function _before_delete(){
+        //禁止删除Admin模块,权限设置节点
+        $this->_filter_id([1,2],'该节点不能被删除');
+    }
+
+    /**
+     * 永久删除限制
+     */
+    protected function _before_foreverDelete(){
+        //禁止删除Admin模块,权限设置节点
+        $this->_filter_id([1,2],'该节点不能被删除');
+    }
 }

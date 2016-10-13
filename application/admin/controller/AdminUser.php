@@ -81,7 +81,7 @@ class AdminUser extends Controller{
     /**
      * 不允许永久删除
      */
-    public function foreverdelete()
+    public function foreverDelete()
     {
         ajax_return_adv_error('非法请求');
     }
