@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>TreeAsnySample</title>
+    <link href="css/tree.css" rel="stylesheet" type="text/css" />
+    <link href="sample-css/page.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+    body {
+		color:#000; /* MAIN BODY TEXT COLOR */
+		font-family:"Lucida Grande","Lucida Sans Unicode",Arial,Verdana,sans-serif; /* MAIN BODY FONTS */
+		}
+		.demo{
+      float:left;
+      width:260px;
+    }
+    .docs{
+      margin-left: 265px;
+    }
+    a.button{
+      font-size: 0.8em;
+      margin-right: 4px;
+    }
+    </style>
+    <meta charset="UTF-8" />
+    <!--code highlighter file import-->
+    <script src="../highlighter/scripts/shCore.js" type="text/javascript"></script>
+    <script src="../highlighter/scripts/shBrushJScript.js" type="text/javascript"></script>
+    <script src="../highlighter/scripts/shBrushCss.js" type="text/javascript"></script>  
+    <link href="../highlighter/styles/shCore.css" rel="stylesheet" type="text/css" />
+    <link href="../highlighter/styles/shThemeDefault.css" rel="stylesheet" type="text/css" /> 
+    <script type="text/javascript">
+        SyntaxHighlighter.config.clipboardSwf = '../highlighter/scripts/clipboard.swf';
+    	  SyntaxHighlighter.all();
+	  </script>
+    <!--end code highlighter-->
+</head>
+<body>
+<div style="padding:10px;"> 
+  <div class="demo">
+    <div style="margin-bottom:5px;">
+
+        <a class="button" href="javascript:void(0);" id="reflashnode0">Refresh root-0</a>
+    </div>
+    <div style="border-bottom: #c3daf9 1px solid; border-left: #c3daf9 1px solid; width: 250px; height: 500px; overflow: auto; border-top: #c3daf9 1px solid; border-right: #c3daf9 1px solid;">
+        <div id="tree">
+            
+        </div>
+        
+    </div>
+  </div>
+  <div class="docs">
+    <fieldset>
+      <legend>Lazy Load Nodes</legend>
+      This demo show how load nodes in a lazy way. <br>
+      If you have a lots of levels/nodes(more 10,000 nodes) in a tree and load it in one time,
+      you may concern lazy load way. That is, the highest level nodes are loaded initially.
+      Subnodes will be loaded by ajax call only if end user would like to expand their parent node.
+      Nodes not expands will never be loaded.
+      You can expand/collapse and check/uncheked nodes to see how quickly it response.<br>
+    </fieldset>
+  
+     <fieldset>
+      <legend>Refresh Node</legend>
+      The following lines show how to get checked nodes.
+       <pre class="brush:js;">
+          $("#reflashnode10").click(function(e) {
+                $("#tree").reflash("root-0"); //"root-0" is id of the node to be reloaded
+            });
+        </pre>
+    </fieldset>
+  <div>  
+</div>
+    <script src="src/jquery.js" type="text/javascript"></script>
+    <script src="src/Plugins/jquery.tree.js" type="text/javascript"></script>
+    <script src="data/tree1.js" type="text/javascript"></script>
+   
+    <script type="text/javascript">
+        var userAgent = window.navigator.userAgent.toLowerCase();
+        $.browser.msie8 = $.browser.msie && /msie 8\.0/i.test(userAgent);
+        $.browser.msie7 = $.browser.msie && /msie 7\.0/i.test(userAgent);
+        $.browser.msie6 = !$.browser.msie8 && !$.browser.msie7 && $.browser.msie && /msie 6\.0/i.test(userAgent);
+        function load() {        
+            var o = {showcheck: true,
+              //onnodeclick:function(item){alert(item.text);},          
+              url: "datafeed.php" 
+            };
+            o.data = [ {
+                "id" : "root",
+                "text" : "root",
+                "value" : "86",
+                "showcheck" : true,
+                complete : false,
+                "isexpand" : false,
+                "checkstate" : 0,
+                "hasChildren" : true
+            }];                  
+            $("#tree").treeview(o);            
+            $("#reflashnode10").click(function(e) {
+                $("#tree").reflash("root-0"); //"root-0" is id of the node to be reloaded
+            });
+
+        }   
+        if( $.browser.msie6)
+        {
+            load();
+        }
+        else{
+            $(document).ready(load);
+        }
+    </script>
+</body>
+</html>

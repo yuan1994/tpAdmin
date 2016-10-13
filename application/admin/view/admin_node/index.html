@@ -1,0 +1,56 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    {include file='form' /}
+    <div class="cl pd-5 bg-1 bk-gray">
+        <span class="l">
+            <a class="btn btn-primary radius" href="javascript:;" onclick="layer_open('添加','{:url(\'add\',[\'pid\'=>input(\'param.pid\')])}')"><i class="Hui-iconfont">&#xe600;</i> 添加</a>
+            <a href="javascript:;" onclick="forbid_all('{:url(\'forbid\')}')" class="btn btn-warning radius ml-5"><i class="Hui-iconfont">&#xe631;</i> 禁用</a>
+            <a href="javascript:;" onclick="resume_all('{:url(\'resume\')}')" class="btn btn-success radius ml-5"><i class="Hui-iconfont">&#xe615;</i> 恢复</a>
+            <a href="javascript:;" onclick="del_all('{:url(\'delete\')}')" class="btn btn-danger radius ml-5"><i class="Hui-iconfont">&#xe6e2;</i> 删除</a>
+            <a href="javascript:;" onclick="open_window('回收站','{:url(\'recyclebin\')}')" class="btn btn-secondary radius ml-5"><i class="Hui-iconfont">&#xe6b9;</i> 回收站</a>
+            <a href="{:url('index',['pid'=>0])}" class="btn btn-success radius ml-5"><i class="Hui-iconfont">&#xe625;</i> 返回根目录</a>
+            <a href="javascript:;" onclick="history.back()" class="btn btn-secondary radius ml-5"><i class="Hui-iconfont">&#xe66b;</i> 返回上一级</a>
+            <a href="javascript:;" onclick="layer_open('批量导入','{:url(\'load\',[\'pid\'=>input(\'param.pid\')])}')" class="btn btn-primary radius ml-5"><i class="Hui-iconfont">&#xe645;</i> 批量导入</a>
+        </span>
+        <span class="r pt-5 pr-5">
+            共有数据 ：<strong>{$count}</strong> 条
+        </span>
+    </div>
+    <table class="table table-border table-bordered table-hover table-bg mt-20">
+        <thead>
+        <tr class="text-c">
+            {include file="th" /}
+            <th width="70">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+        <tr class="text-c">
+            <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
+            <td>{$vo.id}</td>
+            <td><a href="{:url('index',['pid'=>$vo.id])}">{eq name='vo.group_id' value='0'}未分组{else/}{$group_list[$vo.group_id]['name']}{/eq}</a></td>
+            <td><a href="{:url('index',['pid'=>$vo.id])}">{$vo.title|high_light=input('param.title')}</a></td>
+            <td><a href="{:url('index',['pid'=>$vo.id])}">{$vo.name|high_light=input('param.name')}</a></td>
+            <td>{$vo.type?'控制器':'<span class="c-red">方法</span>'}</td>
+            <td>{$vo.sort}</td>
+            <td>{$vo.status|get_status}</td>
+            <td class="f-14">
+                {$vo.status|show_status=$vo.id}
+                <a title="编辑" href="javascript:;" onclick="layer_open('编辑','{:url(\'edit\',[\'id\'=>$vo[\'id\']])}')" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>
+                <a title="删除" href="javascript:;" onclick="del(this,'{$vo.id}','{:url(\'delete\')}')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    <div class="page-bootstrap">{$page}</div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    $(function () {
+        $("[name='group_id']").find("[value='{:input(\"param.group_id\")}']").attr("selected",true);
+    })
+</script>
+{/block}

@@ -1,0 +1,59 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <button class="btn btn-success" onclick="layer_open('默认弹层','{:url(\'layer\')}')">默认弹层</button>
+    <div class="mt-20 markdown">
+```
+layer_open('默认弹层','{:url(\'layer\')}'); //默认弹层宽高都为80%
+```
+    </div>
+    <button class="btn btn-success" onclick="layer_open('全屏弹层','{:url(\'layer\')}',{w:'100%',h:'100%'})">全屏弹层</button>
+    <div class="mt-20 markdown">
+```
+layer_open('全屏弹层','{:url(\'layer\')}',{w:'100%',h:'100%'}); //全屏弹层宽高都为100%
+```
+    </div>
+    <button class="btn btn-success" onclick="layer_open('带警告的弹层','{:url(\'layer\')}',{confirm:true})">带警告的弹层</button>
+    <div class="mt-20 markdown">
+```
+layer_open('带警告的弹层','{:url(\'layer\')}',{confirm:true}); //弹层关闭前会有警告提醒
+```
+    </div>
+    <button class="btn btn-success" onclick="layer_open('带回调的弹层','{:url(\'layer\')}',{fn:function() {layer.alert('我是回调，会在弹层结束后触发')}})">带警告的弹层</button>
+    <div class="mt-20 markdown">
+```
+layer_open('带回调的弹层','{:url(\'layer\')}',{fn:function() {layer.alert('我是回调，会在弹层结束后触发')}}); //回调会在弹层结束后触发
+```
+    </div>
+    <button class="btn btn-success" onclick="layer_open('使用HTML内联弹层',$('#tpl').html(),{type:1})">使用HTML内联弹层</button>
+    <div class="mt-20 markdown">
+```
+layer_open('使用HTML内联弹层',$('#tpl').html(),{type:1}); //使用HTML内联弹层，可以把HTML定义在script标签里，把type定义为text/html
+<script type="text/html" id="tpl">
+    <p>我是HTML</p>
+    <p>信不信由你</p>
+    <p>反正我是信了</p>
+</script>
+```
+    </div>
+    <div>
+        以上弹层的参数都可以组合使用
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        var converter = new showdown.Converter();
+        $(".markdown").each(function () {
+            $(this).html(converter.makeHtml($(this).html()))
+        });
+    })
+</script>
+<script type="text/html" id="tpl">
+    <p>我是HTML</p>
+    <p>信不信由你</p>
+    <p>反正我是信了</p>
+</script>
+{/block}

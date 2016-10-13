@@ -1,0 +1,9 @@
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('recycle',explode(',','[menu]'))"}
+<a class="btn btn-success radius" href="javascript:;" onclick="recycle_all('{:url(\'recycle\')}')"><i class="Hui-iconfont">&#xe610;</i> 还原</a>
+{/if}
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('deleteForever',explode(',','[menu]'))"}
+<a href="javascript:;" onclick="del_forever_all('{:url(\'deleteForever\')}')" class="btn btn-danger radius ml-5"><i class="Hui-iconfont">&#xe6e2;</i> 彻底删除</a>
+{/if}
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('clear',explode(',','[menu]'))"}
+<a href="javascript:;" onclick="clear_recyclebin('{:url(\'clear\')}')" class="btn btn-danger radius ml-5"><i class="Hui-iconfont">&#xe6e2;</i> 清空回收站</a>
+{/if}

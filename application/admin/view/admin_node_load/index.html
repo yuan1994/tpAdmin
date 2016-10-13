@@ -1,0 +1,35 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    {include file='form' /}
+    <div class="cl pd-5 bg-1 bk-gray">
+        <span class="l">
+            {include file="template/table_menu" menu="add,forbid,resume" /}
+        </span>
+        <span class="r pt-5 pr-5">
+            共有数据 ：<strong>{$count}</strong> 条
+        </span>
+    </div>
+    <table class="table table-border table-bordered table-hover table-bg mt-20">
+        <thead>
+        <tr class="text-c">
+            {include file="th" /}
+            <th width="70">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+        <tr class="text-c">
+            {include file="td" /}
+            <td class="f-14">
+                {$vo.status|show_status=$vo.id}
+                <a title="编辑" href="javascript:;" onclick="layer_open('编辑','{:url(\'edit\',[\'id\'=>$vo[\'id\']])}')" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>
+                <a title="永久删除" href="javascript:;" onclick="del_forever(this,'{$vo.id}','{:url(\'deleteForever\')}')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    <div class="page-bootstrap">{$page}</div>
+</div>
+{/block}

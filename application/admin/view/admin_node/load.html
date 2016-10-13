@@ -1,0 +1,131 @@
+{extend name="template/base" /}
+{block name="nav"}{/block}
+{block name="content"}
+<div class="page-container" id="full">
+    <form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <input type="hidden" name="pid" value="{:isset($vo.pid)?$vo.pid:'0'}">
+        <input type="hidden" name="level" value="{:isset($vo.level)?$vo.level:'1'}">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">分组：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <div class="select-box">
+                    <select name="group_id" class="select">
+                        <option value="0">未分组</option>
+                        {foreach name='group_list' item='group'}
+                        <option value="{$group.id}">{$group.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">类型：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <div class="select-box">
+                    <select name="type" class="select">
+                        <option value="1">控制器</option>
+                        <option value="0">方法</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">模板：</label>
+            <div class="formControls col-xs-9 col-sm-9 skin-minimal">
+                <div class="row">
+                    {foreach name="node_template" item="v"}
+                    <div class="col-xs-4">
+                        <div class="radio-box">
+                            <input type="checkbox" name="node[]" id="template-{$v.id}" value="{$v.id}">
+                            <label for="template-{$v.id}">{$v.title}({$v.name})</label>
+                        </div>
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">公共类：</label>
+            <div class="formControls col-xs-9 col-sm-9 skin-minimal">
+                <div class="row">
+                    {foreach name="node_public" item="v" key="k"}
+                    <div class="col-xs-4">
+                        <div class="radio-box">
+                            <input type="checkbox" name="node_name[]" id="public-{$k}" value="{$v.name}###{$v.title|default='未定义'}">
+                            <label for="public-{$k}">{$v.title|default='未定义'}({$v.name})</label>
+                        </div>
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">当前类：</label>
+            <div class="formControls col-xs-9 col-sm-9 skin-minimal">
+                <div class="row">
+                    {foreach name="node_current" item="v" key="k"}
+                    <div class="col-xs-4">
+                        <div class="radio-box">
+                            <input type="checkbox" name="node_name[]" id="current-{$k}" value="{$v.name}###{$v.title|default='未定义'}">
+                            <label for="current-{$k}">{$v.title|default='未定义'}({$v.name})</label>
+                        </div>
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>排序：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="number" class="input-text" value="50" placeholder="" name="sort" datatype="n" nullmsg="请填写排序" errormsg="只能填写数字">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>状态：</label>
+            <div class="formControls col-xs-6 col-sm-6 skin-minimal">
+                <div class="radio-box">
+                    <input type="radio" name="status" id="status-0" value="1" checked>
+                    <label for="status-0">启用</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" name="status" id="status-1" value="0">
+                    <label for="status-1">禁用</label>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"> </div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+                <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+<script>
+    $(function () {
+        $('.skin-minimal input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        $("#form").Validform({
+            tiptype:2,
+            ajaxPost:true,
+            showAllError:true,
+            callback:function(ret){
+                ajax_progress(ret);
+            }
+        });
+    })
+</script>
+{/block}

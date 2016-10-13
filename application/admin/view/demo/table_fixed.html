@@ -1,0 +1,231 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <table class="table table-border table-bordered table-hover table-bg mt-20">
+        <caption>我是不会溢出的表格</caption>
+        <thead>
+        <tr>
+            <th width="100">第一列</th>
+            <th width="200">第二列</th>
+            <th width="200">第三列</th>
+            <th width="300">第四列</th>
+            <th width="200">第五列</th>
+            <th width="300">第六列</th>
+            <th width="200">第七列</th>
+            <th width="200">第八列</th>
+            <th width="300">第九列</th>
+            <th width="200">第十列</th>
+            <th width="100">第十一列</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td width="100">第一列内容</td>
+            <td width="200">第二列内容</td>
+            <td width="200">第三列内容</td>
+            <td width="300">第四列内容</td>
+            <td width="200">第五列内容</td>
+            <td width="300">第六列内容</td>
+            <td width="200">第七列内容</td>
+            <td width="200">第八列内容</td>
+            <td width="300">第九列内容</td>
+            <td width="200">第十列内容</td>
+            <td width="100">第十一列内容</td>
+        </tr>
+        <tr>
+            <td width="100">第一列内容</td>
+            <td width="200">第二列内容</td>
+            <td width="200">第三列内容</td>
+            <td width="300">第四列内容</td>
+            <td width="200">第五列内容</td>
+            <td width="300">第六列内容</td>
+            <td width="200">第七列内容</td>
+            <td width="200">第八列内容</td>
+            <td width="300">第九列内容</td>
+            <td width="200">第十列内容</td>
+            <td width="100">第十一列内容</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table tabe classer table-bordered table-hover table-bg mt-20 table_fixed">
+        <caption>我是会溢出的表格</caption>
+        <thead>
+        <tr>
+            <th width="100">第一列</th>
+            <th width="200">第二列</th>
+            <th width="200">第三列</th>
+            <th width="300">第四列</th>
+            <th width="200">第五列</th>
+            <th width="300">第六列</th>
+            <th width="200">第七列</th>
+            <th width="200">第八列</th>
+            <th width="300">第九列</th>
+            <th width="200">第十列</th>
+            <th width="100">第十一列</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td width="100">第一列内容</td>
+            <td width="200">第二列内容</td>
+            <td width="200">第三列内容</td>
+            <td width="300">第四列内容</td>
+            <td width="200">第五列内容</td>
+            <td width="300">第六列内容</td>
+            <td width="200">第七列内容</td>
+            <td width="200">第八列内容</td>
+            <td width="300">第九列内容</td>
+            <td width="200">第十列内容</td>
+            <td width="100">第十一列内容</td>
+        </tr>
+        <tr>
+            <td width="100">第一列内容</td>
+            <td width="200">第二列内容</td>
+            <td width="200">第三列内容</td>
+            <td width="300">第四列内容</td>
+            <td width="200">第五列内容</td>
+            <td width="300">第六列内容</td>
+            <td width="200">第七列内容</td>
+            <td width="200">第八列内容</td>
+            <td width="300">第九列内容</td>
+            <td width="200">第十列内容</td>
+            <td width="100">第十一列内容</td>
+        </tr>
+        </tbody>
+    </table>
+<div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        table_fixed('.table_fixed');
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+/**
+ * 表格无限宽横向溢出
+ * @param selector
+ * @param width 不赋值默认为th的width值和
+ */
+function table_fixed(selector,width) {
+    $obj = $(selector);
+    //未设置宽度自动获取width属性的宽
+    if (typeof width === "undefined"){
+        width = 0;
+        $obj.find("tr:first th").each(function () {
+            width += parseInt($(this).attr("width") || $(this).innerWidth());
+        })
+    }
+    $obj.css({"width":width+"px","table-layout":"fixed"});
+    $obj.wrap('<div style="width:100%;overflow:auto"></div>');
+}
+```
+html代码：
+```
+ <table class="table table-border table-bordered table-hover table-bg mt-20">
+    <caption>我是不会溢出的表格</caption>
+    <thead>
+    <tr>
+        <th width="100">第一列</th>
+        <th width="200">第二列</th>
+        <th width="200">第三列</th>
+        <th width="300">第四列</th>
+        <th width="200">第五列</th>
+        <th width="300">第六列</th>
+        <th width="200">第七列</th>
+        <th width="200">第八列</th>
+        <th width="300">第九列</th>
+        <th width="200">第十列</th>
+        <th width="100">第十一列</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td width="100">第一列内容</td>
+        <td width="200">第二列内容</td>
+        <td width="200">第三列内容</td>
+        <td width="300">第四列内容</td>
+        <td width="200">第五列内容</td>
+        <td width="300">第六列内容</td>
+        <td width="200">第七列内容</td>
+        <td width="200">第八列内容</td>
+        <td width="300">第九列内容</td>
+        <td width="200">第十列内容</td>
+        <td width="100">第十一列内容</td>
+    </tr>
+    <tr>
+        <td width="100">第一列内容</td>
+        <td width="200">第二列内容</td>
+        <td width="200">第三列内容</td>
+        <td width="300">第四列内容</td>
+        <td width="200">第五列内容</td>
+        <td width="300">第六列内容</td>
+        <td width="200">第七列内容</td>
+        <td width="200">第八列内容</td>
+        <td width="300">第九列内容</td>
+        <td width="200">第十列内容</td>
+        <td width="100">第十一列内容</td>
+    </tr>
+    </tbody>
+</table>
+<table class="table table-border table-bordered table-hover table-bg mt-20 table_fixed">
+    <caption>我是会溢出的表格</caption>
+    <thead>
+    <tr>
+        <th width="100">第一列</th>
+        <th width="200">第二列</th>
+        <th width="200">第三列</th>
+        <th width="300">第四列</th>
+        <th width="200">第五列</th>
+        <th width="300">第六列</th>
+        <th width="200">第七列</th>
+        <th width="200">第八列</th>
+        <th width="300">第九列</th>
+        <th width="200">第十列</th>
+        <th width="100">第十一列</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td width="100">第一列内容</td>
+        <td width="200">第二列内容</td>
+        <td width="200">第三列内容</td>
+        <td width="300">第四列内容</td>
+        <td width="200">第五列内容</td>
+        <td width="300">第六列内容</td>
+        <td width="200">第七列内容</td>
+        <td width="200">第八列内容</td>
+        <td width="300">第九列内容</td>
+        <td width="200">第十列内容</td>
+        <td width="100">第十一列内容</td>
+    </tr>
+    <tr>
+        <td width="100">第一列内容</td>
+        <td width="200">第二列内容</td>
+        <td width="200">第三列内容</td>
+        <td width="300">第四列内容</td>
+        <td width="200">第五列内容</td>
+        <td width="300">第六列内容</td>
+        <td width="200">第七列内容</td>
+        <td width="200">第八列内容</td>
+        <td width="300">第九列内容</td>
+        <td width="200">第十列内容</td>
+        <td width="100">第十一列内容</td>
+    </tr>
+    </tbody>
+</table>
+```
+js代码：
+```
+table_fixed('.table_fixed');
+```
+</script>
+{/block}

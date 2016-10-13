@@ -1,0 +1,41 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <form action="" target="_blank" method="post">
+        <button class="btn btn-success" type="submit">导出Excel</button>
+    </form>
+<div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+export_excel($header,$body,$name = null); //助手函数
+/Excel::export($header,$body,$name = null);
+```
+html代码：
+```
+<form action="" target="_blank" method="post">
+    <button class="btn btn-success" type="submit">导出Excel</button>
+</form>
+```
+php代码：
+```
+$header = ['用户ID','登录IP','登录地点','登录浏览器','登录操作系统','登录时间'];
+$data = db("LoginLog")->field("id",true)->order("id asc")->limit(20)->select();
+if ($error = export_excel($header,$data,"示例Excel导出")){
+    exception($error);
+}
+```
+</script>
+{/block}

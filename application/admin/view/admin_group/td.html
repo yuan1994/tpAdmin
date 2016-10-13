@@ -1,0 +1,7 @@
+<td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
+<td>{$vo.id}</td>
+<td>{$vo.name|high_light=input('param.name')}</td>
+<td><i class="Hui-iconfont">{$vo.icon|htmlspecialchars_decode|default='&#xe616;'}</i></td>
+<td>{$vo.sort}</td>
+<td>{$vo.remark}</td>
+<td>{$vo.status|get_status}</td>

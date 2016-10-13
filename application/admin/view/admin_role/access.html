@@ -1,0 +1,30 @@
+{extend name="template/base" /}
+{block name="nav"}{/block}
+{block name="content"}
+<div class="page-container">
+        <div class="pt-5 pr-5 pos-f" style="right: 20px;top: 20px;">
+            <button type="button" class="btn btn-primary radius save">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
+            <button type="button" class="ml-20 btn btn-default radius" onclick="layer_close()">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+        </div>
+    <div id="tree"></div>
+</div>
+{/block}
+{block name="script"}
+<link rel="stylesheet" href="__LIB__/wdTree/css/tree.css">
+<script type="text/javascript" src="__LIB__/wdTree/jquery.tree.js"></script>
+<script>
+    $(function () {
+        $("#tree").treeview({
+            showcheck: true,
+            cbiconpath:'__LIB__/wdTree/css/images/icons/',
+            data:{$tree},
+            theme:'bbit-tree-lines',
+        });
+
+        $(".save").click(function () {
+            var node = $("#tree").getCheckedNodes();
+            ajax_req('{:request()->baseUrl()}',{id:'{:input("id")}','node_id':node},undefined,undefined,true);
+        });
+    })
+</script>
+{/block}

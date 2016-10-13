@@ -1,0 +1,5 @@
+<td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
+<td>{$vo.id}</td>
+<td>{$vo.title|high_light=input('param.title')}</td>
+<td>{$vo.name|high_light=input('param.name')}</td>
+<td>{$vo.status|get_status}</td>

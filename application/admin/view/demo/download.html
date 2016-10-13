@@ -1,0 +1,37 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <a class="btn btn-success" href="{:url('','file=build.php')}" target="download">下载文件</a>
+    <div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+download($file_path,$file_name = '',$file_size = '',$ext=''); //助手函数
+/File::download($file_path,$file_name = '',$file_size = '',$ext='');
+```
+html代码：
+```
+<a class="btn btn-success" href="{:url('','file=build.php')}" target="download">下载文件</a>
+```
+php代码：
+```
+if (input("param.file")){
+    return download("../build.php");
+} else {
+    return $this->fetch();
+}
+```
+</script>
+{/block}

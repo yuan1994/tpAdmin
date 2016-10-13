@@ -1,0 +1,48 @@
+/*  
+Theme Name: iBlog2
+Description:  The iBlog2 theme by <a href="http://www.pagelines.com">Pagelines</a>, inspired by Apple. Support for native WordPress 'post thumbnails' added in 2.9. Change options in 'Appearance > iBlog2 Options'.  This version is localization ready, so send us your translations. 
+Theme URI: http://www.pagelines.com/themes/
+Version: 2.9.8.0
+Author: PageLines
+Author URI: http://www.pagelines.com
+Tags: theme-options, white, silver, light, two-columns, fixed-width, threaded-comments, translation-ready, sticky-post, custom-header
+	
+	*Notes - Not titling your widgets in the sidebar can break the markup (and design)
+	- change the header image and site favicon in Iblog options in the admin	
+	
+	This version released under the <a href="http://www.opensource.org/licenses/gpl-license.php">GPL</a>.
+*/
+
+
+body {
+	background: #ffffff url(none);
+	padding: 0 40px;
+	margin: 0px;
+	color: #000000;
+}
+#page {
+	background: none;
+}
+#wrapper {
+	width: 100%;
+	margin: 0px;
+}
+
+
+h1 {
+	color: #000000;
+}
+h1 a, h1 a:visited {
+	color: #000000;
+}
+
+
+#left-col {
+	width: 100%;
+}
+
+#content {
+	padding: 0;
+	background: #ffffff;
+	width: 100%;
+}

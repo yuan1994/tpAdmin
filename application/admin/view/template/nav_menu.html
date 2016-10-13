@@ -1,0 +1,12 @@
+{volist name="groups" id="group"}
+    <dl>
+        <dt><i class="Hui-iconfont">{$group.icon|htmlspecialchars_decode|default='&#xe616;'}</i> {$group.name}<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+        <dd>
+            <ul>
+                {volist id="item" name="menu[$group['id']]"}
+                    {:widget("Index/menu",['list'=>$item])}
+                {/volist}
+            </ul>
+        </dd>
+    </dl>
+{/volist}

@@ -1,0 +1,103 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>收件地址：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" placeholder="你的邮箱地址，请勿填写别人的" name="receiver" datatype="*" nullmsg="请填写收件地址">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+                <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+    <div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        $("#form").Validform({
+            tiptype:2,
+            ajaxPost:true,
+            showAllError:true,
+            callback:function(ret){
+                ajax_progress(ret,function () {
+                    $("[name='receiver']").val('');
+                });
+            }
+        });
+
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+{literal}
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+/Mail::instance()->mail($receive, $content, $subject = 'No Subject');
+```
+html代码：
+```
+<form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+    <div class="row cl">
+        <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>收件地址：</label>
+        <div class="formControls col-xs-6 col-sm-6">
+            <input type="text" class="input-text" placeholder="你的邮箱地址，请勿填写别人的" name="receiver" datatype="*" nullmsg="请填写收件地址">
+        </div>
+        <div class="col-xs-3 col-sm-3"></div>
+    </div>
+
+    <div class="row cl">
+        <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+            <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+            <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+        </div>
+    </div>
+</form>
+```
+javascript代码：
+```
+$("#form").Validform({
+    tiptype:2,
+    ajaxPost:true,
+    showAllError:true,
+    callback:function(ret){
+        ajax_progress(ret,function () {
+            $("[name='receiver']").val('');
+        });
+    }
+});
+```
+php代码：
+```
+$receive = input("post.receiver");
+$result = $this->validate(
+    ['receiver' => $receive],
+    ['receiver|收件人' => 'require|email']
+);
+if ($result !== true){
+    ajax_return_adv_error($result);
+}
+$html = "<p>这是一封来自tpadmin的测试邮件，请勿回复</p><p><br></p><p>该邮件由访问发送，本站不承担任何责任，如有骚扰请屏蔽此邮件地址</p>";
+$result = \Mail::instance()->mail($receive,$html,"测试邮件");
+if ($result !== true){
+    ajax_return_adv_error($result);
+} else {
+    ajax_return_adv("邮件发送成功，请注意查收");
+}
+```
+</script>
+{/literal}
+{/block}

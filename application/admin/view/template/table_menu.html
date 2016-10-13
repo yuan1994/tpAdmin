@@ -1,0 +1,15 @@
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('add',explode(',','[menu]'))"}
+<a class="btn btn-primary radius" href="javascript:;" onclick="layer_open('添加','{:url(\'add\')}')"><i class="Hui-iconfont">&#xe600;</i> 添加</a>
+{/if}
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('forbid',explode(',','[menu]'))"}
+<a href="javascript:;" onclick="forbid_all('{:url(\'forbid\')}')" class="btn btn-warning radius ml-5"><i class="Hui-iconfont">&#xe631;</i> 禁用</a>
+{/if}
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('resume',explode(',','[menu]'))"}
+<a href="javascript:;" onclick="resume_all('{:url(\'resume\')}')" class="btn btn-success radius ml-5"><i class="Hui-iconfont">&#xe615;</i> 恢复</a>
+{/if}
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('delete',explode(',','[menu]'))"}
+<a href="javascript:;" onclick="del_all('{:url(\'delete\')}')" class="btn btn-danger radius ml-5"><i class="Hui-iconfont">&#xe6e2;</i> 删除</a>
+{/if}
+{if condition="(substr('[menu]',1,4) eq 'menu') OR in_array('recyclebin',explode(',','[menu]'))"}
+<a href="javascript:;" onclick="open_window('回收站','{:url(\'recyclebin\')}')" class="btn btn-secondary radius ml-5"><i class="Hui-iconfont">&#xe6b9;</i> 回收站</a>
+{/if}

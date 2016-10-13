@@ -1,0 +1,9 @@
+<td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
+<td>{$vo.uid|high_light=input('param.uid')}</td>
+<td>{$vo.user.account|high_light=input('param.account')}</td>
+<td>{$vo.user.realname|high_light=input('param.name')}</td>
+<td>{$vo.login_ip}</td>
+<td>{$vo.login_location|high_light=input('param.login_location')}</td>
+<td>{$vo.login_browser}</td>
+<td>{$vo.login_os}</td>
+<td>{$vo.login_time}</td>

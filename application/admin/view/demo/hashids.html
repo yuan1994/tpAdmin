@@ -1,0 +1,110 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>ID：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" name="id" datatype="*" nullmsg="请填写ID">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+                <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <p>加密后的字符串：<span id="encode" class="c-red"></span></p>
+                <p>解密后的字符串：<span id="decode" class="c-red"></span></p>
+            </div>
+        </div>
+    </form>
+    <div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        $("#form").Validform({
+            tiptype:2,
+            ajaxPost:true,
+            showAllError:true,
+            callback:function(ret){
+                ajax_progress(ret,function () {
+                    $("#encode").html(ret.data.encode);
+                    $("#decode").html(ret.data.decode);
+                });
+            }
+        });
+
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+{literal}
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+hashids($length=null,$salt=null,$alphabet=null)->encode($id); //助手函数
+hashids($length=null,$salt=null,$alphabet=null)->decode($hashed_id); //助手函数
+\Hashids\Hashids::instance($length,$salt,$alphabet)->encode($id);
+\Hashids\Hashids::instance($length,$salt,$alphabet)->decode($hashed_id);
+```
+html代码：
+```
+<form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+    <div class="row cl">
+        <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>ID：</label>
+        <div class="formControls col-xs-6 col-sm-6">
+            <input type="text" class="input-text" name="id" datatype="*" nullmsg="请填写ID">
+        </div>
+        <div class="col-xs-3 col-sm-3"></div>
+    </div>
+
+    <div class="row cl">
+        <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+            <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+            <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+        </div>
+    </div>
+    <div class="row cl">
+        <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+            <p>加密后的字符串：<span id="encode" class="c-red"></span></p>
+            <p>解密后的字符串：<span id="decode" class="c-red"></span></p>
+        </div>
+    </div>
+</form>
+```
+javascript代码：
+```
+ $("#form").Validform({
+    tiptype:2,
+    ajaxPost:true,
+    showAllError:true,
+    callback:function(ret){
+        ajax_progress(ret,function () {
+            $("#encode").html(ret.data.encode);
+            $("#decode").html(ret.data.decode);
+        });
+    }
+});
+```
+php代码：
+```
+$id = input("post.id");
+$hashids = hashids(8,"tpadmin");
+$encode_id = $hashids->encode($id); //加密
+$decode_id = $hashids->decode($encode_id); //解密
+ajax_return_adv("操作成功",'',false,'','',['encode'=>$encode_id,'decode'=>$decode_id]);
+```
+</script>
+{/literal}
+{/block}

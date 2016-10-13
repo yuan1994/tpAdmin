@@ -1,0 +1,113 @@
+@charset "utf-8";
+@main-color:#5a98de;
+@border-color:#dcdcdc;
+@border-color-menu:#bbb9bc;
+@text-gray:#888888;
+@bg-gray:#e0e0e0;
+@bg-gray-shallow:#f1f2f8;
+
+.sub-menu-title{
+  padding-left: 20px !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  font-weight: bold;
+  b{
+    width: 1em;
+    display: inline-block;
+  }
+  + .sub-menu-list{
+    display: none;
+    padding-left: 15px !important;
+  }
+}
+
+//排序图标
+.sorting-box{margin: -8px;display: block;}
+.sorting-asc,.sorting-desc,.sorting {cursor: pointer; background-repeat:no-repeat;background-position:right center}
+.sorting{background-image:url(../h-ui/images/dataTable/sort_both.png)}
+.sorting-asc {background-image:url(../h-ui/images/dataTable/sort_asc.png)}
+.sorting-desc {background-image:url(../h-ui/images/dataTable/sort_desc.png)}
+
+//分页
+.page{
+  text-align: center;
+  margin: 15px 0;
+  *{
+    font-size: 12px;
+  }
+  > div > *{
+    width: 30px;
+    height: 26px;
+    text-align: center;
+    line-height: 26px;
+    display: inline-block;
+    margin: 3px;
+  }
+  a{
+    color: #666;
+    border: 1px solid #ccc;
+    &:hover{
+      background-color: @main-color;
+      text-decoration: none;
+    }
+  }
+  span.current{
+    background: @main-color;
+    color: #fff;
+  }
+}
+
+//分页bootstrap驱动
+.page-bootstrap{
+  text-align: center;
+  margin: 15px 0;
+  li{
+    display: inline-block;
+    a,span{
+      color: #666;
+      border: 1px solid #ccc;
+      width: 30px;
+      height: 26px;
+      text-align: center;
+      line-height: 26px;
+      display: inline-block;
+      margin: 3px;
+    }
+    a:hover{
+      background-color: @main-color;
+      text-decoration: none;
+    }
+    span{
+
+    }
+    &.active{
+      span{
+        background: @main-color;
+        color: #fff;
+      }
+    }
+    &.disabled{
+      span{
+        background: @bg-gray;
+      }
+    }
+  }
+}
+
+tr .check-box > div{
+  margin-top: -15px;
+}
+
+.permission-list > dt{
+  background-color: #3bb4f2;
+  color: #fff;
+}
+.permission-list2 > dt{
+  color: red;
+}
+.permission-list2 dd label{
+  padding-right: 20px !important;
+}
+
+.form-horizontal .form-label{
+  text-align: right;
+}

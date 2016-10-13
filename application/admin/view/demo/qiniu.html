@@ -1,0 +1,68 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <iframe name="upload" style="display: none"></iframe>
+    <form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:request()->baseUrl()}">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>图片：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="file" class="input-text" placeholder="图片" name="file" datatype="*" nullmsg="请选择上传文件">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+                <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+    <div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+{literal}
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+\Qiniu::instance()->upload();
+```
+html代码：
+```
+<iframe name="upload" style="display: none"></iframe>
+<form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:request()->baseUrl()}">
+    <div class="row cl">
+        <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>图片：</label>
+        <div class="formControls col-xs-6 col-sm-6">
+            <input type="file" class="input-text" placeholder="图片" name="file" datatype="*" nullmsg="请选择上传文件">
+        </div>
+        <div class="col-xs-3 col-sm-3"></div>
+    </div>
+
+    <div class="row cl">
+        <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+            <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+            <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+        </div>
+    </div>
+</form>
+```
+php代码：
+```
+return '<s1cript>parent.layer.alert("仅做演示")</s1cript>'; //去掉sc中间的1，markdown解析失败
+/*$result = \Qiniu::instance()->upload();
+p($result);*/
+```
+</script>
+{/literal}
+{/block}

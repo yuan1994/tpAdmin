@@ -1,0 +1,290 @@
+{extend name="template/base" /}
+{block name="nav"}
+<nav class="breadcrumb">
+    tpadmin 代码自动生成器
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:;" onclick="location.replace(location.href);" title="刷新"><i class="Hui-iconfont"></i></a>
+</nav>
+{/block}
+{block name="content"}
+<div class="page-container">
+    <form class="form form-horizontal" id="form" method="post" action="{:url('generate')}">
+        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <div class="row cl">
+            <label class="form-label col-xs-1"><span class="c-red">*</span>控制器：</label>
+            <div class="formControls col-xs-8">
+                <input type="text" class="input-text" placeholder="字母，驼峰式，例如AdminGroup，前面可加小写目录" name="controller_name" datatype="/^([a-z][a-z0-9]*\.)*[A-Z]\w*$/" nullmsg="控制器英文名必填" errormsg="必须是(dir.[dir2.dir3....])?Controller的格式" title="正则：/^([a-z][a-z0-9]*\.)*[A-Z]\w*$/，比如one.Demo或者Demo，注意大小写" style="width: 49%">
+                <input type="text" class="input-text" placeholder="中文，例如分组" name="controller_title" datatype="*" nullmsg="控制器中文名必填" style="width: 49%">
+            </div>
+            <div class="col-xs-2"> </div>
+        </div>
+        <div class="row cl form-el">
+            <label class="form-label col-xs-1"><span class="c-red">*</span>表单元素：</label>
+            <div class="formControls col-xs-8">
+                <input type="text" class="input-text" placeholder="中文描述" name="form_title[]" datatype="*" nullmsg="中文描述不可为空" style="width: 100px">
+                <input type="text" class="input-text" placeholder="字段，字母" name="form_name[]" datatype="*" nullmsg="字段名不可为空" style="width: 100px">
+                <div class="select-box" style="width:100px">
+                    <select class="select" name="form_type[]" datatype="*" nullmsg="请选择字段类型">
+                        <option value="">字段类型</option>
+                        <option value="text">text</option>
+                        <option value="select">select</option>
+                        <option value="radio">radio</option>
+                        <option value="textarea">textarea</option>
+                        <option value="checkbox">checkbox</option>
+                        <option value="password">password</option>
+                        <option value="number">number</option>
+                    </select>
+                </div>
+                <div class="select-box" style="width:150px">
+                    <select class="select" name="form_sort[]">
+                        <option value="0">筛选排序：否</option>
+                        <option value="1">筛选排序：是</option>
+                    </select>
+                </div>
+                <div class="select-box" style="width:150px">
+                    <select class="select" name="form_search[]">
+                        <option value="0">表单搜索：否</option>
+                        <option value="1">表单搜索：是</option>
+                    </select>
+                </div>
+                <div class="select-box" style="width:150px">
+                    <select class="select" name="form_require[]">
+                        <option value="0">是否必填：否</option>
+                        <option value="1">是否必填：是</option>
+                    </select>
+                </div>
+                <input type="text" class="input-text" placeholder="验证规则，不填不验证" name="form_validate[]" style="width: 150px">
+                <input type="text" class="input-text" placeholder="验证为空提示信息" name="form_validate_null[]" style="width: 150px">
+                <input type="text" class="input-text" placeholder="格式错误提示信息" name="form_validate_error[]" style="width: 150px">
+                <!--<button type="button" class="btn btn-primary op-prev" data-type="form">上移</button>
+                <button type="button" class="btn btn-primary op-next" data-type="form">下移</button>-->
+                <button type="button" class="btn btn-success op-add" data-type="form">增加一栏</button>
+            </div>
+            <div class="col-xs-3"> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1">数据表：</label>
+            <div class="formControls col-xs-8 skin-minimal">
+                <div class="radio-box">
+                    <input type="checkbox" name="table" value="1" checked>
+                    <label title="会在数据库自动创建相应模型的数据表">创建数据表</label>
+                </div>
+                <div class="radio-box">
+                    <input type="checkbox" name="table_force" value="1">
+                    <label title="勾选此项后无论表是否存在都会删除原表强制创建新表，不勾选只在表不存在时才创建新表，慎重选择，如果创建失败会自动回滚">强制建表</label>
+                </div>
+                <button type="button" class="btn btn-warning op-sync" title="将表单元素里的字段自动填充到表字段里，会清空原表字段的数据，谨慎操作">同步字段(鼠标悬浮看说明)</button>
+            </div>
+            <div class="col-xs-3"> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1"></label>
+            <div class="formControls col-xs-8">
+                <span class="c-red">勾选强制建表后无论表是否存在都会删除原表强制创建新表，不勾选只在表不存在时才创建新表，慎重选择</span>
+            </div>
+            <div class="col-xs-3"> </div>
+        </div>
+        <div class="row cl table-el">
+            <label class="form-label col-xs-1"><span class="c-red">*</span>表字段：</label>
+            <div class="formControls col-xs-8">
+                <input type="text" class="input-text" placeholder="名称" name="table_name[]" datatype="/[a-z0-9_]+/" nullmsg="字段名称不可为空" errormsg="只能填写小写字母、数字、下划线" style="width: 100px">
+                <div class="select-box" style="width:120px">
+                    <select class="select" name="table_type[]">
+                        <option value="varchar">varchar</option>
+                        <option value="char">char</option>
+                        <option value="int">int</option>
+                        <option value="text">text</option>
+                        <option value="float">float</option>
+                        <option value="tinyint">tinyint</option>
+                        <option value="date">date</option>
+                        <option value="time">time</option>
+                        <option value="datetime">datetime</option>
+                        <option value="timestamp">timestamp</option>
+                        <option value="smallint">smallint</option>
+                        <option value="mediumint">mediumint</option>
+                        <option value="bigint">bigint</option>
+                        <option value="tinytext">tinytext</option>
+                        <option value="longtext">longtext</option>
+                    </select>
+                </div>
+                &nbsp;长度：<input type="text" class="input-text" placeholder="字段长度" name="table_size[]" value="255" style="width: 100px">
+                <input type="text" class="input-text" placeholder="默认值" name="table_default[]" style="width: 100px">
+                <div class="select-box" style="width:150px">
+                    <select class="select" name="table_null[]">
+                        <option value="1">不为空：是</option>
+                        <option value="0">不为空：否</option>
+                    </select>
+                </div>
+                <div class="select-box" style="width:150px">
+                    <select class="select" name="table_key[]">
+                        <option value="0">是否索引：否</option>
+                        <option value="1">是否索引：是</option>
+                    </select>
+                </div>
+                <input type="text" class="input-text" placeholder="注释" name="table_comment[]" style="width: 250px">
+                <!--<button type="button" class="btn btn-primary op-prev" data-type="table">上移</button>
+                <button type="button" class="btn btn-primary op-next" data-type="table">下移</button>-->
+                <button type="button" class="btn btn-success op-add" data-type="table">增加一栏</button>
+            </div>
+            <div class="col-xs-3"> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1">首页菜单：</label>
+            <div class="formControls col-xs-8 skin-minimal">
+                <div class="radio-box">
+                    <input type="checkbox" name="menu[]" id="radio-0" value="add" checked>
+                    <label for="radio-0">添加</label>
+                </div>
+                <div class="radio-box">
+                    <input type="checkbox" name="menu[]" id="radio-1" value="forbid" checked>
+                    <label for="radio-1">禁用</label>
+                </div>
+                <div class="radio-box">
+                    <input type="checkbox" name="menu[]" id="radio-2" value="resume" checked>
+                    <label for="radio-2">恢复</label>
+                </div>
+                <div class="radio-box">
+                    <input type="checkbox" name="menu[]" id="radio-3" value="delete" checked>
+                    <label for="radio-3">删除</label>
+                </div>
+                <div class="radio-box" title="勾选回收站会自动创建回收站">
+                    <input type="checkbox" name="menu[]" id="radio-4" value="recyclebin" checked>
+                    <label for="radio-4">回收站</label>
+                </div>
+            </div>
+            <div class="col-xs-3"> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1">创建模型：</label>
+            <div class="formControls col-xs-8 skin-minimal">
+                <div class="radio-box">
+                    <input type="checkbox" name="model" value="1">
+                    <label title="会自动创建相应的模型，并且自动添加字段create_time，update_time，并且开启时间戳记录">创建模型（model）</label>
+                </div>
+            </div>
+            <div class="col-xs-3"> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1">验证器：</label>
+            <div class="formControls col-xs-8 skin-minimal">
+                <div class="radio-box">
+                    <input type="checkbox" name="validate" value="1">
+                    <label title="只自动添加必填规则，其他规则太复杂，会留空，请到验证器手动完善">创建验证器（validate）（默认自动生成前端一致的验证规则）</label>
+                </div>
+            </div>
+            <div class="col-xs-3"> </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-xs-offset-1">
+                <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;确认创建&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="style"}
+<style>
+    .input-text,.select-box,.btn{
+        margin-bottom: 10px;
+    }
+</style>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+<script>
+    $(function () {
+        $('.skin-minimal input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        //初始化表单验证
+        function form_init(){
+            $("#form").Validform({
+                tiptype:2,
+                ajaxPost:true,
+                showAllError:true,
+                callback:function(ret){
+                    ajax_progress(ret,function () {
+                        layer.alert('您接下来是要继续生成下一个控制器还是继续停留？', {
+                            btn: ['继续生成','查看','停留在此页'], //按钮
+                            yes: function (i) {
+                                location.reload();
+                                layer.close(i);
+                            },
+                            btn2: function (i) {
+                                window.open(ret.data.action);
+                                return false;
+                            }
+                        });
+                    });
+                }
+            });
+        }
+        form_init();
+
+        var template = {};
+        //获取模板
+        template['form'] = $(".form-el .formControls").html();
+        template['table'] = $(".table-el .formControls").html();
+        //增加一栏
+        $(document).on("click",".op-add",function () {
+            var type = $(this).attr("data-type");
+            add_column(type);
+            form_init();
+        }).on("click",".op-delete",function () { //删除一栏
+            $(this).parents(".row").remove();
+        }).on("change","[name='form_require[]']",function () { //必填项自动加*
+            var $this = $(this);
+            var form_validate = $this.parents(".formControls").find("[name='form_validate[]']");
+            var form_validate_val = form_validate.val();
+            if ($this.val() == 1){
+                if (form_validate_val){
+                    if (form_validate_val.substring(0,1) != "*"){
+                        form_validate.val("*|"+form_validate_val);
+                    }
+                } else {
+                    form_validate.val("*");
+                }
+            } else {
+                if (form_validate_val.length == 1){
+                    form_validate.val("");
+                } else {
+                    form_validate.val(form_validate_val.substring(2));
+                }
+            }
+        }).on("click",".op-sync",function () { //自动同步
+            $(".table-el:gt(0)").remove();
+            $("[name='form_name[]']").each(function (index,item) {
+                if (index != 0){
+                    add_column('table');
+                }
+                $("[name='table_name[]']").eq(index).val(item.value);
+                $("[name='table_comment[]']").eq(index).val($("[name='form_title[]']").eq(index).val());
+            });
+            form_init();
+        });
+
+        function add_column(type) {
+            var html = '<div class="row cl '+type+'-el">'
+                    + '<label class="form-label col-xs-1"></label>'
+                    + '<div class="formControls col-xs-8">'+template[type]+'<button type="button" class="btn btn-danger op-delete">删除</button></div>'
+                    + '<div class="col-xs-3"> </div>'
+                    + '</div>';
+            $("."+type+"-el:last").after(html);
+        }
+        /*$(document).on("click",".op-prev",function () { //上移
+
+        }).on("click",".op-next",function () { //下移
+            var el = "."+$(this).attr("data-type")+"-el";
+            var next_obj = $(this).parents(el).next(el);
+            if (next_obj.length > 0){ //不是最后一个时才能移动
+                var this_html = $(this).parents(".formControls").html();
+                var next_html = next_obj.find(".formControls").html();
+                $(this).parents(".formControls").html(next_html);
+                next_obj.find(".formControls").html(this_html);
+            }
+        })*/
+    })
+</script>
+{/block}

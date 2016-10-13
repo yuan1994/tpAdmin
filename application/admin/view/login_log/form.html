@@ -1,0 +1,8 @@
+<form class="mb-20" method="get" action="{:url(request()->action())}">
+    <input type="text" class="input-text" style="width:80px" placeholder="用户ID" name="uid" value="{:input('param.uid')}">
+    <input type="text" class="input-text" style="width:150px" placeholder="用户帐号" name="account" value="{:input('param.account')}">
+    <input type="text" class="input-text" style="width:150px" placeholder="用户姓名" name="name" value="{:input('param.name')}">
+    <input type="text" class="input-text" style="width:200px" placeholder="登录IP" name="login_ip" value="{:input('param.login_ip')}">
+    <input type="text" class="input-text" style="width:150px" placeholder="登录地点" name="login_location" value="{:input('param.login_location')}">
+    <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+</form>
