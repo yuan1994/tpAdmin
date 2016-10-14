@@ -37,14 +37,22 @@ use think\Session;
 class Rbac {
     static private $config_prefix = "rbac."; //配置信息前缀
 
-    // 认证方法
+    /**
+     * 认证方法
+     * @param $map
+     * @param string $model
+     * @return array|false|PDOStatement|string|\think\Model
+     */
     static public function authenticate($map,$model='') {
         if(empty($model)) $model =  config(self::$config_prefix.'user_auth_model');
         //使用给定的Map进行认证
         return db($model)->where($map)->find();
     }
 
-    //用于检测用户权限的方法,并保存到Session中
+    /**
+     * 用于检测用户权限的方法,并保存到Session中
+     * @param null $authId
+     */
     static function saveAccessList($authId=null) {
         if(null===$authId)   $authId = Session::get(config(self::$config_prefix.'user_auth_key'));
         // 如果使用普通权限模式，保存当前用户的访问权限列表
@@ -54,7 +62,10 @@ class Rbac {
         return ;
     }
 
-    //检查当前操作是否需要认证
+    /**
+     * 检查当前操作是否需要认证
+     * @return bool
+     */
     static function checkAccess() {
         //如果项目要求认证，并且当前模块需要认证，则进行权限认证
         if( config(self::$config_prefix.'user_auth_on') ){
@@ -89,7 +100,10 @@ class Rbac {
         return false;
     }
 
-	// 登录检查
+    /**
+     * 登录检查
+     * @return bool
+     */
 	static public function checkLogin() {
         //检查当前操作是否需要认证
         if(self::checkAccess()) {
@@ -109,7 +123,13 @@ class Rbac {
         return true;
 	}
 
-    //权限认证的过滤器方法
+    /**
+     * 权限认证的过滤器方法
+     * @param null $moduleName
+     * @param null $controllerName
+     * @param null $actionName
+     * @return bool
+     */
     static public function AccessDecision($moduleName=null,$controllerName=null,$actionName=null) {
         //检查是否需要认证
         if(self::checkAccess()) {
@@ -155,7 +175,12 @@ class Rbac {
         return true;
     }
 
-    //判断多维数组是否存在$key中的key
+    /**
+     * 判断多维数组是否存在$key中的key
+     * @param $multi
+     * @param $key
+     * @return bool
+     */
     static private function keyExist($multi,$key){
         $tmp = $multi;
         while ($k = array_shift($key)){
@@ -169,23 +194,19 @@ class Rbac {
     }
 
     /**
-     +----------------------------------------------------------
      * 取得当前认证号的所有权限列表
-     +----------------------------------------------------------
-     * @param integer $authId 用户ID
-     +----------------------------------------------------------
-     * @access public
-     +----------------------------------------------------------
+     * @param $authId
+     * @return array
      */
     static public function getAccessList($authId) {
         // Db方式权限数据
         $db = db();
         $table_prefix = config('database.prefix');
         $table = array(
-            'role'=>$table_prefix.config(self::$config_prefix.'role_table'),
-            'user'=>$table_prefix.config(self::$config_prefix.'user_table'),
-            'access'=>$table_prefix.config(self::$config_prefix.'access_table'),
-            'node'=>$table_prefix.config(self::$config_prefix.'node_table')
+            'role' => $table_prefix . config(self::$config_prefix . 'role_table'),
+            'user' => $table_prefix . config(self::$config_prefix . 'user_table'),
+            'access' => $table_prefix . config(self::$config_prefix . 'access_table'),
+            'node' => $table_prefix . config(self::$config_prefix . 'node_table')
         );
         $sql = "select node.id,node.name,node.pid from ".
                 $table['role']." as role,".

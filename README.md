@@ -9,9 +9,9 @@ tpadmin是一个基于ThinkPHP5.0正式版和Hui.admin v2.5的管理后台，简
 ##git克隆：
 git clone git@github.com:yuan1994/tpadmin.git
 ##直接下载（建议使用git克隆，确保取到的代码最新）：
-tar.gz格式：[https://github.com/yuan1994/tpadmin/archive/v1.0.tar.gz](https://github.com/yuan1994/tpadmin/archive/v1.0.tar.gz)
+tar.gz格式：[https://github.com/yuan1994/tpadmin/archive/v1.0.1.tar.gz](https://github.com/yuan1994/tpadmin/archive/v1.0.1.tar.gz)
 
-zip格式：[https://github.com/yuan1994/tpadmin/archive/v1.0.zip](https://github.com/yuan1994/tpadmin/archive/v1.0.zip)
+zip格式：[https://github.com/yuan1994/tpadmin/archive/v1.0.1.zip](https://github.com/yuan1994/tpadmin/archive/v1.0.1.zip)
 
 #部署
 参考[ThinkPHP5 - 部署](http://www.kancloud.cn/manual/thinkphp5/129745)

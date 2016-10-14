@@ -55,12 +55,12 @@ class AdminNode extends Controller{
             $validate = validate("AdminNode");
             $insert_all = [];
             $error = []; //错误信息
-            $nodes = isset($data['node']) ? $data['node'] : [];
+            $node_ids = isset($data['node']) ? $data['node'] : [];
             $node_name = isset($data['node_name']) ? $data['node_name'] : [];
             unset($data['node'],$data['node_name']);
             //有选择模板
-            if ($nodes){
-                $nodes = db("AdminNodeLoad")->where("id","in",$data['node'])->field("name,title")->select();
+            if ($node_ids){
+                $nodes = db("AdminNodeLoad")->where("id","in",$node_ids)->field("title,name")->select();
                 foreach ($nodes as $node){
                     $insert = array_merge($data,$node);
                     //数据校验
