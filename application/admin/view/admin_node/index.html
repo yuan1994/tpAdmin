@@ -29,9 +29,9 @@
         <tr class="text-c">
             <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
             <td>{$vo.id}</td>
-            <td><a href="{:url('index',['pid'=>$vo.id])}">{eq name='vo.group_id' value='0'}未分组{else/}{$group_list[$vo.group_id]['name']}{/eq}</a></td>
-            <td><a href="{:url('index',['pid'=>$vo.id])}">{$vo.title|high_light=input('param.title')}</a></td>
-            <td><a href="{:url('index',['pid'=>$vo.id])}">{$vo.name|high_light=input('param.name')}</a></td>
+            <td><a href="{:url('index',['pid'=>$vo.id])}" class="c-blue">{eq name='vo.group_id' value='0'}未分组{else/}{$group_list[$vo.group_id]['name']}{/eq}</a></td>
+            <td><a href="{:url('index',['pid'=>$vo.id])}" class="c-blue">{$vo.title|high_light=input('param.title')}</a></td>
+            <td><a href="{:url('index',['pid'=>$vo.id])}" class="c-blue">{$vo.name|high_light=input('param.name')}</a></td>
             <td>{$vo.type?'控制器':'<span class="c-red">方法</span>'}</td>
             <td>{$vo.sort}</td>
             <td>{$vo.status|get_status}</td>

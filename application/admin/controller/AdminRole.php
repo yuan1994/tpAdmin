@@ -107,7 +107,7 @@ class AdminRole extends Controller{
             $group = resetByKey($list_group,"id");
 
             //节点信息
-            $node = db("AdminNode")->field("id,pid,group_id,name,title,level,type")->select();
+            $node = db("AdminNode")->where("status=1 AND isdelete=0")->field("id,pid,group_id,name,title,level,type")->select();
             $accesses = db("AdminAccess")->where("role_id",$role_id)->select();
             $accesses_node = filterValue($accesses,"node_id");
 
@@ -121,8 +121,8 @@ class AdminRole extends Controller{
                     "value" => $v['id']."_".$v['level']."_".$v['pid'],
                     "showcheck" => true,
                     'checkstate' => in_array($v['id'],$accesses_node) ? 1 : 0,
-                    'hasChildren' => true,
-                    'isexpand' => $v['type'] ? true : false,
+                    'hasChildren' => $v['type'] ? true : false,
+                    'isexpand' => true,
                     'complete' => true,
                 ];
             }
