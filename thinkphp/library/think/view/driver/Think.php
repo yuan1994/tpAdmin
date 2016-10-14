@@ -32,6 +32,8 @@ class Think
         'view_depr'   => DS,
         // 是否开启模板编译缓存,设为false则每次都会重新编译
         'tpl_cache'   => true,
+        // 模板主题 tianpian <tianpian0805@gmail.com>
+        'default_theme' => '',
     ];
 
     public function __construct($config = [])
@@ -125,6 +127,10 @@ class Think
             } elseif (false === strpos($template, $depr)) {
                 $template = str_replace('.', DS, $controller) . $depr . $template;
             }
+        }
+        //模板主题 tianpian <tianpian0805@gmail.com>
+        if ($this->config['default_theme']){
+            $template = $this->config['default_theme'] . DS . $template;
         }
         return $path . ltrim($template, '/') . '.' . ltrim($this->config['view_suffix'], '.');
     }

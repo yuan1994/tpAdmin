@@ -48,7 +48,7 @@ class Controller extends \think\Controller{
 
         }
 
-        //前置方法
+        //前置方法 tianpian <tianpian0805@gmail.com>
         $before_action = "_before_".request()->action();
         if(method_exists($this,$before_action)){
             $this->$before_action();

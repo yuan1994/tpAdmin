@@ -18,9 +18,6 @@ class AdminGroup extends Controller{
     protected function _filter(&$map){
         if (input("param.name")) $map['name'] = array("like","%".input("param.name")."%");
     }
-    public function _empty(){
-        return $this->fetch();
-    }
 
     /**
      * 禁用限制

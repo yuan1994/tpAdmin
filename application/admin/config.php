@@ -26,5 +26,7 @@ return array(
         'view_suffix'  => '.html',
         // 预先加载的标签库
         'taglib_pre_load'     =>    'app\\admin\\taglib\\Tp',
+        //默认主题
+        'default_theme' => ''
     ],
 );
