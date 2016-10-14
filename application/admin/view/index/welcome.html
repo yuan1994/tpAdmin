@@ -4,7 +4,9 @@
 <div class="page-container">
     <p class="f-20 text-success">欢迎使用{$Think.config.site.name} <span class="f-14">{$Think.config.site.version}</span>后台管理系统！</p>
     <p>登录次数：{$info.login_count} </p>
+    {if condition="session('last_login_time')"}
     <p>上次登录IP：{$last_login_ip} &nbsp;&nbsp;&nbsp; 上次登录时间：{$Think.session.last_login_time|date='Y-m-d H:i:s',###} &nbsp;&nbsp;&nbsp; 上次登录地点：{$last_login_loc}</p>
+    {/if}
     <p>本次登录IP：{$current_login_ip} &nbsp;&nbsp;&nbsp; 本次登录时间：{$info.last_login_time|date='Y-m-d H:i:s',###} &nbsp;&nbsp;&nbsp; 本次登录地点：{$current_login_loc}</p>
     <p><br></p>
     <p><a href="https://github.com/yuan1994/tpadmin" target="_blank" class="c-blue">github仓库地址</a></p>

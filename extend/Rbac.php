@@ -208,12 +208,12 @@ class Rbac {
             'access' => $table_prefix . config(self::$config_prefix . 'access_table'),
             'node' => $table_prefix . config(self::$config_prefix . 'node_table')
         );
-        $sql = "select node.id,node.name,node.pid from ".
-                $table['role']." as role,".
-                $table['user']." as user,".
-                $table['access']." as access ,".
-                $table['node']." as node ".
-                "where user.user_id='{$authId}' and user.role_id=role.id and access.role_id=role.id and role.status=1 and access.node_id=node.id and node.status=1";
+        $sql = "SELECT node.id,node.name,node.pid FROM ".
+                $table['role']." AS role,".
+                $table['user']." AS user,".
+                $table['access']." AS access ,".
+                $table['node']." AS node ".
+                "WHERE user.user_id='{$authId}' AND user.role_id=role.id AND access.role_id=role.id AND role.status=1 AND access.node_id=node.id AND node.status=1 AND (role.pid = 0 OR (role.pid <> 0 AND node.id IN (SELECT node_id FROM {$table['access']} WHERE role_id = role.pid)))";
         $apps =  $db->query($sql);
         //转化为树
         $tree = list_to_tree($apps);

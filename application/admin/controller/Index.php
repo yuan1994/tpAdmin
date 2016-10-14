@@ -24,12 +24,12 @@ class Index extends Controller{
             $nodes = db("AdminNode")->where("status=1 AND group_id > 0")->field("id,name,pid,group_id,title,type")->select();
         } else {
             $auth_id = Session::get(config('rbac.user_auth_key'));
-            $sql = "select node.id,node.name,node.pid,node.group_id,node.title,node.type from ".
-                "{$prefix}admin_role as role,".
-                "{$prefix}admin_role_user as user,".
-                "{$prefix}admin_access as access ,".
-                "{$prefix}admin_node as node ".
-                "where user.user_id='{$auth_id}' and user.role_id=role.id and access.role_id=role.id and role.status=1 and access.node_id=node.id and node.status=1 and node.group_id > 0 order by node.sort asc";
+            $sql = "SELECT node.id,node.name,node.pid,node.group_id,node.title,node.type from ".
+                "{$prefix}admin_role AS role,".
+                "{$prefix}admin_role_user AS user,".
+                "{$prefix}admin_access AS access ,".
+                "{$prefix}admin_node AS node ".
+                "WHERE user.user_id='{$auth_id}' AND user.role_id=role.id AND access.role_id=role.id AND role.status=1 AND access.node_id=node.id AND node.status=1 AND node.group_id > 0 AND (role.pid = 0 OR (role.pid <> 0 AND node.id IN (SELECT node_id FROM {$prefix}admin_access WHERE role_id = role.pid))) ORDER BY node.sort ASC";
             $nodes =  db()->query($sql);
         }
 
@@ -41,10 +41,12 @@ class Index extends Controller{
         $groups_id = [];
         foreach ($tree_node as $module){
             if (strtoupper($module['name']) == strtoupper(request()->module())){
-                foreach ($module['_child'] as $controller){
-                    $group_id = $controller['group_id'];
-                    array_push($groups_id,$group_id);
-                    $menu[$group_id][] = $controller;
+                if(isset($module['_child'])){
+                    foreach ($module['_child'] as $controller){
+                        $group_id = $controller['group_id'];
+                        array_push($groups_id,$group_id);
+                        $menu[$group_id][] = $controller;
+                    }
                 }
                 break;
             }
@@ -69,14 +71,18 @@ class Index extends Controller{
      */
     public function welcome(){
         //查询ip地址和登录地点
-        $last_login_ip = Session::get('last_login_ip');
-        $last_login_loc = \Ip::find($last_login_ip);
+        if (Session::get('last_login_time')){
+            $last_login_ip = Session::get('last_login_ip');
+            $last_login_loc = \Ip::find($last_login_ip);
+
+            $this->assign("last_login_ip",$last_login_ip);
+            $this->assign("last_login_loc",implode(" ",$last_login_loc));
+
+        }
         $current_login_ip = request()->ip();
         $current_login_loc = \Ip::find($current_login_ip);
 
-        $this->assign("last_login_ip",$last_login_ip);
         $this->assign("current_login_ip",$current_login_ip);
-        $this->assign("last_login_loc",implode(" ",$last_login_loc));
         $this->assign("current_login_loc",implode(" ",$current_login_loc));
 
         //查询个人信息
