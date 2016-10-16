@@ -114,44 +114,48 @@ function ajax_req(url,data,callback,param,shade){
 }
 
 /**
- *  * ajax处理，对应服务端ajax_return_adv方法返回的json数据处理
+ * ajax处理，对应服务端ajax_return_adv方法返回的json数据处理
  * @param data ajax返回数据
  * @param callback 成功回调函数
  * @param param 回调参数
  */
 function ajax_progress(data,callback,param){
-    if(data.status == 'y'){
-        var index = parent.layer.getFrameIndex(window.name);
-        if(data.close){
-            parent.layer.close(index);
-        }
-        if(data.redirect == 'current'){ //是否当前页重定向
-            if(!data.url){ //刷新
-                window.location.reload();
-            } else { //重定向到url
-                window.location.href = data.url;
+    if(data.code == 0){
+        if (typeof data.opt == "object") {
+            var index = parent.layer.getFrameIndex(window.name);
+            if(data.opt.close){
+                parent.layer.close(index);
             }
-        } else if(data.redirect == 'parent'){ //是否父层重定向
-            if(!data.url){ //刷新
-                window.parent.location.reload();
-            } else { //重定向到url
-                window.parent.location.href = data.url;
+            if(data.opt.redirect == 'current'){ //是否当前页重定向
+                if(!data.opt.url){ //刷新
+                    window.location.reload();
+                } else { //重定向到url
+                    window.location.href = data.opt.url;
+                }
+            } else if(data.opt.redirect == 'parent'){ //是否父层重定向
+                if(!data.opt.url){ //刷新
+                    window.parent.location.reload();
+                } else { //重定向到url
+                    window.parent.location.href = data.opt.url;
+                }
+                parent.layer.close(index); //关闭当前层
             }
-            parent.layer.close(index); //关闭当前层
-        }
-        if(data.alert){ //父层弹出信息
-            parent.layer.alert(data.alert);
-            parent.layer.close(index);
-        }
-        if(!data.close && !data.redirect && !data.alert){
-            parent.layer.msg(data.info);
-            parent.layer.close(index);
+            if(data.opt.alert){ //父层弹出信息
+                parent.layer.alert(data.opt.alert);
+                parent.layer.close(index);
+            }
+            if(!data.opt.close && !data.opt.redirect && !data.opt.alert){
+                parent.layer.msg(data.msg);
+                parent.layer.close(index);
+            }
+        } else {
+            layer.msg(data.msg);
         }
         if (typeof callback == "function"){
-            callback.apply(this,param);
+            callback.apply(this, param);
         }
     } else {
-        layer.alert(data.info,{title:"错误信息",icon:2});
+        layer.alert(data.msg, {title:"错误信息", icon:2});
     }
 }
 
@@ -257,11 +261,11 @@ function clear_recyclebin(url){
         icon:3
     }, function(){
         $.post(url,'',function(data){
-            if(data.status == 'y'){
+            if(data.code == 0){
                 layer.msg("已清空",{icon:1,time:1000});
                 window.location.reload();
             } else {
-                layer.alert(data.info);
+                layer.alert(data.msg);
             }
         },'json')
     }, function(index){
@@ -297,8 +301,12 @@ function table_fixed(selector,width) {
     $obj.wrap('<div style="width:100%;overflow:auto"></div>');
 }
 
-//生成随机字符串
-var get_random = function (prefix) {
+/**
+ * 生成随机字符串
+ * @param prefix
+ * @returns {string}
+ */
+function get_random(prefix) {
     prefix = prefix || "";
     return prefix + Date.now().toString(36) + "_" + Math.random().toString(36).substr(2);
 };
@@ -310,11 +318,11 @@ function _del_recycle(obj,id,url,msg,returnMsg){
         icon:3
     }, function(){
         $.post(url,{id:id},function(data){
-            if(data.status == 'y'){
+            if(data.code == 0){
                 layer.msg(returnMsg,{icon:1,time:1000});
                 $(obj).parents("tr").fadeOut();
             } else {
-                layer.alert(data.info);
+                layer.alert(data.msg);
             }
         },'json')
     }, function(index){
@@ -330,7 +338,7 @@ function _recycle(obj,id,url,msg){
     _del_recycle(obj,id,url,msg,"已还原！")
 }
 
-function _del_recycle_all(url,checkbox_group,msg,returnMsg){
+function _del_recycle_all(url,checkbox_group,msg,return_msg){
     layer.confirm(msg, {
         btn: ['确定','取消'],
         title:'提示',
@@ -341,11 +349,11 @@ function _del_recycle_all(url,checkbox_group,msg,returnMsg){
             id.push($(this).val())
         });
         $.post(url,{id:id.join(',')},function(data){
-            if(data.status == 'y'){
-                parent.layer.msg(returnMsg,{icon:1,time:1000});
+            if(data.code == 0){
+                parent.layer.msg(return_msg,{icon:1,time:1000});
                 window.location.reload();
             } else {
-                layer.alert(data.info);
+                layer.alert(data.msg);
             }
         },'json')
     }, function(index){

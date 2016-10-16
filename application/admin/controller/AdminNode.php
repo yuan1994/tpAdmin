@@ -26,12 +26,12 @@ class AdminNode extends Controller{
 
     protected function _before_index() {
         $group_list	=	db("AdminGroup")->field('id,name')->where("isdelete=0 AND status=1")->select();
-        $this->assign('group_list',resetByKey($group_list,"id"));
+        $this->assign('group_list',reset_by_key($group_list,"id"));
     }
 
     protected function _before_recyclebin() {
         $group_list	=	db("AdminGroup")->field('id,name')->where("isdelete=0 AND status=1")->select();
-        $this->assign('group_list',resetByKey($group_list,"id"));
+        $this->assign('group_list',reset_by_key($group_list,"id"));
     }
 
     protected function _before_add() {

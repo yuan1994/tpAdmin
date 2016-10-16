@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace mail;
+
 require 'phpmailer/class.phpmailer.php';
 
 class Phpmailer extends \PHPMailer
@@ -33,7 +34,7 @@ class Phpmailer extends \PHPMailer
 
     public function mail($receive, $content, $subject = 'No Subject')
     {
-        try{
+        try {
             $this->AddAddress($receive);
             $this->Subject = $subject;
             $this->Body = $content;
@@ -42,7 +43,7 @@ class Phpmailer extends \PHPMailer
             //$this->AddAttachment("f:/test.png");  //可以添加附件
             $this->Send();
             return true;
-        } catch (\phpmailerException $e){
+        } catch (\phpmailerException $e) {
             $this->errormsg = $e->getMessage();
             return false;
         }
@@ -51,7 +52,8 @@ class Phpmailer extends \PHPMailer
     /**
      * 获取错误信息
      */
-    public function getError(){
+    public function getError()
+    {
         return $this->errormsg;
     }
 }

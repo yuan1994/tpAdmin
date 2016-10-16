@@ -55,7 +55,7 @@ class AdminRole extends Controller{
             $list_user=db("AdminUser")->field('id,account,realname')->where('status=1 AND id > 1')->select();
 
             $list_role_user = db("AdminRoleUser")->where("role_id",$role_id)->select();
-            $checks = filterValue($list_role_user,"user_id",true);
+            $checks = filter_value($list_role_user,"user_id",true);
 
             $this->assign('list',$list_user);
             $this->assign('checks',$checks);
@@ -105,18 +105,19 @@ class AdminRole extends Controller{
 
             //分组信息
             $list_group = db("AdminGroup")->where("status=1 AND isdelete=0")->field("id,name")->order("sort asc")->select();
-            $group = resetByKey($list_group,"id");
+            $group = reset_by_key($list_group,"id");
 
             //节点信息
             $where_node['status'] = 1;
             $where_node['isdelete'] = 0;
+            //对于非超级管理员用户只显示其拥有所有权限的节点
             if (!Session::has(config('rbac.admin_auth_key'))){
-                //TODO 多级角色权限管理
-                $access_node = model("AdminAccess")::with("admin_role_user")->where("admin_role_user.user_id");
+                $access_node = db("AdminAccess")->alias("access")->join("__ADMIN_ROLE_USER__ role_user","role_user.role_id = access.role_id")->field("access.node_id")->where("role_user.user_id",Session::get(config("rbac.user_auth_key")))->select();
+                $where_node['id'] = array("in",filter_value($access_node,"node_id"));
             }
             $node = db("AdminNode")->where("status=1 AND isdelete=0")->field("id,pid,group_id,name,title,level,type")->select();
             $accesses = db("AdminAccess")->where("role_id",$role_id)->select();
-            $accesses_node = filterValue($accesses,"node_id");
+            $accesses_node = filter_value($accesses,"node_id");
 
             //生成wdTree插件需要的数据格式
             $node_tree = [];
@@ -159,7 +160,7 @@ class AdminRole extends Controller{
 
         //已授权权限
         $list_access = db("AdminAccess")->where("role_id",$role_id)->field("node_id")->select();
-        $checks = filterValue($list_access,"node_id",true);
+        $checks = filter_value($list_access,"node_id",true);
         $this->assign('checks',$checks);
 
         return $this->fetch();

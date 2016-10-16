@@ -15,32 +15,41 @@ namespace app\admin;
 
 use think\Session;
 
-class Controller extends \think\Controller{
+class Controller extends \think\Controller
+{
+    use \app\admin\traits\controller\Controller;
+
     protected $isdelete = 0; //是否删除标志，0-正常|1-删除|false-不包含该字段
 
-    protected function _initialize(){
+    protected function _initialize()
+    {
+        //用户ID
+        defined('UID') or define('UID', Session::get('rbac.user_auth_key'));
         // 用户权限检查
-        if (config('rbac.user_auth_on' ) && !in_array(request()->module(),explode(',',config('rbac.not_auth_module')))) {
-            if (! \Rbac::AccessDecision ()) {
+        if (
+            config('rbac.user_auth_on')
+            &&
+            !in_array($this->request->module(), explode(',', config('rbac.not_auth_module')))
+        ) {
+            if (!\Rbac::AccessDecision()) {
                 //检查认证识别号
-                //未登录抛出错误并且跳转登录页
                 if (!Session::has(config('rbac.user_auth_key'))) {
                     //跳转到认证网关
-                    if (request()->isAjax()){
-                        ajax_return_adv_error("登录超时，请先登陆","","","current",url("Common/loginFrame"));
+                    if ($this->request->isAjax()) {
+                        return ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"));
                     } else {
-                        if(strtolower(request()->controller()) == 'index' && strtolower(request()->action()) == 'index'){
+                        if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
                             $this->redirect(config('rbac.user_auth_gateway'));
+                            return false;
                         } else {
-                            echo '<script>if(window.parent.frames.length == 0) window.location = "'.url('Common/login').'?callback='.urlencode(request()->url(true)).'"; else parent.login("'.url('Common/loginFrame').'");</script>';
+                            return '<script>if(window.parent.frames.length == 0) window.location = "' . url('Common/login') . '?callback=' . urlencode($this->request->url(true)) . '"; else parent.login("' . url('Common/loginFrame') . '");</script>';
                         }
                     }
-                    exit;
                 }
 
                 //已登录直接抛出错误
-                if (request()->isAjax()){
-                    ajax_return_adv_error('没有权限');
+                if ($this->request->isAjax()) {
+                    return ajax_return_adv_error('没有权限');
                 } else {
                     exception("没有权限");
                 }
@@ -49,29 +58,31 @@ class Controller extends \think\Controller{
         }
 
         //前置方法 tianpian <tianpian0805@gmail.com>
-        $before_action = "_before_".request()->action();
-        if(method_exists($this,$before_action)){
+        $before_action = "_before_" . $this->request->action();
+        if (method_exists($this, $before_action)) {
             $this->$before_action();
         }
     }
+
     /**
      * 首页
      * @return mixed
      */
-    public function index() {
+    public function index()
+    {
         $model = $this->_getModel();
 
         //列表过滤器，生成查询Map对象
         $map = $this->_search($model);
-        if ($this->isdelete !== false){
+        if ($this->isdelete !== false) {
             $map['isdelete'] = $this->isdelete;
         }
 
-        if (method_exists ( $this, '_filter' )) {
-            $this->_filter ( $map );
+        if (method_exists($this, '_filter')) {
+            $this->_filter($map);
         }
 
-        $this->_list ( $model, $map );
+        $this->_list($model, $map);
         return $this->fetch();
     }
 
@@ -79,7 +90,8 @@ class Controller extends \think\Controller{
      * 回收站
      * @return mixed
      */
-    public function recyclebin(){
+    public function recyclebin()
+    {
         $this->isdelete = 1;
         return $this->index();
     }
@@ -87,12 +99,13 @@ class Controller extends \think\Controller{
     /**
      * 自动搜索查询字段
      */
-    protected function _search($model){
+    protected function _search($model)
+    {
         //自动给模型字段过滤
         $map = [];
         $table_info = $model->getTableInfo();
-        foreach (input("param.") as $key => $val){
-            if ($val !== "" && in_array($key,$table_info['type'])) $map[$key] = $val;
+        foreach (input("param.") as $key => $val) {
+            if ($val !== "" && in_array($key, $table_info['type'])) $map[$key] = $val;
         }
         return $map;
     }
@@ -102,9 +115,10 @@ class Controller extends \think\Controller{
      * @param string $controller
      * @return \think\db\Query|\think\Model
      */
-    protected function _getModel($controller = ''){
+    protected function _getModel($controller = '')
+    {
         $controller = $this->_getRealController($controller);
-        if (class_exists("\\app\\".request()->module()."\\model\\{$controller}")){
+        if (class_exists("\\app\\" . $this->request->module() . "\\model\\{$controller}")) {
             return model($controller);
         } else {
             return db($controller);
@@ -112,20 +126,21 @@ class Controller extends \think\Controller{
     }
 
     /**
-    +----------------------------------------------------------
+     * +----------------------------------------------------------
      * 根据表单生成查询条件
      * 进行列表过滤
-    +----------------------------------------------------------
+     * +----------------------------------------------------------
      * @access protected
-    +----------------------------------------------------------
-     * @param object $model 数据对象
-     * @param array $map 过滤条件 $map['_table']可强制设置表名前缀,$map['_relation']可强制设置关联模型预载入(需在模型里定义),$map['_field']可强制设置字段,$map['_order_by']可强制设置排序字段(field asc|desc[,filed2 asc|desc...]或者false)
-     * @param string $field 查询的字段
+     * +----------------------------------------------------------
+     * @param object $model  数据对象
+     * @param array $map     过滤条件 $map['_table']可强制设置表名前缀,$map['_relation']可强制设置关联模型预载入(需在模型里定义),$map['_field']可强制设置字段,$map['_order_by']可强制设置排序字段(field asc|desc[,filed2 asc|desc...]或者false)
+     * @param string $field  查询的字段
      * @param string $sortBy 排序
-     * @param boolean $asc 是否正序
-    +----------------------------------------------------------
+     * @param boolean $asc   是否正序
+     *                       +----------------------------------------------------------
      */
-    protected function _list($model, $map, $field = '*',$sortBy = '', $asc = false) {
+    protected function _list($model, $map, $field = '*', $sortBy = '', $asc = false)
+    {
         //排序字段 默认为主键名
         $order = input('param._order') ?: (empty($sortBy) ? $model->getPk() : $sortBy);
 
@@ -136,49 +151,64 @@ class Controller extends \think\Controller{
         $listRows = input("param.numPerPage") ?: config("paginate.list_rows");
 
         //设置关联预载入
-        if (isset($map['_relation'])){
+        if (isset($map['_relation'])) {
             $model = $model::with($map['_relation']);
         }
 
         //设置字段
-        if (isset($map['_field'])){
+        if (isset($map['_field'])) {
             $field = $map['_field'];
         }
 
         //设置有$map['_controller']表示存在关联模型
-        if (isset($map['_table'])){
+        if (isset($map['_table'])) {
             //给排序字段强制加上表名前缀
-            if (strpos($order,".")===false){
-                $order = $map['_table'].".".$order;
+            if (strpos($order, ".") === false) {
+                $order = $map['_table'] . "." . $order;
             }
             //给字段强制加上表名前缀
-            $_field = is_array($field) ? $field : explode(",",$field);
-            foreach ($_field as &$v){
-                if (strpos($v,".")===false){
-                    $v = preg_replace("/([^\s\(\)]*[a-z0-9\*])/",$map['_table'].'.$1',$v,1);
+            $_field = is_array($field) ? $field : explode(",", $field);
+            foreach ($_field as &$v) {
+                if (strpos($v, ".") === false) {
+                    $v = preg_replace("/([^\s\(\)]*[a-z0-9\*])/", $map['_table'] . '.$1', $v, 1);
                 }
             }
-            $field = implode(",",$_field);
+            $field = implode(",", $_field);
         }
 
         //设置排序字段
         //防止表无主键报错
         $order_by = $order ? "{$order} {$sort}" : false;
-        if (isset($map['_order_by'])){
+        if (isset($map['_order_by'])) {
             $order_by = $map['_order_by'];
         }
 
         //删除设置属性的字段
-        unset($map['_table'],$map['_relation'],$map['_field'],$map['_order_by']);
+        unset($map['_table'], $map['_relation'], $map['_field'], $map['_order_by']);
 
         //分页查询
-        $list = $model->field($field)->where($map)->order($order_by)->paginate($listRows,false,['query' => input("get.")]);
+        $list = $model->field($field)->where($map)->order($order_by)->paginate($listRows, false, ['query' => input("get.")]);
 
         //模板赋值显示
-        $this->assign ( 'list', $list );
-        $this->assign ( "page", $list->render() );
-        $this->assign ( "count", $list->total() );
-        $this->assign ( 'numPerPage', $listRows );
+        $this->assign('list', $list);
+        $this->assign("page", $list->render());
+        $this->assign("count", $list->total());
+        $this->assign('numPerPage', $listRows);
+    }
+
+
+    /**
+     * 获取实际的控制器名称(应用于多层控制器的场景)
+     * @param $controller
+     * @return mixed
+     */
+    protected function _getRealController($controller = '')
+    {
+        if (!$controller) {
+            $controllers = explode(".", $this->request->controller());
+            $controller = array_pop($controllers);
+        }
+        return $controller;
     }
 
     /**
@@ -361,18 +391,5 @@ class Controller extends \think\Controller{
                 ajax_return_adv_error($error_msg);
             }
         }
-    }
-
-    /**
-     * 获取实际的控制器名称(应用于多层控制器的场景)
-     * @param $controller
-     * @return mixed
-     */
-    protected function _getRealController($controller = ''){
-        if (!$controller){
-            $controllers = explode(".",request()->controller());
-            $controller = array_pop($controllers);
-        }
-        return $controller;
     }
 }
