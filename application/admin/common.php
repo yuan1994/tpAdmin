@@ -314,7 +314,7 @@ function one_to_multi_array($arr, $length, $i = 0)
  */
 function password_hash_my($password)
 {
-    return hash("md5", $password);
+    return hash("md5", trim($password));
 }
 
 /**
@@ -334,11 +334,12 @@ function hashids($length = null, $salt = null, $alphabet = null)
  * @param array $header     Excel头部 ["COL1","COL2","COL3",...]
  * @param array $body       和头部长度相等字段查询出的数据就可以直接导出
  * @param null|string $name 文件名，不包含扩展名，为空默认为当前时间
+ * @param string|int $version 版本 2007|2003|ods|pdf
  * @return string
  */
-function export_excel($header, $body, $name = null)
+function export_excel($header, $body, $name = null, $version = '2007')
 {
-    return \Excel::export($header, $body, $name);
+    return \Excel::export($header, $body, $name, $version);
 }
 
 /**

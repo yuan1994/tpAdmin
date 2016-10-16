@@ -14,6 +14,7 @@
 namespace app\admin;
 
 use think\Session;
+use think\Db;
 
 class Controller extends \think\Controller
 {
@@ -25,36 +26,32 @@ class Controller extends \think\Controller
     {
         //用户ID
         defined('UID') or define('UID', Session::get('rbac.user_auth_key'));
-        // 用户权限检查
-        if (
-            config('rbac.user_auth_on')
-            &&
-            !in_array($this->request->module(), explode(',', config('rbac.not_auth_module')))
-        ) {
-            if (!\Rbac::AccessDecision()) {
-                //检查认证识别号
-                if (!Session::has(config('rbac.user_auth_key'))) {
-                    //跳转到认证网关
-                    if ($this->request->isAjax()) {
-                        return ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"));
-                    } else {
-                        if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
-                            $this->redirect(config('rbac.user_auth_gateway'));
-                            return false;
-                        } else {
-                            return '<script>if(window.parent.frames.length == 0) window.location = "' . url('Common/login') . '?callback=' . urlencode($this->request->url(true)) . '"; else parent.login("' . url('Common/loginFrame') . '");</script>';
-                        }
-                    }
-                }
 
-                //已登录直接抛出错误
-                if ($this->request->isAjax()) {
-                    return ajax_return_adv_error('没有权限');
+        //检查认证识别号
+        if (null === UID) {
+            //跳转到认证网关
+            if ($this->request->isAjax()) {
+                return ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"));
+            } else {
+                if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
+                    $this->redirect(config('rbac.user_auth_gateway'));
+
+                    return false;
                 } else {
+                    return '<script>if(window.parent.frames.length == 0) window.location = "' . url('Common/login') . '?callback=' . urlencode($this->request->url(true)) . '"; else parent.login("' . url('Common/loginFrame') . '");</script>';
+                }
+            }
+        } else {
+            // 用户权限检查
+            if (
+                config('rbac.user_auth_on')
+                &&
+                !in_array($this->request->module(), explode(',', config('rbac.not_auth_module')))
+            ) {
+                if (!\Rbac::AccessDecision()) {
                     exception("没有权限");
                 }
             }
-
         }
 
         //前置方法 tianpian <tianpian0805@gmail.com>
@@ -83,6 +80,7 @@ class Controller extends \think\Controller
         }
 
         $this->_list($model, $map);
+
         return $this->fetch();
     }
 
@@ -93,20 +91,23 @@ class Controller extends \think\Controller
     public function recyclebin()
     {
         $this->isdelete = 1;
+
         return $this->index();
     }
 
     /**
-     * 自动搜索查询字段
+     * 自动搜索查询字段,给模型字段过滤
      */
-    protected function _search($model)
+    protected function search($model)
     {
-        //自动给模型字段过滤
         $map = [];
         $table_info = $model->getTableInfo();
         foreach (input("param.") as $key => $val) {
-            if ($val !== "" && in_array($key, $table_info['type'])) $map[$key] = $val;
+            if ($val !== "" && in_array($key, $table_info['type'])) {
+                $map[$key] = $val;
+            }
         }
+
         return $map;
     }
 
@@ -115,31 +116,26 @@ class Controller extends \think\Controller
      * @param string $controller
      * @return \think\db\Query|\think\Model
      */
-    protected function _getModel($controller = '')
+    protected function getModel($controller = '')
     {
-        $controller = $this->_getRealController($controller);
+        $controller = $this->getRealController($controller);
         if (class_exists("\\app\\" . $this->request->module() . "\\model\\{$controller}")) {
             return model($controller);
         } else {
-            return db($controller);
+            return Db::name($controller);
         }
     }
 
     /**
-     * +----------------------------------------------------------
      * 根据表单生成查询条件
      * 进行列表过滤
-     * +----------------------------------------------------------
-     * @access protected
-     * +----------------------------------------------------------
      * @param object $model  数据对象
      * @param array $map     过滤条件 $map['_table']可强制设置表名前缀,$map['_relation']可强制设置关联模型预载入(需在模型里定义),$map['_field']可强制设置字段,$map['_order_by']可强制设置排序字段(field asc|desc[,filed2 asc|desc...]或者false)
      * @param string $field  查询的字段
      * @param string $sortBy 排序
      * @param boolean $asc   是否正序
-     *                       +----------------------------------------------------------
      */
-    protected function _list($model, $map, $field = '*', $sortBy = '', $asc = false)
+    protected function datalist($model, $map, $field = '*', $sortBy = '', $asc = false)
     {
         //排序字段 默认为主键名
         $order = input('param._order') ?: (empty($sortBy) ? $model->getPk() : $sortBy);
@@ -202,12 +198,13 @@ class Controller extends \think\Controller
      * @param $controller
      * @return mixed
      */
-    protected function _getRealController($controller = '')
+    protected function getRealController($controller = '')
     {
         if (!$controller) {
             $controllers = explode(".", $this->request->controller());
             $controller = array_pop($controllers);
         }
+
         return $controller;
     }
 
@@ -215,23 +212,24 @@ class Controller extends \think\Controller
      * 添加
      * @return mixed
      */
-    public function add($template = "edit") {
+    public function add($template = "edit")
+    {
         $module = request()->module();
-        $controller = $this->_getRealController();
+        $controller = $this->getRealController();
 
-        if (request()->isPost()){ //插入
+        if (request()->isPost()) { //插入
             $data = input("post.");
             unset($data['id']);
 
             //验证
-            if (class_exists("\\app\\{$module}\\validate\\{$controller}")){
+            if (class_exists("\\app\\{$module}\\validate\\{$controller}")) {
                 $validate = validate($controller);
-                if (!$validate->check($data)){
+                if (!$validate->check($data)) {
                     ajax_return_adv_error($validate->getError());
                 }
             }
             //写入数据
-            if (class_exists("\\app\\{$module}\\model\\{$controller}")){
+            if (class_exists("\\app\\{$module}\\model\\{$controller}")) {
                 //使用模型写入，可以在模型中定义更高级的操作
                 $model = model($controller);
                 $ret = $model->save($data);
@@ -240,7 +238,7 @@ class Controller extends \think\Controller
                 $model = db($controller);
                 $ret = $model->insert($data);
             }
-            if (!$ret){
+            if (!$ret) {
                 ajax_return_adv_error($model->getError());
             }
 
@@ -254,49 +252,51 @@ class Controller extends \think\Controller
      * 编辑
      * @return mixed
      */
-    public function edit() {
+    public function edit()
+    {
         $module = request()->module();
-        $controller = $this->_getRealController();
+        $controller = $this->getRealController();
 
-        if (request()->isPost()){ //更新
+        if (request()->isPost()) { //更新
             $data = input("post.");
-            if (!$data['id']){
+            if (!$data['id']) {
                 ajax_return_adv_error("缺少参数ID");
             }
 
             //验证
-            if (class_exists("\\app\\{$module}\\validate\\{$controller}")){
+            if (class_exists("\\app\\{$module}\\validate\\{$controller}")) {
                 $validate = validate($controller);
-                if (!$validate->check($data)){
+                if (!$validate->check($data)) {
                     ajax_return_adv_error($validate->getError());
                 }
             }
             //更新数据
-            if (class_exists("\\app\\{$module}\\model\\{$controller}")){
+            if (class_exists("\\app\\{$module}\\model\\{$controller}")) {
                 //使用模型更新，可以在模型中定义更高级的操作
                 $model = model($controller);
-                $ret = $model->isUpdate(true)->save($data,['id'=>$data['id']]);
+                $ret = $model->isUpdate(true)->save($data, ['id' => $data['id']]);
             } else {
                 //简单的直接使用db更新
                 $model = db($controller);
-                $ret = $model->where('id',$data['id'])->update($data);
+                $ret = $model->where('id', $data['id'])->update($data);
             }
-            if ($ret === false){
+            if ($ret === false) {
                 ajax_return_adv_error($model->getError());
             }
 
             ajax_return_adv("编辑成功");
         } else { //编辑
             $id = input("param.id");
-            if (!$id){
+            if (!$id) {
                 exception("缺少参数ID");
             }
             $vo = db($controller)->find($id);
-            if (!$vo){
+            if (!$vo) {
                 exception("缺少参数ID");
             }
 
-            $this->assign("vo",$vo);
+            $this->assign("vo", $vo);
+
             return $this->fetch();
         }
     }
@@ -304,21 +304,24 @@ class Controller extends \think\Controller
     /**
      * 默认删除操作
      */
-    public function delete() {
+    public function delete()
+    {
         $this->_update("isdelete", 1, $msg = "移动到回收站成功");
     }
 
     /**
      * 从回收站恢复
      */
-    public function recycle() {
+    public function recycle()
+    {
         $this->_update("isdelete", 0, $msg = "恢复成功");
     }
 
     /**
      * 默认禁用操作
      */
-    public function forbid() {
+    public function forbid()
+    {
         $this->_update("status", 0, $msg = "禁用成功");
     }
 
@@ -326,7 +329,8 @@ class Controller extends \think\Controller
     /**
      * 默认恢复操作
      */
-    public function resume() {
+    public function resume()
+    {
         $this->_update("status", 1, $msg = "恢复成功");
     }
 
@@ -334,11 +338,12 @@ class Controller extends \think\Controller
     /**
      * 永久删除
      */
-    public function deleteForever() {
+    public function deleteForever()
+    {
         $model = $this->_getModel();
         $ids = input("id");
-        $where["id"] = is_array($ids) ? array("in",explode(",",$ids)) : $ids;
-        if ($model->where($where)->delete() === false){
+        $where["id"] = is_array($ids) ? ["in", explode(",", $ids)] : $ids;
+        if ($model->where($where)->delete() === false) {
             ajax_return_adv_error($model->getError());
         }
         ajax_return_adv("删除成功");
@@ -347,10 +352,11 @@ class Controller extends \think\Controller
     /**
      * 清空回收站
      */
-    public function clear() {
+    public function clear()
+    {
         $model = $this->_getModel();
         $where["isdelete"] = 1;
-        if ($model->where($where)->delete() === false){
+        if ($model->where($where)->delete() === false) {
             ajax_return_adv_error($model->getError());
         }
         ajax_return_adv("清空回收站成功");
@@ -358,17 +364,18 @@ class Controller extends \think\Controller
 
     /**
      * 默认更新字段方法
-     * @param string $field 更新的字段
+     * @param string $field     更新的字段
      * @param string|int $value 更新的值
-     * @param string $msg 操作成功提示信息
-     * @param string $pk 主键，默认为id
-     * @param string $input 接收参数，默认为id
+     * @param string $msg       操作成功提示信息
+     * @param string $pk        主键，默认为id
+     * @param string $input     接收参数，默认为id
      */
-    protected function _update($field, $value, $msg = "操作成功", $pk = "id", $input = "id"){
+    protected function _update($field, $value, $msg = "操作成功", $pk = "id", $input = "id")
+    {
         $model = $this->_getModel();
         $ids = input($input);
-        $where[$pk] = array("in",$ids);
-        if ($model->where($where)->update([$field=>$value]) === false){
+        $where[$pk] = ["in", $ids];
+        if ($model->where($where)->update([$field => $value]) === false) {
             ajax_return_adv_error($model->getError());
         }
         ajax_return_adv($msg);
@@ -380,14 +387,15 @@ class Controller extends \think\Controller
      * @param string $error_msg
      * @param string $key
      */
-    protected function _filter_id($filter_array,$error_msg="该记录不能执行此操作",$key = "id"){
+    protected function _filter_id($filter_array, $error_msg = "该记录不能执行此操作", $key = "id")
+    {
         $data = input("param.");
-        if (!isset($data[$key])){
+        if (!isset($data[$key])) {
             ajax_return_adv_error("缺少必要参数");
         }
-        $ids = is_array($data[$key]) ? $data[$key] : explode(",",$data[$key]);
-        foreach ($ids as $id){
-            if(in_array($id,$filter_array)){
+        $ids = is_array($data[$key]) ? $data[$key] : explode(",", $data[$key]);
+        foreach ($ids as $id) {
+            if (in_array($id, $filter_array)) {
                 ajax_return_adv_error($error_msg);
             }
         }

@@ -34,7 +34,7 @@ class Rbac
      * 用于检测用户权限的方法,并保存到Session中
      * @param null $authId
      */
-    private static function saveAccessList($authId = null)
+    public static function saveAccessList($authId = null)
     {
         if (null === $authId) {
             $authId = session(config('rbac.user_auth_key'));
