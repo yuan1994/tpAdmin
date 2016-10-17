@@ -34,15 +34,17 @@ class ReadClass
         //遍历public方法
         foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
             if ($parents || (!$parents && $method->class == $class_name)) {
-                //根据phpDoc获取方法说明
-                $title = '';
-                $docComment = $method->getDocComment();
-                if ($docComment !== false) {
-                    $docCommentArr = explode("\n", $docComment);
-                    $comment = trim($docCommentArr[1]);
-                    $title = trim(substr($comment, strpos($comment, '*') + 1));
+                if (substr($method->name, 0, 2) != '__') {
+                    //根据phpDoc获取方法说明
+                    $title = '';
+                    $docComment = $method->getDocComment();
+                    if ($docComment !== false) {
+                        $docCommentArr = explode("\n", $docComment);
+                        $comment = trim($docCommentArr[1]);
+                        $title = trim(substr($comment, strpos($comment, '*') + 1));
+                    }
+                    $ret[] = ['name' => $method->name, 'title' => $title];
                 }
-                $ret[] = ['name' => $method->name, 'title' => $title];
             }
         }
         return $ret;

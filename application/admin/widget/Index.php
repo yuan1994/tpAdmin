@@ -19,7 +19,7 @@ class Index
     public function menu($list)
     {
         $html = "";
-        $generate = function ($list, $controller = "") use (&$html) {
+        $generate = function ($list, $controller = "") use (&$html, &$generate) {
             $html .= "<li>";
             if (isset($list['_child'])) {
                 $controller .= $list['name'] . ".";
@@ -27,7 +27,7 @@ class Index
                 $html .= '<ul class="sub-menu-list">';
                 foreach ($list['_child'] as $sub) {
                     // 递归调用
-                    $html .= call_user_func($generate, [$sub, $controller]);
+                    $html .= $generate($sub, $controller);
                 }
                 $html .= '</ul>';
             } else {
