@@ -491,7 +491,6 @@ class Loader
     /**
      * 字符串命名风格转换
      * type 0 将Java风格转换为C的风格 1 将C风格转换为Java的风格
-     * tianpian <tianpian0805@gmail.com> 修改，支持多级控制器
      * @param string  $name 字符串
      * @param integer $type 转换类型
      * @return string

@@ -59,10 +59,10 @@ class Index extends Controller{
         }
         $groups=db("AdminGroup")->where(array('id'=>array('in',$groups_id),'status'=>"1"))->order("sort asc,id asc")->field('id,name,icon')->select();
 
-        $this->assign('groups',$groups);
-        $this->assign('menu',$menu);
+        $this->view->assign('groups',$groups);
+        $this->view->assign('menu',$menu);
 
-        return $this->fetch();
+        return $this->view->fetch();
     }
 
     /**
@@ -75,20 +75,20 @@ class Index extends Controller{
             $last_login_ip = Session::get('last_login_ip');
             $last_login_loc = \Ip::find($last_login_ip);
 
-            $this->assign("last_login_ip",$last_login_ip);
-            $this->assign("last_login_loc",implode(" ",$last_login_loc));
+            $this->view->assign("last_login_ip",$last_login_ip);
+            $this->view->assign("last_login_loc",implode(" ",$last_login_loc));
 
         }
         $current_login_ip = request()->ip();
         $current_login_loc = \Ip::find($current_login_ip);
 
-        $this->assign("current_login_ip",$current_login_ip);
-        $this->assign("current_login_loc",implode(" ",$current_login_loc));
+        $this->view->assign("current_login_ip",$current_login_ip);
+        $this->view->assign("current_login_loc",implode(" ",$current_login_loc));
 
         //查询个人信息
         $info = db("AdminUser")->where("id",Session::get(config("rbac.user_auth_key")))->find();
-        $this->assign("info",$info);
+        $this->view->assign("info",$info);
 
-        return $this->fetch();
+        return $this->view->fetch();
     }
 }

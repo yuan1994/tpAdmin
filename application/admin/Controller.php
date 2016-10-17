@@ -13,20 +13,38 @@
 
 namespace app\admin;
 
+use think\Exception;
+use think\View;
+use think\Request;
 use think\Session;
 use think\Db;
 use think\Response;
 use think\Config;
 use think\Loader;
+use think\exception\HttpException;
 
-class Controller extends \think\Controller
+class Controller
 {
     use \app\admin\traits\controller\Controller;
 
-    protected $isdelete = 0; //是否删除标志，0-正常|1-删除|false-不包含该字段
+    // 视图类实例
+    protected $view;
+    // Request实例
+    protected $request;
+    // 黑名单方法，禁止访问某些方法
+    protected $blacklist = [];
+    // 是否删除标志，0-正常|1-删除|false-不包含该字段
+    protected $isdelete = 0;
 
-    protected function _initialize()
+    public function __construct()
     {
+        if (null === $this->view) {
+            $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
+        }
+        if (null === $this->request) {
+            $this->request = Request::instance();
+        }
+
         //用户ID
         defined('UID') or define('UID', Session::get(Config::get('rbac.user_auth_key')));
 
@@ -37,7 +55,7 @@ class Controller extends \think\Controller
                 ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"))->send();
             } else {
                 if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
-                    $this->redirect(Config::get('rbac.user_auth_gateway'));
+                    Response::create(Config::get('rbac.user_auth_gateway'), 'redirect')->send();
                 } else {
                     //判断是弹出登录框还是直接跳转到登录页
                     $ret = '<script>' .
@@ -61,6 +79,11 @@ class Controller extends \think\Controller
             }
         }
 
+        //黑名单方法
+        if ($this->blacklist && in_array($this->request->action(), $this->blacklist)) {
+            throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($this))->getName() . '->' . $this->request->action());
+        }
+
         //前置方法
         $before_action = "_before_" . $this->request->action();
         if (method_exists($this, $before_action)) {
@@ -82,20 +105,21 @@ class Controller extends \think\Controller
             $map['isdelete'] = $this->isdelete;
         }
 
-        if (method_exists($this, '_filter')) {
-            $this->_filter($map);
+        //自定义过滤器
+        if (method_exists($this, 'filter')) {
+            $this->filter($map);
         }
 
         $this->datalist($model, $map);
 
-        return $this->fetch();
+        return $this->view->fetch();
     }
 
     /**
      * 回收站
      * @return mixed
      */
-    public function recyclebin()
+    public function recycleBin()
     {
         $this->isdelete = 1;
 
@@ -121,15 +145,17 @@ class Controller extends \think\Controller
     /**
      * 获取模型
      * @param string $controller
-     * @return \think\db\Query|\think\Model
+     * @return mixed
      */
     protected function getModel($controller = '')
     {
-        $controller = $this->getRealController($controller);
-        if (class_exists("\\app\\admin\\model\\{$controller}")) {
-            return Loader::model($controller);
+        if (!$controller) {
+            $controller = $this->request->controller();
+        }
+        if (class_exists("\\app\\admin\\model\\" . $this->parseClass($controller))) {
+            return Loader::model($this->parseClass($controller));
         } else {
-            return Db::name($controller);
+            return Db::name($this->parseTable($controller));
         }
     }
 
@@ -195,10 +221,10 @@ class Controller extends \think\Controller
         $list = $model->field($field)->where($map)->order($order_by)->paginate($listRows, false, ['query' => input("get.")]);
 
         //模板赋值显示
-        $this->assign('list', $list);
-        $this->assign("page", $list->render());
-        $this->assign("count", $list->total());
-        $this->assign('numPerPage', $listRows);
+        $this->view->assign('list', $list);
+        $this->view->assign("page", $list->render());
+        $this->view->assign("count", $list->total());
+        $this->view->assign('numPerPage', $listRows);
     }
 
 
@@ -224,36 +250,47 @@ class Controller extends \think\Controller
      */
     public function add()
     {
-        $controller = $this->getRealController();
+        $controller = $this->request->controller();
 
-        if (request()->isPost()) { //插入
+        if (request()->isPost()) {
+            //插入
+
             $data = input("post.");
             unset($data['id']);
 
             //验证
             if (class_exists("\\app\\admin\\validate\\{$controller}")) {
-                $validate = validate($controller);
+                $validate = Loader::validate($controller);
                 if (!$validate->check($data)) {
                     return ajax_return_adv_error($validate->getError());
                 }
             }
-            //写入数据
-            if (class_exists("\\app\\admin\\model\\{$controller}")) {
-                //使用模型写入，可以在模型中定义更高级的操作
-                $model = model($controller);
-                $ret = $model->save($data);
-            } else {
-                //简单的直接使用db写入
-                $model = Db::name($controller);
-                $ret = $model->insert($data);
-            }
-            if (!$ret) {
-                return ajax_return_adv_error($model->getError());
-            }
 
-            return ajax_return_adv('添加成功');
-        } else { //添加
-            return $this->fetch('edit');
+            //写入数据
+            Db::startTrans();
+            try {
+                if (class_exists("\\app\\admin\\model\\{$controller}")) {
+                    //使用模型写入，可以在模型中定义更高级的操作
+                    $model = Loader::model($controller);
+                    $ret = $model->save($data);
+                } else {
+                    //简单的直接使用db写入
+                    $model = Db::name($this->parseTable($controller));
+                    $ret = $model->insert($data);
+                }
+                // 提交事务
+                Db::commit();
+
+                return ajax_return_adv('添加成功');
+            } catch (\Exception $e) {
+                // 回滚事务
+                Db::rollback();
+
+                return ajax_return_adv_error($e->getMessage());
+            }
+        } else {
+            //添加
+            return $this->view->fetch('edit');
         }
     }
 
@@ -263,9 +300,10 @@ class Controller extends \think\Controller
      */
     public function edit()
     {
-        $controller = $this->getRealController();
+        $controller = $this->request->controller();
 
-        if (request()->isPost()) { //更新
+        if (request()->isPost()) {
+            //更新
             $data = input("post.");
             if (!$data['id']) {
                 return ajax_return_adv_error("缺少参数ID");
@@ -273,39 +311,47 @@ class Controller extends \think\Controller
 
             //验证
             if (class_exists("\\app\\admin\\validate\\{$controller}")) {
-                $validate = validate($controller);
+                $validate = Loader::validate($controller);
                 if (!$validate->check($data)) {
                     return ajax_return_adv_error($validate->getError());
                 }
             }
-            //更新数据
-            if (class_exists("\\app\\admin\\model\\{$controller}")) {
-                //使用模型更新，可以在模型中定义更高级的操作
-                $model = model($controller);
-                $ret = $model->isUpdate(true)->save($data, ['id' => $data['id']]);
-            } else {
-                //简单的直接使用db更新
-                $model = Db::name($controller);
-                $ret = $model->where('id', $data['id'])->update($data);
-            }
-            if ($ret === false) {
-                return ajax_return_adv_error($model->getError());
-            }
 
-            return ajax_return_adv("编辑成功");
+            //更新数据
+            Db::startTrans();
+            try {
+                if (class_exists("\\app\\admin\\model\\{$controller}")) {
+                    //使用模型更新，可以在模型中定义更高级的操作
+                    $model = Loader::model($controller);
+                    $ret = $model->isUpdate(true)->save($data, ['id' => $data['id']]);
+                } else {
+                    //简单的直接使用db更新
+                    $model = Db::name($this->parseTable($controller));
+                    $ret = $model->where('id', $data['id'])->update($data);
+                }
+                // 提交事务
+                Db::commit();
+
+                return ajax_return_adv("编辑成功");
+            } catch (\Exception $e) {
+                // 回滚事务
+                Db::rollback();
+
+                return ajax_return_adv_error($e->getMessage());
+            }
         } else { //编辑
             $id = input("param.id");
             if (!$id) {
-                exception("缺少参数ID");
+                throw new Exception("缺少参数ID");
             }
-            $vo = Db::name($controller)->find($id);
+            $vo = $this->getModel($controller)->find($id);
             if (!$vo) {
-                abort(404, '该记录不存在');
+                throw new HttpException(404, '该记录不存在');
             }
 
-            $this->assign("vo", $vo);
+            $this->view->assign("vo", $vo);
 
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -349,8 +395,9 @@ class Controller extends \think\Controller
     public function deleteForever()
     {
         $model = $this->getModel();
-        $ids = input("id");
-        $where["id"] = is_array($ids) ? ["in", explode(",", $ids)] : $ids;
+        $pk = $model->getPk();
+        $ids = input($pk);
+        $where[$pk] = ["in", $ids];
         if ($model->where($where)->delete() === false) {
             return ajax_return_adv_error($model->getError());
         }
@@ -377,12 +424,18 @@ class Controller extends \think\Controller
      * @param string $field     更新的字段
      * @param string|int $value 更新的值
      * @param string $msg       操作成功提示信息
-     * @param string $pk        主键，默认为id
-     * @param string $input     接收参数，默认为id
+     * @param string $pk        主键，默认为主键
+     * @param string $input     接收参数，默认为主键
      */
-    protected function update($field, $value, $msg = "操作成功", $pk = "id", $input = "id")
+    protected function update($field, $value, $msg = "操作成功", $pk = "", $input = "")
     {
         $model = $this->getModel();
+        if (!$pk) {
+            $pk = $model->getPk();
+        }
+        if (!$input) {
+            $input = $model->getPk();
+        }
         $ids = input($input);
         $where[$pk] = ["in", $ids];
         if ($model->where($where)->update([$field => $value]) === false) {
@@ -394,21 +447,49 @@ class Controller extends \think\Controller
 
     /**
      * 过滤禁止操作某些主键
-     * @param $filter_array
-     * @param string $error_msg
+     * @param $filterData
+     * @param string $error
      * @param string $key
      */
-    protected function _filter_id($filter_array, $error_msg = "该记录不能执行此操作", $key = "id")
+    protected function filterId($filterData, $error = "该记录不能执行此操作", $key = "id")
     {
         $data = input("param.");
         if (!isset($data[$key])) {
-            return ajax_return_adv_error("缺少必要参数");
+            return ajax_return_adv_error("缺少必要参数")->send();
         }
         $ids = is_array($data[$key]) ? $data[$key] : explode(",", $data[$key]);
         foreach ($ids as $id) {
-            if (in_array($id, $filter_array)) {
-                return ajax_return_adv_error($error_msg);
+            if (in_array($id, $filterData)) {
+                return ajax_return_adv_error($error)->send();
             }
         }
+    }
+
+    /**
+     * 格式化表名，将 /. 转为 _ ，支持多级控制器
+     * @param string $name
+     * @return mixed
+     */
+    protected function parseTable($name = '')
+    {
+        if (!$name) {
+            $name = $this->request->controller();
+        }
+
+        return str_replace(['/', '.'], '_', $name);
+    }
+
+    /**
+     * 格式化类名，将 /. 转为 \\
+     * @param string $name
+     * @return mixed
+     */
+    protected function parseClass($name = '')
+    {
+        if (!$name) {
+            $name = $this->request->controller();
+        }
+
+        return str_replace(['/', '.'], '\\', $name);
     }
 }

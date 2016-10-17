@@ -152,7 +152,8 @@ class Controller
      * @param string $theme
      * @return $this
      */
-    protected function theme($theme = ''){
+    protected function theme($theme = '')
+    {
         $this->view->theme($theme);
         return $this;
     }

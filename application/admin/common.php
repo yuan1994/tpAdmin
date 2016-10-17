@@ -12,25 +12,7 @@
 //-------------------------
 
 use think\Session;
-
-/**
- * 调试打印函数
- * @param $string
- */
-function p($string, $func = null)
-{
-    echo '<pre>';
-    if ($func === null) {
-        if (is_bool($string) || is_null($string) || is_object($string)) {
-            var_dump($string);
-        } else {
-            print_r($string);
-        }
-    } else {
-        call_user_func($func, $string);
-    }
-    echo '</pre>';
-}
+use think\Response;
 
 /**
  * flash message
@@ -45,17 +27,17 @@ function p($string, $func = null)
 function flash($key, $value = false)
 {
     $prefix = 'flash_';
-    //判断是否存在flash message
+    // 判断是否存在flash message
     if ('?' == substr($key, 0, 1)) {
         return Session::has($prefix . substr($key, 1));
     } else {
         $flash_key = $prefix . $key;
         if (false === $value) {
-            //获取flash
+            // 获取flash
             $ret = Session::pull($flash_key);
             return null === $ret ? null : unserialize($ret);
         } else {
-            //设置flash
+            // 设置flash
             return Session::set($flash_key, serialize($value));
         }
     }
@@ -74,7 +56,9 @@ function sort_by($name, $field = '')
     $param['_sort'] = ($sort == 'asc' ? 'desc' : 'asc');
     $param['_order'] = $field;
     $url = url(request()->action(), $param);
-    return input('param._order') == $field ? "<a href='{$url}' title='点击排序' class='sorting-box sorting-{$sort}'>{$name}</a>" : "<a href='{$url}' title='点击排序' class='sorting-box sorting'>{$name}</a>";
+    return input('param._order') == $field ?
+        "<a href='{$url}' title='点击排序' class='sorting-box sorting-{$sort}'>{$name}</a>" :
+        "<a href='{$url}' title='点击排序' class='sorting-box sorting'>{$name}</a>";
 }
 
 /**
@@ -101,12 +85,15 @@ function show_status($status, $id, $field = 'id', $controller = '')
 {
     $controller === '' && $controller = request()->controller();
     switch ($status) {
+        // 恢复
         case 0 :
             $ret = '<a href="javascript:;" onclick="ajax_req(\'' . url($controller . '/resume', [$field => $id]) . '\',{},change_status,[this,\'resume\'])" class="label label-success radius" title="点击恢复">恢复</a>';
             break;
+        // 禁用
         case 1 :
             $ret = '<a href="javascript:;" onclick="ajax_req(\'' . url($controller . '/forbid', [$field => $id]) . '\',{},change_status,[this,\'forbid\'])" class="label label-warning radius" title="点击禁用">禁用</a>';
             break;
+        // 还原
         case -1 :
             $ret = '<a href="javascript:;" onclick="ajax_req(\'' . url($controller . '/recycle', [$field => $id]) . '\')" class="label label-secondary radius" title="点击还原">还原</a>';
             break;
@@ -165,7 +152,7 @@ function ajax_return_adv($msg = '操作成功', $alert = '', $close = false, $re
             'url'      => $url,
         ],
     ];
-    return json($ret);
+    return Response::create($ret, 'json');
 }
 
 /**
@@ -185,7 +172,7 @@ function ajax_return_adv_error($msg = '', $alert = '', $close = false, $redirect
 function ajax_return($data = [], $msg = "", $code = 0)
 {
     $ret = ["code" => $code, "msg" => $msg, "data" => $data];
-    return json($ret);
+    return Response::create($ret, 'json');
 }
 
 /**
@@ -348,7 +335,7 @@ function export_excel($header, $body, $name = null, $version = '2007')
  */
 function qiniu_token()
 {
-    return Qiniu::token();
+    return \Qiniu::token();
 }
 
 /**
