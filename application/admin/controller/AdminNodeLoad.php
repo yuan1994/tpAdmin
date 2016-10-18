@@ -12,13 +12,18 @@
 //-------------------------
 
 namespace app\admin\controller;
+
 use app\admin\Controller;
 
-class AdminNodeLoad extends Controller{
+class AdminNodeLoad extends Controller
+{
+    use \app\admin\traits\controller\Controller;
+
     protected $isdelete = false;
 
-    protected function _filter(&$map){
-        if (input("param.title")) $map['title'] = array("like","%".input("param.title")."%");
-        if (input("param.name")) $map['name'] = array("like","%".input("param.name")."%");
+    protected function filter(&$map)
+    {
+        if (input("param.title")) $map['title'] = ["like", "%" . input("param.title") . "%"];
+        if (input("param.name")) $map['name'] = ["like", "%" . input("param.name") . "%"];
     }
 }

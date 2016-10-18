@@ -13,24 +13,53 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use think\Loader;
 use think\Session;
 use think\Db;
+use think\Config;
+use think\Exception;
+use think\View;
+use think\Request;
 
-class Common extends Controller
+class Common
 {
+    use \traits\controller\Jump;
+
+    // 视图类实例
+    protected $view;
+    // Request实例
+    protected $request;
+
+    // 黑名单方法，禁止访问某
+
+    public function __construct()
+    {
+        if (null === $this->view) {
+            $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
+        }
+        if (null === $this->request) {
+            $this->request = Request::instance();
+        }
+
+        //用户ID
+        defined('UID') or define('UID', Session::get(Config::get('rbac.user_auth_key')));
+        //是否是管理员
+        defined('ADMIN') or define('ADMIN', true === Session::get(Config::get('rbac.admin_auth_key')));
+    }
+
     /**
      * 检查用户是否登录
      */
     protected function checkUser()
     {
-        if (!Session::has(config('rbac.user_auth_key'))) {
+        if (null === UID) {
             if ($this->request->isAjax()) {
-                return ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"));
+                ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"))->send();
             } else {
-                $this->error("登录超时，请先登录", config('rbac.user_auth_gateway'));
+                $this->error("登录超时，请先登录", Config::get('rbac.user_auth_gateway'));
             }
         }
+
         return true;
     }
 
@@ -40,10 +69,10 @@ class Common extends Controller
      */
     public function login()
     {
-        if (Session::has(config('rbac.user_auth_key'))) {
+        if (Session::has(Config::get('rbac.user_auth_key'))) {
             $this->redirect('Index/index');
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -53,7 +82,7 @@ class Common extends Controller
      */
     public function loginFrame()
     {
-        return $this->fetch();
+        return $this->view->fetch();
     }
 
     /**
@@ -70,11 +99,11 @@ class Common extends Controller
      */
     public function logout()
     {
-        if (Session::has(config('rbac.user_auth_key'))) {
+        if (UID) {
             Session::clear();
-            $this->success('登出成功！', config('rbac.user_auth_gateway'));
+            $this->success('登出成功！', Config::get('rbac.user_auth_gateway'));
         } else {
-            $this->error('已经登出！', config('rbac.user_auth_gateway'));
+            $this->error('已经登出！', Config::get('rbac.user_auth_gateway'));
         }
     }
 
@@ -108,7 +137,7 @@ class Common extends Controller
                 }
 
                 //生成session信息
-                Session::set(config('rbac.user_auth_key'), $auth_info['id']);
+                Session::set(Config::get('rbac.user_auth_key'), $auth_info['id']);
                 Session::set('user_name', $auth_info['account']);
                 Session::set('real_name', $auth_info['realname']);
                 Session::set('email', $auth_info['email']);
@@ -118,7 +147,7 @@ class Common extends Controller
 
                 //超级管理员标记
                 if ($auth_info['id'] == 1) {
-                    Session::set(config('rbac.admin_auth_key'), true);
+                    Session::set(Config::get('rbac.admin_auth_key'), true);
                 }
 
                 //保存登录信息
@@ -141,7 +170,7 @@ class Common extends Controller
                 return ajax_return_adv('登录成功！');
             }
         } else {
-            exception("非法请求");
+            throw new Exception("非法请求");
         }
     }
 
@@ -163,19 +192,19 @@ class Common extends Controller
 
             //查询旧密码进行比对
             $db = Db::name("AdminUser");
-            $info = $db->where("id", Session::get(config('rbac.user_auth_key')))->field("password")->find();
-            if ($info['password'] != password_hash_my(trim($data['oldpassword']))) {
+            $info = $db->where("id", UID)->field("password")->find();
+            if ($info['password'] != password_hash_my($data['oldpassword'])) {
                 return ajax_return_adv_error("旧密码错误");
             }
 
             //写入新密码
-            $password_hash = password_hash_my($data['password']);
-            if ($db->where("id", Session::get(config('rbac.user_auth_key')))->update(['password' => $password_hash]) === false) {
+            if (false === Loader::model('AdminUser')->updatePassword(UID, $data['password'])) {
                 return ajax_return_adv_error("密码修改失败");
             }
+
             return ajax_return_adv("密码修改成功");
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -187,15 +216,16 @@ class Common extends Controller
         $this->checkUser();
         if ($this->request->isPost()) { //修改资料
             $data = $this->request->only(['realname', 'email', 'mobile', 'remark'], 'post');
-            if (Db::name("AdminUser")->where("id", Session::get(config('rbac.user_auth_key')))->update($data) === false) {
+            if (Db::name("AdminUser")->where("id", UID)->update($data) === false) {
                 return ajax_return_adv_error("信息修改失败");
             }
+
             return ajax_return_adv("信息修改成功");
         } else { //查看用户信息
-            $vo = Db::name("AdminUser")->field('realname,email,mobile,remark')->where("id", Session::get(config('rbac.user_auth_key')))->find();
-            $this->assign('vo', $vo);
+            $vo = Db::name("AdminUser")->field('realname,email,mobile,remark')->where("id", UID)->find();
+            $this->view->assign('vo', $vo);
 
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 }

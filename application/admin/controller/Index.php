@@ -25,7 +25,7 @@ class Index extends Controller
     public function index()
     {
         //读取数据库模块列表生成菜单项
-        $nodes = Loader::model('AdminNode')->menu();
+        $nodes = Loader::model('AdminNode', 'logic')->getMenu();
 
         //节点转为树
         $tree_node = list_to_tree($nodes);

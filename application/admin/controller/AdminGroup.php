@@ -27,27 +27,27 @@ class AdminGroup extends Controller
     /**
      * 禁用限制
      */
-    protected function _before_forbid()
+    protected function beforeForbid()
     {
         //禁止禁用Admin模块,权限设置节点
-        $this->filterId([1, 2], '该记录不能被禁用');
+        $this->filterId([1, 2], '该分组不能被禁用');
     }
 
     /**
      * 删除限制
      */
-    protected function _before_delete()
+    protected function beforeDelete()
     {
         //禁止删除Admin模块,权限设置节点
-        $this->filterId([1, 2], '该节点不能被删除');
+        $this->filterId([1, 2], '该分组不能被删除');
     }
 
     /**
      * 永久删除限制
      */
-    protected function _before_foreverDelete()
+    protected function beforeForeverDelete()
     {
         //禁止删除Admin模块,权限设置节点
-        $this->filterId([1, 2], '该节点不能被删除');
+        $this->filterId([1, 2], '该分组不能被删除');
     }
 }

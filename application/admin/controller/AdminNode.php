@@ -33,19 +33,18 @@ class AdminNode extends Controller
         if (input("param.name")) $map['name'] = ["like", "%" . input("param.name") . "%"];
     }
 
-    protected function _before_index()
+    protected function beforeIndex()
     {
         $group_list = Loader::model('AdminGroup')->getList();
         $this->view->assign('group_list', reset_by_key($group_list, "id"));
     }
 
-    protected function _before_recycleBin()
+    protected function beforeRecycleBin()
     {
-        $group_list = Loader::model('AdminGroup')->getList();
-        $this->view->assign('group_list', reset_by_key($group_list, "id"));
+        $this->beforeIndex();
     }
 
-    protected function _before_add()
+    protected function beforeAdd()
     {
         //分组
         $group_list = Loader::model('AdminGroup')->getList();
@@ -58,6 +57,31 @@ class AdminNode extends Controller
         $this->view->assign('vo', $vo);
     }
 
+    protected function beforeEdit()
+    {
+        // 分组
+        $group_list = Loader::model('AdminGroup')->getList();
+        $this->view->assign('group_list', $group_list);
+    }
+
+    /**
+     * 禁用限制
+     */
+    protected function beforeForbid()
+    {
+        // 禁止禁用 Admin 模块,权限设置节点
+        $this->filterId([1, 2, 3, 4, 5, 6], '该记录不能被禁用');
+    }
+
+    /**
+     * 删除限制
+     */
+    protected function beforeDelete()
+    {
+        // 禁止删除 Admin 模块,权限设置节点
+        $this->filterId([1, 2, 3, 4, 5, 6], '该节点不能被删除');
+    }
+
     /**
      * 节点快速导入
      */
@@ -65,41 +89,13 @@ class AdminNode extends Controller
     {
         if ($this->request->isPost()) {
             $data = input("post.");
-            $validate = Loader::validate("AdminNode");
-            $insert_all = [];
-            $error = [];
-            $node_ids = isset($data['node']) ? $data['node'] : [];
-            $node_name = isset($data['node_name']) ? $data['node_name'] : [];
+
+            $node_template = isset($data['node']) ? $data['node'] : [];
+            $node_detect = isset($data['node_name']) ? $data['node_name'] : [];
             unset($data['node'], $data['node_name']);
-            // 有选择模板
-            if ($node_ids) {
-                $nodes = Db::name("AdminNodeLoad")->where("id", "in", $node_ids)->field("title,name")->select();
-                foreach ($nodes as $node) {
-                    $insert = array_merge($data, $node);
-                    // 数据校验
-                    if (!$validate->check($insert)) {
-                        $error[] = ["data" => $node, "error" => $validate->getError()];
-                        continue;
-                    }
-                    $insert_all[] = $insert;
-                }
-            }
-            // 有选择自动探测到的节点
-            if ($node_name) {
-                foreach ($node_name as $name) {
-                    list($data['name'], $data['title']) = explode("###", $name);
-                    // 数据校验
-                    if (!$validate->check($data)) {
-                        $error[] = ["data" => $data, "error" => $validate->getError()];
-                        continue;
-                    }
-                    $insert_all[] = $data;
-                }
-            }
-            //TODO 对两种方式产生重复数据的校验
-            if ($insert_all) {
-                Db::name("AdminNode")->insertAll($insert_all);
-            }
+
+            $error = Loader::model('AdminNode')->insertLoad($node_template, $node_detect, $data);
+
             if ($error) {
                 //拼接错误信息
                 $errormsg = "部分节点导入失败：";
@@ -149,30 +145,5 @@ class AdminNode extends Controller
 
             return $this->view->fetch();
         }
-    }
-
-    protected function _before_edit()
-    {
-        // 分组
-        $group_list = Loader::model('AdminGroup')->getList();
-        $this->view->assign('group_list', $group_list);
-    }
-
-    /**
-     * 禁用限制
-     */
-    protected function _before_forbid()
-    {
-        // 禁止禁用 Admin 模块,权限设置节点
-        $this->filterId([1, 2, 3, 4, 5, 6], '该记录不能被禁用');
-    }
-
-    /**
-     * 删除限制
-     */
-    protected function _before_delete()
-    {
-        // 禁止删除 Admin 模块,权限设置节点
-        $this->filterId([1, 2, 3, 4, 5, 6], '该节点不能被删除');
     }
 }

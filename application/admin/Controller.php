@@ -57,7 +57,7 @@ class Controller
         }
 
         //前置方法
-        $before_action = "_before_" . $this->request->action();
+        $before_action = "before" . ucfirst($this->request->action());
         if (method_exists($this, $before_action)) {
             $this->$before_action();
         }
