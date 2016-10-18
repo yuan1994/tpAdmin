@@ -41,6 +41,8 @@ class Controller
 
         //用户ID
         defined('UID') or define('UID', Session::get(Config::get('rbac.user_auth_key')));
+        //是否是管理员
+        defined('ADMIN') or define('ADMIN', true === Session::get(Config::get('rbac.admin_auth_key')));
 
         //检查认证识别号
         if (null === UID) {
