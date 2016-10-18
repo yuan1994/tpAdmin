@@ -7,27 +7,22 @@
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
 
-//------------------------
-// Common验证器
-//-------------------------
-
 namespace app\admin\validate;
+
 use think\Validate;
 
-class Common extends Validate{
+class Pub extends Validate
+{
     protected $rule = [
-        'account|帐号'  =>  'require',
-        'password|密码' =>  'require',
-        'password' =>  'email',
-    ];
-
-    protected $message = [
-        'name.require'  =>  '用户名必须',
-        'email' =>  '邮箱格式错误',
+        'account|帐号'      => 'require',
+        'password|密码'     => 'require',
+        'captcha|验证码'     => 'require|captcha',
+        'oldpassword|旧密码' => 'require',
+        'repassword|重复密码' => 'require',
     ];
 
     protected $scene = [
-        'add'   =>  ['name','email'],
-        'edit'  =>  ['email'],
+        'password' => ['password', 'oldpassword', 'repassword'],
+        'login'    => ['account', 'password', 'captcha'],
     ];
 }

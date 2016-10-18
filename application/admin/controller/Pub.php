@@ -21,7 +21,7 @@ use think\Exception;
 use think\View;
 use think\Request;
 
-class Common
+class Pub
 {
     use \traits\controller\Jump;
 
@@ -43,8 +43,6 @@ class Common
 
         //用户ID
         defined('UID') or define('UID', Session::get(Config::get('rbac.user_auth_key')));
-        //是否是管理员
-        defined('ADMIN') or define('ADMIN', true === Session::get(Config::get('rbac.admin_auth_key')));
     }
 
     /**
@@ -54,7 +52,7 @@ class Common
     {
         if (null === UID) {
             if ($this->request->isAjax()) {
-                ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"))->send();
+                ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("loginFrame"))->send();
             } else {
                 $this->error("登录超时，请先登录", Config::get('rbac.user_auth_gateway'));
             }
@@ -114,14 +112,10 @@ class Common
     public function checkLogin()
     {
         if ($this->request->isAjax() && $this->request->isPost()) {
-            $data = input("post.");
-            $result = $this->validate($data, [
-                'account|帐号'  => 'require',
-                'password|密码' => 'require',
-                'captcha|验证码' => 'require|captcha',
-            ]);
-            if ($result !== true) {
-                return ajax_return_adv_error($result);
+            $data = $this->request->post();
+            $validate = Loader::validate('Pub');
+            if (!$validate->scene('login')->check($data)) {
+                return ajax_return_adv_error($validate->getError());
             }
 
             $map['account'] = $data['account'];
@@ -132,7 +126,7 @@ class Common
             if (null === $auth_info) {
                 return ajax_return_adv_error('帐号不存在或已禁用！');
             } else {
-                if ($auth_info['password'] != password_hash_my($data['password'])) {
+                if ($auth_info['password'] != password_hash_tp($data['password'])) {
                     return ajax_return_adv_error('密码错误！');
                 }
 
@@ -140,10 +134,8 @@ class Common
                 Session::set(Config::get('rbac.user_auth_key'), $auth_info['id']);
                 Session::set('user_name', $auth_info['account']);
                 Session::set('real_name', $auth_info['realname']);
-                Session::set('email', $auth_info['email']);
                 Session::set('last_login_ip', $auth_info['last_login_ip']);
                 Session::set('last_login_time', $auth_info['last_login_time']);
-                Session::set('login_count', $auth_info['login_count']);
 
                 //超级管理员标记
                 if ($auth_info['id'] == 1) {
@@ -179,21 +171,16 @@ class Common
     {
         $this->checkUser();
         if ($this->request->isPost()) {
-            $data = input('post.');
+            $data = $this->request->post();
             //数据校验
-            $result = $this->validate($data, [
-                'oldpassword|旧密码' => 'require',
-                'password|新密码'    => 'require',
-                'repassword|重复密码' => 'require',
-            ]);
-            if ($result !== true) {
-                return ajax_return_adv_error($result);
+            $validate = Loader::validate('Pub');
+            if (!$validate->scene('password')->check($data)) {
+                return ajax_return_adv_error($validate->getError());
             }
 
             //查询旧密码进行比对
-            $db = Db::name("AdminUser");
-            $info = $db->where("id", UID)->field("password")->find();
-            if ($info['password'] != password_hash_my($data['oldpassword'])) {
+            $info = Db::name("AdminUser")->where("id", UID)->field("password")->find();
+            if ($info['password'] != password_hash_tp($data['oldpassword'])) {
                 return ajax_return_adv_error("旧密码错误");
             }
 

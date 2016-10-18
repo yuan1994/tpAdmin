@@ -16,7 +16,6 @@ namespace app\admin\controller;
 use app\admin\Controller;
 use think\Loader;
 use think\Session;
-use think\Config;
 use think\Db;
 
 class Index extends Controller

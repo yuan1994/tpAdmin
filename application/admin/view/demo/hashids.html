@@ -1,7 +1,7 @@
 {extend name="template/base" /}
 {block name="content"}
 <div class="page-container">
-    <form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>ID：</label>
             <div class="formControls col-xs-6 col-sm-6">
@@ -60,7 +60,7 @@ hashids($length=null,$salt=null,$alphabet=null)->decode($hashed_id); //助手函
 ```
 html代码：
 ```
-<form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+<form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
     <div class="row cl">
         <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>ID：</label>
         <div class="formControls col-xs-6 col-sm-6">

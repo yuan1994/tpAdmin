@@ -13,6 +13,7 @@ use think\Exception;
 use think\Db;
 use think\Loader;
 use think\exception\HttpException;
+use think\Config;
 
 trait Controller
 {
@@ -59,10 +60,10 @@ trait Controller
     {
         $controller = $this->request->controller();
 
-        if (request()->isPost()) {
+        if ($this->request->isPost()) {
             //插入
 
-            $data = input("post.");
+            $data = $this->request->post();
             unset($data['id']);
 
             //验证
@@ -109,9 +110,9 @@ trait Controller
     {
         $controller = $this->request->controller();
 
-        if (request()->isPost()) {
+        if ($this->request->isPost()) {
             //更新
-            $data = input("post.");
+            $data = $this->request->post();
             if (!$data['id']) {
                 return ajax_return_adv_error("缺少参数ID");
             }
@@ -147,7 +148,7 @@ trait Controller
                 return ajax_return_adv_error($e->getMessage());
             }
         } else { //编辑
-            $id = input("param.id");
+            $id = $this->request->param('id');
             if (!$id) {
                 throw new Exception("缺少参数ID");
             }
@@ -203,7 +204,7 @@ trait Controller
     {
         $model = $this->getModel();
         $pk = $model->getPk();
-        $ids = input($pk);
+        $ids = $this->request->param($pk);
         $where[$pk] = ["in", $ids];
         if ($model->where($where)->delete() === false) {
             return ajax_return_adv_error($model->getError());
@@ -235,7 +236,7 @@ trait Controller
      */
     protected function filterId($filterData, $error = '该记录不能执行此操作', $method = 'in_array', $key = 'id')
     {
-        $data = input("param.");
+        $data = $this->request->param();
         if (!isset($data[$key])) {
             ajax_return_adv_error("缺少必要参数")->send();
         }
@@ -280,15 +281,15 @@ trait Controller
     protected function datalist($model, $map, $field = '*', $sortBy = '', $asc = false)
     {
         //排序字段 默认为主键名
-        $order = input('param._order') ?: (empty($sortBy) ? $model->getPk() : $sortBy);
+        $order = $this->request->param('_order') ?: (empty($sortBy) ? $model->getPk() : $sortBy);
 
         //接受 sort参数 0 表示倒序 非0都 表示正序
-        $sort = input("param._sort") !== '' ?
-            (input("param._sort") == 'asc' ? 'asc' : 'desc') :
+        $sort = $this->request->param('_sort') !== '' ?
+            ($this->request->param('_sort') == 'asc' ? 'asc' : 'desc') :
             ($asc ? 'asc' : 'desc');
 
         //每页数据数量
-        $listRows = input("param.numPerPage") ?: config("paginate.list_rows");
+        $listRows = $this->request->param('numPerPage') ?: Config::get("paginate.list_rows");
 
         //设置关联预载入
         if (isset($map['_relation'])) {
@@ -327,7 +328,7 @@ trait Controller
         unset($map['_table'], $map['_relation'], $map['_field'], $map['_order_by']);
 
         //分页查询
-        $list = $model->field($field)->where($map)->order($order_by)->paginate($listRows, false, ['query' => input("get.")]);
+        $list = $model->field($field)->where($map)->order($order_by)->paginate($listRows, false, ['query' => $this->request->get()]);
 
         //模板赋值显示
         $this->view->assign('list', $list);

@@ -12,11 +12,13 @@
 //-------------------------
 
 namespace app\admin\validate;
+
 use think\Validate;
 
-class AdminRole extends Validate{
+class AdminRole extends Validate
+{
     protected $rule = [
-        "name|名称" => "require|unique:admin_role",
+        "name|名称"   => "require|unique:admin_role",
         "status|状态" => "require",
     ];
 }

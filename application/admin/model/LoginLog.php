@@ -12,11 +12,13 @@
 //-------------------------
 
 namespace app\admin\model;
+
 use think\Model;
 
-class LoginLog extends Model{
+class LoginLog extends Model
+{
     public function user()
     {
-        return $this->hasOne('AdminUser',"id","uid")->setAlias(["id"=>"uuid"]);
+        return $this->hasOne('AdminUser', "id", "uid")->setAlias(["id" => "uuid"]);
     }
 }

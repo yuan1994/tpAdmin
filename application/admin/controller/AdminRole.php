@@ -24,7 +24,7 @@ class AdminRole extends Controller
 
     protected function filter(&$map)
     {
-        if (input("param.name")) $map['name'] = ["like", "%" . input("param.name") . "%"];
+        if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
     }
 
     /**
@@ -32,7 +32,7 @@ class AdminRole extends Controller
      */
     public function user()
     {
-        $role_id = input("param.id/d");
+        $role_id = $this->request->param('id/d');
         if ($this->request->isPost()) { //提交
             if (!$role_id) {
                 return ajax_return_adv_error("缺少必要参数");
@@ -42,7 +42,7 @@ class AdminRole extends Controller
             //删除之前的角色绑定
             $db_role_user->where("role_id", $role_id)->delete();
             //写入新的角色绑定
-            $data = input("post.");
+            $data = $this->request->post();
             if (isset($data['user_id']) && !empty($data['user_id']) && is_array($data['user_id'])) {
                 $insert_all = [];
                 foreach ($data['user_id'] as $v) {
@@ -78,13 +78,13 @@ class AdminRole extends Controller
      */
     public function access()
     {
-        $role_id = input("param.id/d");
+        $role_id = $this->request->param('id/d');
         if ($this->request->isPost()) {
             if (!$role_id) {
                 return ajax_return_adv_error("缺少必要参数");
             }
 
-            if (true !== $error = Loader::model('AdminAccess', 'logic')->insertAccess($role_id, input('post.'))) {
+            if (true !== $error = Loader::model('AdminAccess', 'logic')->insertAccess($role_id, $this->request->post())) {
                 return ajax_return_adv_error($error);
             }
             return ajax_return_adv("权限分配成功");

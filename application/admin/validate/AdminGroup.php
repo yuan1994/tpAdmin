@@ -12,9 +12,11 @@
 //-------------------------
 
 namespace app\admin\validate;
+
 use think\Validate;
 
-class AdminGroup extends Validate{
+class AdminGroup extends Validate
+{
     protected $rule = [
         "name|分组名称" => "require|unique:admin_group",
     ];

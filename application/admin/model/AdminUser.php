@@ -25,7 +25,7 @@ class AdminUser extends Model
 
     protected function setPasswordAttr($value)
     {
-        return password_hash_my($value);
+        return password_hash_tp($value);
     }
 
     /**
@@ -33,6 +33,6 @@ class AdminUser extends Model
      */
     public function uploadPassword($uid, $password)
     {
-        return $this->where("id", $uid)->update(['password' => password_hash_my($password)]);
+        return $this->where("id", $uid)->update(['password' => password_hash_tp($password)]);
     }
 }

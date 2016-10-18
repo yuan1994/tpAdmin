@@ -28,10 +28,10 @@ class AdminUser extends Controller
         //不查询管理员
         $map['id'] = ["gt", 1];
 
-        if (input("param.realname")) $map['realname'] = ["like", "%" . input("param.realname") . "%"];
-        if (input("param.account")) $map['account'] = ["like", "%" . input("param.account") . "%"];
-        if (input("param.email")) $map['email'] = ["like", "%" . input("param.email") . "%"];
-        if (input("param.mobile")) $map['mobile'] = ["like", "%" . input("param.mobile") . "%"];
+        if ($this->request->param('realname')) $map['realname'] = ["like", "%" . $this->request->param('realname') . "%"];
+        if ($this->request->param('account')) $map['realname'] = ["like", "%" . $this->request->param('account') . "%"];
+        if ($this->request->param('email')) $map['realname'] = ["like", "%" . $this->request->param('email') . "%"];
+        if ($this->request->param('mobile')) $map['realname'] = ["like", "%" . $this->request->param('mobile') . "%"];
     }
 
     /**
@@ -39,14 +39,14 @@ class AdminUser extends Controller
      */
     public function password()
     {
-        $id = input("param.id/d");
+        $id = $this->request->param('id/d');
         if ($this->request->isPost()) {
             //禁止修改管理员的密码，管理员id为1
             if ($id < 2) {
                 return ajax_return_adv_error("缺少必要参数");
             }
 
-            $password = input("post.password");
+            $password = $this->request->post('password');
             if (!$password) {
                 return ajax_return_adv_error("密码不能为空");
             }

@@ -12,9 +12,11 @@
 //-------------------------
 
 namespace app\admin\validate;
+
 use think\Validate;
 
-class AdminNodeLoad extends Validate{
+class AdminNodeLoad extends Validate
+{
     protected $rule = [
         "name|节点名称" => "require|unique:admin_node_load",
     ];

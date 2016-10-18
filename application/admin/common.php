@@ -130,14 +130,14 @@ function get_status($status, $imageShow = true)
 /**
  * 框架内部默认ajax返回
  * @param string $msg      提示信息
+ * @param string $redirect 是否重定向
  * @param string $alert    父层弹框信息
  * @param bool $close      是否关闭当前层
- * @param string $redirect 是否重定向
  * @param string $url      重定向地址
  * @param string $data     附加数据
  * @param int $code        错误码
  */
-function ajax_return_adv($msg = '操作成功', $alert = '', $close = false, $redirect = '', $url = '', $data = '', $code = 0)
+function ajax_return_adv($msg = '操作成功', $redirect = 'parent', $alert = '', $close = false, $url = '', $data = '', $code = 0)
 {
     if (1 == $redirect) $redirect = 'current';
     if (2 == $redirect) $redirect = 'parent';
@@ -158,7 +158,7 @@ function ajax_return_adv($msg = '操作成功', $alert = '', $close = false, $re
 /**
  * 返回错误json信息
  */
-function ajax_return_adv_error($msg = '', $alert = '', $close = false, $redirect = '', $url = '', $data = '', $code = 1)
+function ajax_return_adv_error($msg = '', $code = 1, $redirect = '', $alert = '', $close = false, $url = '', $data = '')
 {
     return ajax_return_adv($msg, $alert, $close, $redirect, $url, $data, $code);
 }
@@ -254,52 +254,11 @@ function list_to_tree($list, $pk = 'id', $pid = 'pid', $child = '_child', $root 
 }
 
 /**
- * 将树递归成多维数组
- * @param array $tree               树
- * @param string $key               放入多维数组里的键名
- * @param string|array $key_default 默认值，如果是数组[VALUE]，则为当前数组子项的键名，如果是其他就是传入的值
- * @param string $key_child         子节点键名
- * @param null|string $callback     回调函数
- * @return array
- */
-function tree_to_multi_array($tree, $key = "name", $key_default = "id", $key_child = "_child", $callback = null)
-{
-    $return = [];
-    if (is_array($tree)) {
-        foreach ($tree as $v) {
-            $new_key = $callback === null ? $v[$key] : call_user_func($callback, $v[$key]);
-            $return[$new_key] = isset($v[$key_child]) ?
-                tree_to_multi_array($v[$key_child], $key, $key_default, $key_child, $callback) :
-                (is_array($key_default) ? $v[$key_default[0]] : $key_default);
-        }
-    }
-    return $return;
-}
-
-/**
- * 一维数组转多维数组
- * @param array $arr
- * @param int $length 数组长度
- * @param int $i      起始位置
- * @return array
- */
-function one_to_multi_array($arr, $length, $i = 0)
-{
-    $ret = [];
-    if ($i == $length - 1) {
-        $ret[$arr[$i]] = [];
-    } else {
-        $ret[$arr[$i]] = one_to_multi_array($arr, $length, $i + 1);
-    }
-    return $ret;
-}
-
-/**
  * 统一密码加密方式，如需变动直接修改此处
  * @param $password
  * @return string
  */
-function password_hash_my($password)
+function password_hash_tp($password)
 {
     return hash("md5", trim($password));
 }
@@ -369,7 +328,7 @@ function get_random($prefix = '')
  */
 function check_access($action = null, $controller = null, $module = null)
 {
-    return \Rbac::AccessDecision($module, $controller, $action);
+    return \Rbac::AccessCheck($action, $controller, $module);
 }
 
 /**

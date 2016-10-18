@@ -21,9 +21,11 @@ class AdminNodeLoad extends Controller
 
     protected $isdelete = false;
 
+    protected $blacklist = ['delete', 'recycle'];
+
     protected function filter(&$map)
     {
-        if (input("param.title")) $map['title'] = ["like", "%" . input("param.title") . "%"];
-        if (input("param.name")) $map['name'] = ["like", "%" . input("param.name") . "%"];
+        if ($this->request->param('title')) $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
+        if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
     }
 }

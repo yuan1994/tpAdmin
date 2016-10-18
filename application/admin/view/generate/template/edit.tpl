@@ -2,7 +2,7 @@
 {block name="nav"}{/block}
 {block name="content"}
 <div class="page-container">
-    <form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
         <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
 [ROWS]
         <div class="row cl">

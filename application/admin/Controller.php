@@ -10,6 +10,7 @@
 namespace app\admin;
 
 use think\Exception;
+use think\Url;
 use think\View;
 use think\Request;
 use think\Session;
@@ -48,7 +49,7 @@ class Controller
         if (null === UID) {
             $this->notLogin();
         } else {
-            $this->authError();
+            $this->auth();
         }
 
         //黑名单方法
@@ -70,7 +71,7 @@ class Controller
     {
         $map = [];
         $table_info = $model->getTableInfo();
-        foreach (input("param.") as $key => $val) {
+        foreach ($this->request->param() as $key => $val) {
             if ($val !== "" && in_array($key, $table_info['type'])) {
                 $map[$key] = $val;
             }
@@ -129,13 +130,13 @@ class Controller
         if (!$input) {
             $input = $model->getPk();
         }
-        $ids = input($input);
+        $ids = $this->request->param($input);
         $where[$pk] = ["in", $ids];
         if ($model->where($where)->update([$field => $value]) === false) {
             return ajax_return_adv_error($model->getError());
         }
 
-        return ajax_return_adv($msg);
+        return ajax_return_adv($msg, '');
     }
 
     /**
@@ -173,17 +174,17 @@ class Controller
     {
         //跳转到认证网关
         if ($this->request->isAjax()) {
-            ajax_return_adv_error("登录超时，请先登陆", "", "", "current", url("Common/loginFrame"))->send();
+            ajax_return_adv_error("登录超时，请先登陆", "", "", "current", Url::build("Pub/loginFrame"))->send();
         } else {
             if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
-                Response::create(Config::get('rbac.user_auth_gateway'), 'redirect')->send();
+                Response::create(Url::build('Pub/login'), 'redirect')->send();
             } else {
                 //判断是弹出登录框还是直接跳转到登录页
                 $ret = '<script>' .
                     'if(window.parent.frames.length == 0) ' .
-                    'window.location = "' . url('Common/login') . '?callback=' . urlencode($this->request->url(true)) . '";' .
+                    'window.location = "' . Url::build('Pub/login') . '?callback=' . urlencode($this->request->url(true)) . '";' .
                     ' else ' .
-                    'parent.login("' . url('Common/loginFrame') . '");' .
+                    'parent.login("' . Url::build('Pub/loginFrame') . '");' .
                     '</script>';
                 Response::create($ret)->send();
             }
@@ -191,16 +192,16 @@ class Controller
     }
 
     /**
-     * 权限校验失败
+     * 权限校验
      */
-    protected function authError()
+    protected function auth()
     {
         // 用户权限检查
         if (
             Config::get('rbac.user_auth_on') &&
             !in_array($this->request->module(), explode(',', Config::get('rbac.not_auth_module')))
         ) {
-            if (!\Rbac::AccessDecision()) {
+            if (!\Rbac::AccessCheck()) {
                 throw new Exception("没有权限");
             }
         }

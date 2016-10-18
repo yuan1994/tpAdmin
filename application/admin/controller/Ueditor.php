@@ -13,15 +13,21 @@
 
 namespace app\admin\controller;
 
+use think\Request;
+use think\Response;
+use think\Config;
+use think\Loader;
+use think\Db;
+
 class Ueditor
 {
     public function index()
     {
-        $action = input("param.action");
+        $action = Request::instance()->param('action');
         if (method_exists($this, $action)) {
             return $this->$action();
         } else {
-            return json(['state' => "请求地址出错"]);
+            return Response::create(['state' => "请求地址出错"], 'json');
         }
     }
 
@@ -30,7 +36,7 @@ class Ueditor
      */
     public function config()
     {
-        $img_url = config('qiniu.domain');
+        $img_url = Config::get('qiniu.domain');
         $config = [
             /* 上传图片配置项 */
             "imageActionName"         => "upload", /* 执行上传图片的action名称 */
@@ -55,7 +61,7 @@ class Ueditor
                 "localhost",
                 "img.baidu.com",
                 preg_replace("/^https?:\/\/(.*?)\/?$/", "$1", $img_url),
-                preg_replace("/^https?:\/\/(.*?)\/?$/", "$1", request()->domain()),
+                preg_replace("/^https?:\/\/(.*?)\/?$/", "$1", Request::instance()->domain()),
             ],
             "catcherActionName"       => "remote", /* 执行抓取远程图片的action名称 */
             "catcherFieldName"        => "source", /* 提交的图片列表表单名称 */
@@ -88,7 +94,7 @@ class Ueditor
             "imageManagerAllowFiles"  => [".png", ".jpg", ".jpeg", ".gif", ".bmp"], /* 列出的文件类型 */
         ];
 
-        return json_encode($config);
+        return Response::create($config, 'json');
     }
 
     /**
@@ -102,11 +108,10 @@ class Ueditor
 
         //保存图片到数据库
         if ($info) {
-            $model = model("File");
-            $domain = config('qiniu.domain');
+            $model = Loader::model("File");
             foreach ($info as $v) {
                 if (is_array($v)) {
-                    $model->insertRecord($v, $cate, $domain);
+                    $model->insertRecord($v, $cate);
                 }
             }
         }
@@ -116,7 +121,7 @@ class Ueditor
             $ret['state'] = "SUCCESS";
         }
 
-        return json($ret);
+        return Response::create($ret, 'json');
     }
 
     /**
@@ -143,17 +148,18 @@ class Ueditor
     public function listImage()
     {
         /* 获取参数 */
-        $size = input("param.size", 20, 'intval');
-        $start = input("param.start", 0, 'intval');
+        $size = Request::instance()->param('size/d', 20);
+        $start = Request::instance()->param('start/d', 0);
 
-        $model = db("File");
+        $model = Db::name("File");
         $count = $model->count("*");
-        if (!$count) { //$count为0
+        // $count 为 0
+        if (!$count) {
             $ret = [
                 "state" => "no match file",
                 "list"  => [],
-                "start" => $start,
-                "total" => $count,
+                "start" => intval($start),
+                "total" => intval($count),
             ];
         } else {
             $list = $model->field("`name` AS url,mtime")->limit($start, $size)->select();
@@ -161,12 +167,12 @@ class Ueditor
             $ret = [
                 "state" => "SUCCESS",
                 "list"  => $list,
-                "start" => $start,
+                "start" => intval($start),
                 "total" => intval($count),
             ];
         }
 
-        return json($ret);
+        return Response::create($ret, 'json');
     }
 
     /**
@@ -174,13 +180,12 @@ class Ueditor
      */
     public function remote()
     {
-        $sources = input("param.source");
+        $sources = Request::instance()->param('source');
 
         //遍历上传
         $ret["list"] = [];
         $upload = \Qiniu::instance();
-        $model = model("File");
-        $domain = config('qiniu.domain');
+        $model = Loader::model("File");
         foreach ($sources as $source) {
             $file_name = basename($source);
             $file_path = TEMP_PATH . $file_name;
@@ -194,7 +199,7 @@ class Ueditor
                 $ret['list'][] = ['state' => $error];
             } else {
                 //上传成功，将数据写入到本地数据库中
-                $model->insertRecord($info, 1, $domain);
+                $model->insertRecord($info, 1);
 
                 $ret['list'][] = [
                     'state'  => "SUCCESS",
@@ -206,6 +211,6 @@ class Ueditor
             unlink($file_path);
         }
 
-        return json($ret);
+        return Response::create($ret, 'json');
     }
 }

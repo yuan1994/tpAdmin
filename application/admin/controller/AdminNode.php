@@ -21,16 +21,14 @@ class AdminNode extends Controller
 {
     use \app\admin\traits\controller\Controller;
 
-    protected $blacklist = ['clear', 'deleteForever'];
-
     protected function filter(&$map)
     {
         if ($this->request->action() == 'index') {
-            $map['pid'] = input("param.pid", 0);
+            $map['pid'] = $this->request->param('pid', 0);
         }
 
-        if (input("param.title")) $map['title'] = ["like", "%" . input("param.title") . "%"];
-        if (input("param.name")) $map['name'] = ["like", "%" . input("param.name") . "%"];
+        if ($this->request->param('title')) $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
+        if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
     }
 
     protected function beforeIndex()
@@ -51,7 +49,7 @@ class AdminNode extends Controller
         $this->view->assign('group_list', $group_list);
 
         //父节点和层级
-        $node = Db::name("AdminNode")->where("id", input("param.pid/d"))->field("id,level")->find();
+        $node = Db::name("AdminNode")->where("id", $this->request->param('pid/d'))->field("id,level")->find();
         $vo['pid'] = $node['id'];
         $vo['level'] = intval($node['level']) + 1;
         $this->view->assign('vo', $vo);
@@ -83,18 +81,27 @@ class AdminNode extends Controller
     }
 
     /**
+     * 删除限制
+     */
+    protected function beforeDeleteForever()
+    {
+        // 禁止删除 Admin 模块,权限设置节点
+        $this->filterId([1, 2, 3, 4, 5, 6], '该节点不能被删除');
+    }
+
+    /**
      * 节点快速导入
      */
     public function load()
     {
         if ($this->request->isPost()) {
-            $data = input("post.");
+            $data = $this->request->post();
 
             $node_template = isset($data['node']) ? $data['node'] : [];
             $node_detect = isset($data['node_name']) ? $data['node_name'] : [];
             unset($data['node'], $data['node_name']);
 
-            $error = Loader::model('AdminNode')->insertLoad($node_template, $node_detect, $data);
+            $error = Loader::model('AdminNode', 'logic')->insertLoad($node_template, $node_detect, $data);
 
             if ($error) {
                 //拼接错误信息
@@ -102,8 +109,11 @@ class AdminNode extends Controller
                 foreach ($error as $err) {
                     $errormsg .= "<br>{$err['data']['title']}({$err['data']['name']})：{$err['error']}";
                 }
-                return ajax_return_adv_error($errormsg);
+                $errormsg .= "<p class='c-red'>请手动刷新页面</p>";
+
+                return ajax_return_adv('', '', $errormsg);
             }
+
             return ajax_return_adv("批量导入成功");
         } else {
             // 分组
@@ -112,7 +122,7 @@ class AdminNode extends Controller
 
             // 父节点和层级
             $db_node = Db::name("AdminNode");
-            $node = $db_node->where("id", input("param.pid/d"))->field("id,pid,name,level")->find();
+            $node = $db_node->where("id", $this->request->param('pid/d'))->field("id,pid,name,level")->find();
             $vo['pid'] = $node['id'];
             $vo['level'] = intval($node['level']) + 1;
             $this->view->assign('vo', $vo);

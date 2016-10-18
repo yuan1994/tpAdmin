@@ -13,8 +13,9 @@
 
 use think\exception\Handle;
 use think\exception\HttpException;
+use think\Request;
 
-class MyException extends Handle
+class TpException extends Handle
 {
     public function render(\Exception $e)
     {
@@ -23,9 +24,9 @@ class MyException extends Handle
             http_response_code($statusCode);
         }
         //可以在此交由系统处理
-        if (request()->isAjax()) {
+        if (Request::instance()->isAjax()) {
             $error_code = $this->getCode($e) ?: 1;
-            return ajax_return_adv_error($this->getMessage($e), '', false, '', '', '', $error_code);
+            return ajax_return_adv_error($this->getMessage($e), $error_code);
         }
         return parent::render($e);
     }

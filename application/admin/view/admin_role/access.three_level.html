@@ -2,7 +2,7 @@
 {block name="nav"}{/block}
 {block name="content"}
 <div class="page-container">
-    <form action="{:request()->baseUrl()}" method="post" id="form" style="padding-top: 50px">
+    <form action="{:\\think\\Request::instance()->baseUrl()}" method="post" id="form" style="padding-top: 50px">
         <input type="hidden" name="id" VALUE="{:input('param.id')}" />
         <div class="cl pd-5 bg-1 bk-gray pos-f" style="left: 20px;right: 20px;top: 20px;">
             <span class="l">

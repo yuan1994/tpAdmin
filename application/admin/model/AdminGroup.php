@@ -12,9 +12,11 @@
 //-------------------------
 
 namespace app\admin\model;
+
 use think\Model;
 
-class AdminGroup extends Model{
+class AdminGroup extends Model
+{
     // 开启自动写入时间戳字段
     protected $autoWriteTimestamp = 'int';
 

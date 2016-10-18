@@ -14,8 +14,6 @@
 namespace app\admin\model;
 
 use think\Model;
-use think\Db;
-use think\Config;
 
 class AdminNode extends Model
 {

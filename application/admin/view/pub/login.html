@@ -82,11 +82,12 @@
             ajaxPost:true,
             showAllError:true,
             callback:function(ret){
-                if (ret.status == 'n'){
-                    if (ret.info == '验证码错误!'){
+                if (ret.code){
+                    if (ret.msg == '验证码错误!'){
                         $("#captcha").click();
+                        $("[name='captcha']").val('');
                     }
-                    layer.alert(ret.info);
+                    layer.alert(ret.msg);
                 } else {
                     layer.msg("登录成功！");
                     location.href = '{:input("get.callback")?:url("Index/index")}';

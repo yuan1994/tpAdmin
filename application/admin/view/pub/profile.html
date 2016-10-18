@@ -2,7 +2,7 @@
 {block name="nav"}{/block}
 {block name="content"}
 <div class="page-container">
-    <form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>姓名：</label>
             <div class="formControls col-xs-6 col-sm-6">

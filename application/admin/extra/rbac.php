@@ -14,7 +14,7 @@ return [
     'user_auth_key'=>'auth_id',	// 用户认证SESSION标记
     'admin_auth_key'=>'administrator',
     'user_auth_model'=>'AdminUser',	// 默认验证数据表模型
-    'user_auth_gateway'=>'Common/login',	// 默认认证网关
+    'user_auth_gateway'=>'Pub/login',	// 默认认证网关
     'not_auth_controller'=>'',		// 默认无需认证模块
     'require_auth_controller'=>'',		// 默认需要认证模块
     'not_auth_action'=>'',		// 默认无需认证操作
