@@ -1,4 +1,4 @@
-<form class="mb-20" method="get" action="{:\\think\\Request::instance()->baseUrl()}">
+<form class="mb-20" method="get" action="{:\\think\\Url::build(\\think\\Request::instance()->action())}">
     <div class="select-box" style="width:250px">
         <select name="group_id" class="select">
             <option value="">分组不限</option>

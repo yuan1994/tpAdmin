@@ -13,6 +13,8 @@
 
 use think\Session;
 use think\Response;
+use think\Request;
+use think\Url;
 
 /**
  * flash message
@@ -51,12 +53,12 @@ function flash($key, $value = false)
  */
 function sort_by($name, $field = '')
 {
-    $sort = input('param._sort');
-    $param = input('get.');
+    $sort = Request::instance()->param('_sort');
+    $param = Request::instance()->get();
     $param['_sort'] = ($sort == 'asc' ? 'desc' : 'asc');
     $param['_order'] = $field;
-    $url = url(request()->action(), $param);
-    return input('param._order') == $field ?
+    $url = Url::build(Request::instance()->action(), $param);
+    return Request::instance()->param('_order') == $field ?
         "<a href='{$url}' title='点击排序' class='sorting-box sorting-{$sort}'>{$name}</a>" :
         "<a href='{$url}' title='点击排序' class='sorting-box sorting'>{$name}</a>";
 }
@@ -83,19 +85,19 @@ function high_light($string, $needle = '', $class = 'c-red')
  */
 function show_status($status, $id, $field = 'id', $controller = '')
 {
-    $controller === '' && $controller = request()->controller();
+    $controller === '' && $controller = Request::instance()->controller();
     switch ($status) {
         // 恢复
         case 0 :
-            $ret = '<a href="javascript:;" onclick="ajax_req(\'' . url($controller . '/resume', [$field => $id]) . '\',{},change_status,[this,\'resume\'])" class="label label-success radius" title="点击恢复">恢复</a>';
+            $ret = '<a href="javascript:;" onclick="ajax_req(\'' . Url::build($controller . '/resume', [$field => $id]) . '\',{},change_status,[this,\'resume\'])" class="label label-success radius" title="点击恢复">恢复</a>';
             break;
         // 禁用
         case 1 :
-            $ret = '<a href="javascript:;" onclick="ajax_req(\'' . url($controller . '/forbid', [$field => $id]) . '\',{},change_status,[this,\'forbid\'])" class="label label-warning radius" title="点击禁用">禁用</a>';
+            $ret = '<a href="javascript:;" onclick="ajax_req(\'' . Url::build($controller . '/forbid', [$field => $id]) . '\',{},change_status,[this,\'forbid\'])" class="label label-warning radius" title="点击禁用">禁用</a>';
             break;
         // 还原
         case -1 :
-            $ret = '<a href="javascript:;" onclick="ajax_req(\'' . url($controller . '/recycle', [$field => $id]) . '\')" class="label label-secondary radius" title="点击还原">还原</a>';
+            $ret = '<a href="javascript:;" onclick="ajax_req(\'' . Url::build($controller . '/recycle', [$field => $id]) . '\')" class="label label-secondary radius" title="点击还原">还原</a>';
             break;
     }
     return $ret;

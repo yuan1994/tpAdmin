@@ -16,6 +16,7 @@ namespace app\admin\controller;
 use think\Controller;
 use think\Db;
 use think\Exception;
+use think\Request;
 
 class Demo extends Controller
 {
@@ -41,7 +42,7 @@ class Demo extends Controller
      */
     public function download()
     {
-        if (input("param.file")) {
+        if ($this->request->param('file')) {
             return download("../build.php");
         } else {
             return $this->fetch();
@@ -54,8 +55,8 @@ class Demo extends Controller
      */
     public function download_image()
     {
-        if (request()->isPost()) {
-            $url = input("post.url");
+        if (Request::instance()->isPost()) {
+            $url = $this->request->post("url");
             if (substr($url, 0, 4) != "http") {
                 ajax_return_adv_error("url非法");
             }
@@ -64,7 +65,7 @@ class Demo extends Controller
             if (!$filename) {
                 ajax_return_adv_error($filename);
             } else {
-                $url = request()->domain() . substr($filename, 1);
+                $url = $this->request->domain() . substr($filename, 1);
                 ajax_return_adv("下载成功", "图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
             }
         } else {
@@ -78,8 +79,8 @@ class Demo extends Controller
      */
     public function mail()
     {
-        if (request()->isPost()) {
-            $receive = input("post.receiver");
+        if ($this->request->isPost()) {
+            $receive = $this->request->post("receiver");
             $result = $this->validate(
                 ['receiver' => $receive],
                 ['receiver|收件人' => 'require|email']
@@ -105,7 +106,7 @@ class Demo extends Controller
      */
     public function qiniu()
     {
-        if (request()->isPost()) {
+        if ($this->request->isPost()) {
             return '<script>parent.layer.alert("仅做演示")</script>';
             /*$result = \Qiniu::instance()->upload();
             p($result);*/
@@ -120,8 +121,8 @@ class Demo extends Controller
      */
     public function hashids()
     {
-        if (request()->isPost()) {
-            $id = input("post.id");
+        if ($this->request->isPost()) {
+            $id = $this->request->post("id");
             $hashids = hashids(8, "tpadmin");
             $encode_id = $hashids->encode($id); //加密
             $decode_id = $hashids->decode($encode_id); //解密

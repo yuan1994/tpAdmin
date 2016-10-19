@@ -124,7 +124,7 @@ class Generate
         if ($el) {
             $el .= '    <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>' . "\n";
         }
-        $content = '<form class="mb-20" method="get" action="{:url(request()->action())}">' . "\n" . $el . '</form>';
+        $content = '<form class="mb-20" method="get" action="{:\\think\\Url::build(\\think\\Request::instance()->action())}">' . "\n" . $el . '</form>';
         $file = APP_PATH . $this->module . "/view/" . $this->multi_controller_dir . $this->controller_lower . "/form.html";
 
         return file_put_contents($file, $content);

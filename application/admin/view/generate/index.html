@@ -8,7 +8,7 @@
 {/block}
 {block name="content"}
 <div class="page-container">
-    <form class="form form-horizontal" id="form" method="post" action="{:url('generate')}">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Url::build('generate')}">
         <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
         <div class="row cl">
             <label class="form-label col-xs-1"><span class="c-red">*</span>控制器：</label>

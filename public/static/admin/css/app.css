@@ -104,3 +104,7 @@ tr .check-box > div {
 .form-horizontal .form-label {
   text-align: right;
 }
+.Hui-aside .menu_dropdown li a.focus {
+  color: #148cf1;
+  background-color: #fafafa;
+}

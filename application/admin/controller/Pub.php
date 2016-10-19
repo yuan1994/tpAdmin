@@ -159,14 +159,16 @@ class Pub
                 // 缓存访问权限
                 \Rbac::saveAccessList();
 
-                return ajax_return_adv('登录成功！');
+                return ajax_return_adv('登录成功！', '');
             }
         } else {
             throw new Exception("非法请求");
         }
     }
 
-    // 修改密码
+    /**
+     * 修改密码
+     */
     public function password()
     {
         $this->checkUser();
@@ -189,7 +191,7 @@ class Pub
                 return ajax_return_adv_error("密码修改失败");
             }
 
-            return ajax_return_adv("密码修改成功");
+            return ajax_return_adv("密码修改成功", '');
         } else {
             return $this->view->fetch();
         }
@@ -207,7 +209,7 @@ class Pub
                 return ajax_return_adv_error("信息修改失败");
             }
 
-            return ajax_return_adv("信息修改成功");
+            return ajax_return_adv("信息修改成功", '');
         } else { //查看用户信息
             $vo = Db::name("AdminUser")->field('realname,email,mobile,remark')->where("id", UID)->find();
             $this->view->assign('vo', $vo);

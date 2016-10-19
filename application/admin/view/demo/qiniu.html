@@ -2,7 +2,7 @@
 {block name="content"}
 <div class="page-container">
     <iframe name="upload" style="display: none"></iframe>
-    <form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:\\think\\Request::instance()->baseUrl()}">
+    <form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:\\think\\Url::build(\\think\\Request::instance()->action())}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>图片：</label>
             <div class="formControls col-xs-6 col-sm-6">

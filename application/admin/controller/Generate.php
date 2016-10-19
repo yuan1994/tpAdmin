@@ -40,7 +40,7 @@ class Generate extends Controller
 
         $model->build();
         //Url::build方法有bug，url("one.two.Three")会生成 one.two._three的链接，正确的应该是one.two.three
-        $controllers = explode(".", input("post.controller_name"));
+        $controllers = explode(".", $this->request->post('controller_name'));
         $real_controller = array_pop($controllers);
         array_push($controllers, lcfirst($real_controller));
 
