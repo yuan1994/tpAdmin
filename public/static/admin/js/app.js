@@ -14,7 +14,7 @@ $(function () {
  * @param opt 选项 {w:WIDTH('800px|80%'),h:HEIGHT('600px|80%'),type:1|2,fn:CALLBACK(回调函数),confirm:BOOL(关闭弹层警告)}
  */
 function layer_open(title,url,opt){
-    if (typeof opt === "undefined") opt = {};
+    if (typeof opt === "undefined") opt = {nav:true};
     return layer.open({
         type: opt.type || 2,
         area: [opt.w || "80%", opt.h || "80%"],
@@ -33,6 +33,10 @@ function layer_open(title,url,opt){
                         layer.close(index);
                     });
                 });
+            }
+            //自动添加面包屑导航
+            if (true === opt.nav) {
+                layer.getChildFrame('#nav-title',index).html($('#nav-title').html()+' <span class="c-gray en">&gt;</span> '+$('.layui-layer-title').html());
             }
             if (typeof opt.fn === "function"){
                 opt.fn();

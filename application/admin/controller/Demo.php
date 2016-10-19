@@ -2,7 +2,9 @@
 // +----------------------------------------------------------------------
 // | tpadmin [a web admin based ThinkPHP5]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian
+// | Copyright (c) 2016 tianpian All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
@@ -58,15 +60,15 @@ class Demo extends Controller
         if (Request::instance()->isPost()) {
             $url = $this->request->post("url");
             if (substr($url, 0, 4) != "http") {
-                ajax_return_adv_error("url非法");
+                return ajax_return_adv_error("url非法");
             }
             $name = "./tmp/" . get_random();
             $filename = \File::downloadImage($url, $name);
             if (!$filename) {
-                ajax_return_adv_error($filename);
+                return  ajax_return_adv_error($filename);
             } else {
                 $url = $this->request->domain() . substr($filename, 1);
-                ajax_return_adv("下载成功", "图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
+                return ajax_return_adv("下载成功", "图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
             }
         } else {
             return $this->fetch();
@@ -86,14 +88,14 @@ class Demo extends Controller
                 ['receiver|收件人' => 'require|email']
             );
             if ($result !== true) {
-                ajax_return_adv_error($result);
+                return ajax_return_adv_error($result);
             }
             $html = "<p>这是一封来自tpadmin的测试邮件，请勿回复</p><p><br></p><p>该邮件由访问发送，本站不承担任何责任，如有骚扰请屏蔽此邮件地址</p>";
             $result = \Mail::instance()->mail($receive, $html, "测试邮件");
             if ($result !== true) {
-                ajax_return_adv_error($result);
+                return ajax_return_adv_error($result);
             } else {
-                ajax_return_adv("邮件发送成功，请注意查收");
+                return ajax_return_adv("邮件发送成功，请注意查收");
             }
         } else {
             return $this->fetch();
@@ -126,7 +128,7 @@ class Demo extends Controller
             $hashids = hashids(8, "tpadmin");
             $encode_id = $hashids->encode($id); //加密
             $decode_id = $hashids->decode($encode_id); //解密
-            ajax_return_adv("操作成功", '', false, '', '', ['encode' => $encode_id, 'decode' => $decode_id]);
+            return ajax_return_adv("操作成功", '', false, '', '', ['encode' => $encode_id, 'decode' => $decode_id]);
         } else {
             return $this->fetch();
         }

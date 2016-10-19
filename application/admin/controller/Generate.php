@@ -2,7 +2,9 @@
 // +----------------------------------------------------------------------
 // | tpadmin [a web admin based ThinkPHP5]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian
+// | Copyright (c) 2016 tianpian All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
@@ -15,6 +17,7 @@ namespace app\admin\controller;
 
 use think\Controller;
 use think\Loader;
+use think\Url;
 
 class Generate extends Controller
 {
@@ -34,8 +37,8 @@ class Generate extends Controller
     {
         $model = Loader::model('Generate');
         //检查目录是否可写
-        if (!$model->checkWritable()) {
-            return ajax_return_adv_error("目录没有权限不可写，请执行一下命令修改权限：<br>chmod -R 755 " . APP_PATH . $this->request->module());
+        if (!$model::checkWritable()) {
+            return ajax_return_adv_error("目录没有权限不可写，请执行一下命令修改权限：<br>chmod -R 755 " . realpath(APP_PATH . $this->request->module()));
         }
 
         $model->build();
@@ -44,7 +47,7 @@ class Generate extends Controller
         $real_controller = array_pop($controllers);
         array_push($controllers, lcfirst($real_controller));
 
-        ajax_return_adv('生成成功', '', false, '', '', ['action' => url(implode(".", $controllers) . "/index")]);
+        return ajax_return_adv('生成成功', '', false, '', '', ['action' => Url::build(implode(".", $controllers) . "/index")]);
 //        sleep(3);
 //        ajax_return_adv_error('错误信息');
     }

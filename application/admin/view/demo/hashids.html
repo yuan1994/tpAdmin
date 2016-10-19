@@ -99,7 +99,7 @@ javascript代码：
 ```
 php代码：
 ```
-$id = input("post.id");
+$id = \\think\\Request::instance()->post("id");
 $hashids = hashids(8,"tpadmin");
 $encode_id = $hashids->encode($id); //加密
 $decode_id = $hashids->decode($encode_id); //解密

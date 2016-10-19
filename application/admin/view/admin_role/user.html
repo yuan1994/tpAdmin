@@ -3,7 +3,7 @@
 {block name="content"}
 <div class="page-container">
     <form action="{:\\think\\Request::instance()->baseUrl()}" method="post" id="form" style="padding-top: 50px">
-        <input type="hidden" name="id" VALUE="{:input('param.id')}" />
+        <input type="hidden" name="id" VALUE="{:\\think\\Request::instance()->param('id')}" />
         <div class="cl pd-5 bg-1 bk-gray pos-f" style="left: 20px;right: 20px;top: 20px;">
             <span class="l">
                 <button type="button" class="btn btn-primary radius" onclick="$('#checkAll').click()">&nbsp;&nbsp;全选&nbsp;&nbsp;</button>

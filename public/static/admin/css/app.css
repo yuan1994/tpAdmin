@@ -108,3 +108,6 @@ tr .check-box > div {
   color: #148cf1;
   background-color: #fafafa;
 }
+#nav-title {
+  display: inline;
+}

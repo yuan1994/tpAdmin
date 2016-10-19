@@ -82,7 +82,7 @@ $("#form").Validform({
 ```
 php代码：
 ```
-$receive = input("post.receiver");
+$receive = \\think\\Request::instance()->post("receiver");
 $result = $this->validate(
     ['receiver' => $receive],
     ['receiver|收件人' => 'require|email']

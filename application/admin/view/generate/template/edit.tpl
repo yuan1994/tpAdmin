@@ -1,5 +1,4 @@
 {extend name="template/base" /}
-{block name="nav"}{/block}
 {block name="content"}
 <div class="page-container">
     <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">

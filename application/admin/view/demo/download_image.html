@@ -82,7 +82,7 @@ $("#form").Validform({
 ```
 php代码：
 ```
-$url = input("post.url");
+$url = \\think\\Request::instance()->post("url");
 if (substr($url,0,4) != "http"){
     ajax_return_adv_error("url非法");
 }
