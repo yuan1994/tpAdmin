@@ -52,7 +52,7 @@ class Generate
         // 分级控制器目录和命名空间
         if ($controllers) {
             $this->dir = strtolower(implode(DS, $controllers) . DS);
-            $this->namespace = strtolower(implode("\\", $controllers));
+            $this->namespace = "\\" . strtolower(implode("\\", $controllers));
         } else {
             $this->dir = "";
             $this->namespace = "";
@@ -95,7 +95,7 @@ class Generate
         $this->buildIndex($pathView);
         $this->buildEdit($pathView, $pathTemplate);
         $this->buildController($fileName, $pathTemplate);
-        $this->buildModel($fileName, $pathTemplate);
+        $this->buildModel($fileName, $pathTemplate, $tableName);
         $this->buildValidate($fileName, $pathTemplate);
         $this->buildTable($tableName);
     }
@@ -130,7 +130,7 @@ class Generate
             $path = APP_PATH . $this->module . DS . $dir;
             if (!is_dir($path)) {
                 // 创建目录
-                mkdir($path, 0755, true);
+                mkdir($path, 0777, true);
             }
         }
     }
@@ -356,7 +356,7 @@ class Generate
      * 创建模型文件
      * @return bool|int
      */
-    private function buildModel($fileName, $pathTemplate)
+    private function buildModel($fileName, $pathTemplate, $tableName)
     {
         if (isset($this->post['model']) && $this->post['model']) {
             //直接生成空模板
@@ -364,8 +364,8 @@ class Generate
             $file = str_replace('%NAME%', 'model', $fileName);
 
             return file_put_contents($file, str_replace(
-                    ["[TITLE]", "[NAME]", "[NAMESPACE]"],
-                    [$this->post['controller_title'], $this->name, $this->namespace],
+                    ["[TITLE]", "[NAME]", "[NAMESPACE]", "[TABLE]"],
+                    [$this->post['controller_title'], $this->name, $this->namespace, $tableName],
                     $template)
             );
         }
