@@ -10,7 +10,11 @@
         <div class="tabCon">
             <iframe style="display: none" frameborder="0" name="upload-iframe" id="upload-iframe"></iframe>
             <form class="form form-horizontal mt-30" id="upload-form" method="post" enctype="multipart/form-data" action="{:\\think\\Url::build('upload')}">
-                    <i class="Hui-iconfont Hui-iconfont-add3" style="font-size: 100px" id="upload-btn"></i>
+                    <div id="drag">
+                        <label for="file-input">
+                            <i class="Hui-iconfont Hui-iconfont-add3" style="font-size: 100px" id="upload-btn"></i>
+                        </label>
+                    </div>
                     <input type="file" accept="*/*" name="file" id="file-input" class="input-file" style="display: none">
                     <!--<input type="file" accept="*/*" name="file" id="file-input" class="input-file">-->
                         <!--<span class="btn-upload">
@@ -114,32 +118,61 @@
 
     $.fn.tpUpload = function (options) {
         var defaults = {
-            'url' : '',
-            'data' : {},
-            'progress' : function (file, loaded, total) {
-                
-            },
-            'success' : function (file, responseText) {
-                
-            },
-            'error' : function (file, responseText) {
-                
-            }
+            'url' : '', // 文件上传地址
+            'data' : {}, // 表单附加数据
+            'event' : 'change', // 触发上传的事件
+            'drag' : '', // 是否开启拖拽上传,开启传入拖拽框的选择器
+            'dragClass' : 'dragenter', // 拖拽上传拖拽框高亮样式
+            'start' : function (file) {}, // 开始上传事件
+            'progress' : function (loaded, total, file) {}, // 进度
+            'success' : function (responseText, file) {}, // 上传成功
+            'error' : function (responseText, file) {}, // 上传失败
+            'timeout' : function (responseText,file) {}, // 上传超时
+            'end' : function (file) {} // 上传完成
         };
         var settings = $.extend({},defaults,options);
         var $self = $(this);
         $self.on(settings.event||'change',function (e) {
             var file = e.target.files[0] || e.dataTransfer.files[0];
+            formData = buildData(file);
+            upload(formData,file);
+        });
+        if (settings.drag) {
+            var dragObj = $(settings.drag);
+            $("#drag");
+            dragObj.on('dragenter', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                $(this).addClass(settings.dragClass);
+            }).on('dragover', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                e.originalEvent.dataTransfer.dropEffect = 'copy';
+            }).on('drop', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                var file = e.originalEvent.dataTransfer.files[0];
+                formData = buildData(file);
+                upload(formData,file);
+                $(this).removeClass(settings.dragClass);
+            }).on('dragleave', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                $(this).removeClass(settings.dragClass);
+            });
+        }
+        function buildData(file) {
             var formData = new FormData();
             for (var key in settings.data) {
                 formData.append(key,settings.data.key);
             }
             formData.append('file',file);
-            upload(formData,file);
-        });
+            return formData;
+        }
         function upload(data,file) {
             var xhr = new XMLHttpRequest();
             if (xhr.upload) {
+                // 开始上传
                 xhr.upload.onloadstart = function (e) {
                     typeof settings.start == "function" && settings.start(file);
                 };
@@ -147,7 +180,6 @@
                 xhr.upload.onprogress = function(e) {
                     typeof settings.progress == "function" && settings.progress(e.loaded, e.total, file);
                 };
-
                 // 文件上传成功或是失败
                 xhr.onreadystatechange = function(e) {
                     if (xhr.readyState == 4) {
@@ -158,18 +190,18 @@
                         }
                     }
                 };
-
+                // 上传失败
                 xhr.onerror = function (e) {
                     typeof settings.error == "function" && settings.error(xhr.responseText,xhr.status, file);
                 };
-
+                // 上传超时
                 xhr.ontimeout = function(e) {
                     typeof settings.timeout == "function" && settings.timeout(xhr.responseText, file);
                 };
+                // 已上传
                 xhr.onloadend = function (e) {
                     typeof settings.end == "function" && settings.end(file);
-                }
-
+                };
                 // 开始上传
                 xhr.open("POST", settings.url, true);
                 xhr.send(data);
@@ -179,13 +211,12 @@
     $("#file-input").tpUpload({
         url : '{:\\think\\Url::build("upload")}',
         data : {a:'a'},
+        drag : '#drag',
         start : function () {
-            console.log('开始上传')
             layer_msg = layer.msg('已上传0.00%',{time:100000000});
         },
         progress : function (loaded, total, file) {
             $('.layui-layer-msg .layui-layer-content').html('已上传'+(loaded/total*100).toFixed(2)+'%');
-            console.log((loaded/total*100).toFixed(2)+'%');
         },
         success : function (ret) {
             console.log('success');
@@ -250,13 +281,6 @@
         },function (i) {
 
         });
-
-        $("#upload-btn").click(function () {
-            $("#file-input").click();
-        });
-        $("#file-input").change(function () {
-
-        })
     });
 
     /*var nums = 5; //每页出现的数量

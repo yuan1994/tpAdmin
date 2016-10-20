@@ -1,5 +1,11 @@
 @charset "utf-8";
 @main-color:#5a98de;
+@color-primary:#5a98de;
+@color-secondary:#3bb4f2;
+@color-success:#5eb95e;
+@color-warning:#f37b1d;
+@color-danger:#dd514c;
+@color-link:#0e90d2;
 @border-color:#dcdcdc;
 @border-color-menu:#bbb9bc;
 @text-gray:#888888;
@@ -160,5 +166,12 @@ tr .check-box > div{
       width: 100%;
       height: 100%;
     }
+  }
+}
+
+#drag{
+  border: 1px solid @border-color;
+  &.dragenter{
+    border-color: @color-success;
   }
 }
