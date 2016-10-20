@@ -180,6 +180,41 @@ function change_status(obj,type) {
 }
 
 /**
+ * 动态加载javascript或style文件
+ * @param src
+ * @param callback
+ * @param type
+ */
+function loadFile(src, callback, type) {
+    type = type || 'script';
+    var head = document.getElementsByTagName('head')[0];
+    if (type == 'script') {
+        var node = document.createElement('script');
+        node.type = 'text/javascript';
+        node.charset = 'UTF-8';
+        node.src = src;
+    } else {
+        var node = document.createElement('link');
+        node.rel = 'stylesheet';
+        node.href = src;
+    }
+
+    if (node.addEventListener) {
+        node.addEventListener('load', function () {
+            callback();
+        }, false);
+    } else if (node.attachEvent) {
+        node.attachEvent('onreadystatechange', function () {
+            var target = window.event.srcElement;
+            if (target.readyState == 'loaded') {
+                callback();
+            }
+        });
+    }
+    head.appendChild(node);
+}
+
+/**
  * 永久删除操作项
  * @param obj this
  * @param id 对象id

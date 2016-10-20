@@ -2,12 +2,17 @@
 {block name="content"}
 <div class="page-container">
     <div id="tab_upload" class="HuiTab">
-        <div class="tabBar cl"><span>本地上传</span><span>网络图片</span><span>历史图片</span></div>
+        <div class="tabBar cl">
+            <span>本地上传</span>
+            <span>网络图片</span>
+            <span>历史图片</span>
+        </div>
         <div class="tabCon">
             <iframe style="display: none" frameborder="0" name="upload-iframe" id="upload-iframe"></iframe>
             <form class="form form-horizontal mt-30" id="upload-form" method="post" enctype="multipart/form-data" action="{:\\think\\Url::build('upload')}">
-                    <i class="Hui-iconfont Hui-iconfont-add3" style="font-size: 100px"></i>
-                    <input type="file" accept="*/*" name="file_0" class="input-file" style="display: none">
+                    <i class="Hui-iconfont Hui-iconfont-add3" style="font-size: 100px" id="upload-btn"></i>
+                    <input type="file" accept="*/*" name="file" id="file-input" class="input-file" style="display: none">
+                    <!--<input type="file" accept="*/*" name="file" id="file-input" class="input-file">-->
                         <!--<span class="btn-upload">
   <a href="javascript:;" class="btn btn-primary radius"><i class="Hui-iconfont Hui-iconfont-upload"></i> 浏览文件</a>
   <input type="file" multiple name="file_0" class="input-file">
@@ -17,9 +22,9 @@
         <div class="tabCon">
             <div class="form form-horizontal mt-30">
                 <div class="formControls">
-                    <input type="text" class="input-text radius" style="width: 60%">
-                    <button class="btn btn-secondary radius ml-10" type="button">抓取</button>
-                    <button class="btn btn-primary radius ml-10" type="button">确定</button>
+                    <input type="text" class="input-text radius" id="remote-input" style="width: 60%">
+                    <button class="btn btn-secondary radius ml-10" type="button" id="crawl-btn">抓取</button>
+                    <button class="btn btn-primary radius ml-10" type="button" id="remote-btn">确定</button>
                 </div>
             </div>
         </div>
@@ -82,10 +87,12 @@
 {/block}
 {block name="style"}
 <link rel="stylesheet" href="__LIB__/viewer/jquery/viewer.min.css">
+<link rel="stylesheet" href="__LIB__/uploadify/uploadify.css">
 {/block}
 {block name="script"}
 <script src="__LIB__/laypage/1.3/laypage.js"></script>
 <script src="__LIB__/viewer/jquery/viewer.js"></script>
+<script src="__LIB__/uploadify/jquery.uploadify.js"></script>
 <script>
     jQuery.Mytab =function(tabBar,tabCon,class_name,tabEvent,i,callback,finished){
         var $tabBar=$(tabBar),$tabCon=$(tabCon);
@@ -104,18 +111,152 @@
             typeof callback === "function" && callback(index,$tabCon,$tabBar);
         });
     };
+
+    $.fn.tpUpload = function (options) {
+        var defaults = {
+            'url' : '',
+            'data' : {},
+            'progress' : function (file, loaded, total) {
+                
+            },
+            'success' : function (file, responseText) {
+                
+            },
+            'error' : function (file, responseText) {
+                
+            }
+        };
+        var settings = $.extend({},defaults,options);
+        var $self = $(this);
+        $self.on(settings.event||'change',function (e) {
+            var file = e.target.files[0] || e.dataTransfer.files[0];
+            var formData = new FormData();
+            for (var key in settings.data) {
+                formData.append(key,settings.data.key);
+            }
+            formData.append('file',file);
+            upload(formData,file);
+        });
+        function upload(data,file) {
+            var xhr = new XMLHttpRequest();
+            if (xhr.upload) {
+                xhr.upload.onloadstart = function (e) {
+                    typeof settings.start == "function" && settings.start(file);
+                };
+                // 上传中
+                xhr.upload.onprogress = function(e) {
+                    typeof settings.progress == "function" && settings.progress(e.loaded, e.total, file);
+                };
+
+                // 文件上传成功或是失败
+                xhr.onreadystatechange = function(e) {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            typeof settings.success == "function" && settings.success(xhr.responseText,file);
+                        } else {
+                            typeof settings.error == "function" && settings.error(xhr.responseText, xhr.status, file);
+                        }
+                    }
+                };
+
+                xhr.onerror = function (e) {
+                    typeof settings.error == "function" && settings.error(xhr.responseText,xhr.status, file);
+                };
+
+                xhr.ontimeout = function(e) {
+                    typeof settings.timeout == "function" && settings.timeout(xhr.responseText, file);
+                };
+                xhr.onloadend = function (e) {
+                    typeof settings.end == "function" && settings.end(file);
+                }
+
+                // 开始上传
+                xhr.open("POST", settings.url, true);
+                xhr.send(data);
+            }
+        }
+    };
+    $("#file-input").tpUpload({
+        url : '{:\\think\\Url::build("upload")}',
+        data : {a:'a'},
+        start : function () {
+            console.log('开始上传')
+            layer_msg = layer.msg('已上传0.00%',{time:100000000});
+        },
+        progress : function (loaded, total, file) {
+            $('.layui-layer-msg .layui-layer-content').html('已上传'+(loaded/total*100).toFixed(2)+'%');
+            console.log((loaded/total*100).toFixed(2)+'%');
+        },
+        success : function (ret) {
+            console.log('success');
+            console.log(ret);
+        },
+        error : function (ret) {
+            console.log('error');
+            console.log(ret);
+        },
+        end: function () {
+            layer.close(layer_msg)
+        }
+    });
+
+    /*$("#file-input").change(function (e) {
+        var files = e.target.files || e.dataTransfer.files;
+        console.log(files);
+        var formData = new FormData();
+        formData.append('file',files[0]);
+        $.ajax({
+            url: '{:\\think\\Url::build("upload")}',
+            type: 'POST',
+            data: formData,
+            dataType: 'JSON',
+            cache: false,
+            processData: false,
+            contentType: false,
+            success:function(ret){
+                console.log(ret);
+            }
+        });
+    });*/
+
+//    $("#file-input").uploadify({
+//        'fileObjName' : 'file',
+//        'buttonText' : '选择文件',
+//        'buttonCursor' : 'pointer',
+//        'multi' : false,
+//        'fileSizeLimit' : '5MB',
+//        'fileTypeExts' : '*.gif; *.jpg; *.png',
+//        'swf'      : '__LIB__/uploadify/uploadify.swf',
+//        'uploader' : '{:\\think\\Url::build("upload")}',
+//        'onUploadError' : function (file, errorCode, errorMsg, errorString) {
+//            layer.alert('文件'+file.name+'上传失败：'+errorString);
+//        },
+//        'onUploadSuccess' : function (file, ret, response) {
+//            console.log(arguments);
+//        },
+//        'onFallback' : function () {
+//            layer.alert('您的浏览器不支持文件上传')
+//        }
+//    });
 //    var view = $(".photo-list-btn").viewer();
     $(".photo-list").viewer();
     $(".photo-list-item").on("click",'.photo-list-btn',function () {
         $(this).parent().prev().click()
     });
     $(function () {
-        $.Mytab("#tab_upload .tabBar span","#tab_upload .tabCon","current","click","2",function (index,tabCon,tabBar) {
+        $.Mytab("#tab_upload .tabBar span","#tab_upload .tabCon","current","click","0",function (index,tabCon,tabBar) {
 //            console.log(index);
 //            console.log(tabCon.eq(index).html());
         },function (i) {
 
         });
+
+        $("#upload-btn").click(function () {
+            $("#file-input").click();
+        });
+        $("#file-input").change(function () {
+
+        })
     });
 
     /*var nums = 5; //每页出现的数量

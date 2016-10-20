@@ -19,4 +19,15 @@ class Upload extends Controller
     {
         return $this->view->fetch();
     }
+
+    public function upload()
+    {
+        $file = $this->request->file('file');
+        $info = $file->move('./tmp/uploads');
+        if ($info) {
+            return ajax_return_adv($info->getSaveName());
+        } else {
+            return ajax_return_adv_error($file->getError());
+        }
+    }
 }
