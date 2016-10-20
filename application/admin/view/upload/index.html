@@ -8,8 +8,7 @@
             <span>历史图片</span>
         </div>
         <div class="tabCon">
-            <iframe style="display: none" frameborder="0" name="upload-iframe" id="upload-iframe"></iframe>
-            <form class="form form-horizontal mt-30" id="upload-form" method="post" enctype="multipart/form-data" action="{:\\think\\Url::build('upload')}">
+            <div>
                     <div id="drag">
                         <label for="file-input">
                             <i class="Hui-iconfont Hui-iconfont-add3" style="font-size: 100px" id="upload-btn"></i>
@@ -21,7 +20,7 @@
   <a href="javascript:;" class="btn btn-primary radius"><i class="Hui-iconfont Hui-iconfont-upload"></i> 浏览文件</a>
   <input type="file" multiple name="file_0" class="input-file">
 </span>-->
-            </form>
+            </div>
         </div>
         <div class="tabCon">
             <div class="form form-horizontal mt-30">
@@ -162,6 +161,7 @@
             });
         }
         function buildData(file) {
+            //TODO filter
             var formData = new FormData();
             for (var key in settings.data) {
                 formData.append(key,settings.data.key);
@@ -208,7 +208,7 @@
             }
         }
     };
-    $("#file-input").tpUpload({
+    $("#file-input1").tpUpload({
         url : '{:\\think\\Url::build("upload")}',
         data : {a:'a'},
         drag : '#drag',
@@ -231,44 +231,34 @@
         }
     });
 
-    /*$("#file-input").change(function (e) {
-        var files = e.target.files || e.dataTransfer.files;
-        console.log(files);
-        var formData = new FormData();
-        formData.append('file',files[0]);
-        $.ajax({
-            url: '{:\\think\\Url::build("upload")}',
-            type: 'POST',
-            data: formData,
-            dataType: 'JSON',
-            cache: false,
-            processData: false,
-            contentType: false,
-            success:function(ret){
-                console.log(ret);
-            }
-        });
-    });*/
-
-//    $("#file-input").uploadify({
-//        'fileObjName' : 'file',
-//        'buttonText' : '选择文件',
-//        'buttonCursor' : 'pointer',
-//        'multi' : false,
-//        'fileSizeLimit' : '5MB',
-//        'fileTypeExts' : '*.gif; *.jpg; *.png',
-//        'swf'      : '__LIB__/uploadify/uploadify.swf',
-//        'uploader' : '{:\\think\\Url::build("upload")}',
-//        'onUploadError' : function (file, errorCode, errorMsg, errorString) {
-//            layer.alert('文件'+file.name+'上传失败：'+errorString);
-//        },
-//        'onUploadSuccess' : function (file, ret, response) {
-//            console.log(arguments);
-//        },
-//        'onFallback' : function () {
-//            layer.alert('您的浏览器不支持文件上传')
-//        }
-//    });
+    $("#file-input").uploadify({
+        'fileObjName' : 'file',
+        'buttonText' : '选择文件',
+        'buttonCursor' : 'pointer',
+        'multi' : false,
+        'fileSizeLimit' : '5MB',
+        'fileTypeExts' : '*.gif; *.jpg; *.png',
+        'swf'      : '__LIB__/uploadify/uploadify.swf',
+        'uploader' : '{:\\think\\Url::build("upload")}',
+        'onUploadError' : function (file, errorCode, errorMsg, errorString) {
+            layer.alert('文件'+file.name+'上传失败：'+errorString);
+        },
+        'onUploadSuccess' : function (file, ret, response) {
+            console.log(arguments);
+        },
+        'onFallback' : function () {
+//            layer.alert('您的浏览器不支持文件上传');
+            var iframe = $('<iframe style="display: none" name="tp-iframe-upload" />');
+            $(this).show().wrap('<form class="form form-horizontal mt-30" id="upload-form" method="post" target="tp-iframe-upload" enctype="multipart/form-data" action="{:\\think\\Url::build(\'upload\')}"></form>').parents('form').before(iframe);
+            $(this).change(function () {
+                $(this).parents('form').submit();
+            });
+            iframe.load(function () {
+                var data = $(this).contents().find('body').html();
+                console.log(data);
+            })
+        }
+    });
 //    var view = $(".photo-list-btn").viewer();
     $(".photo-list").viewer();
     $(".photo-list-item").on("click",'.photo-list-btn',function () {
