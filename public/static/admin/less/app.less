@@ -120,3 +120,45 @@ tr .check-box > div{
 #nav-title{
   display: inline;
 }
+
+// 文件上传图片浏览页
+.photo-list{
+  .photo-list-item{
+    position: relative;
+    display: inline-block;
+    width: 220px;
+    height: 220px;
+    margin: 5px;
+    &:hover .photo-mask{
+      display: block;
+    }
+    .photo-mask{
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,.3);
+      display: none;
+      .photo-list-btn{
+        position: relative;
+        top: 50%;
+        left: 35px;
+        padding: 5px 20px;
+        border: 1px solid #fff;
+        color: #fff;
+        &:hover,&:active,&:visited{
+          text-decoration: none;
+        }
+        &:hover{
+          background: #fff;
+          color: #000;
+        }
+      }
+    }
+    img{
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
