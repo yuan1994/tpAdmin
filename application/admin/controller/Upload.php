@@ -12,6 +12,7 @@
 namespace app\admin\controller;
 
 use app\admin\Controller;
+use think\Db;
 
 class Upload extends Controller
 {
@@ -20,14 +21,59 @@ class Upload extends Controller
         return $this->view->fetch();
     }
 
+    /**
+     * 文件上传
+     */
     public function upload()
     {
-        $file = $this->request->file('file');
-        $info = $file->move('./tmp/uploads');
-        if ($info) {
-            return ajax_return_adv($info->getSaveName());
-        } else {
-            return ajax_return_adv_error($file->getError());
+        $files = $this->request->file('file');
+        $insert = [];
+        foreach ($files as $file) {
+            $path = APP_PATH . '../public/tmp/uploads/';
+            $info = $file->move($path);
+            if ($info) {
+                $data[] = $info->getSaveName();
+                $insert[] = [
+                    'cate'     => 1,
+                    'name'     => '/tmp/uploads/' . $info->getSaveName(),
+                    'original' => $info->getInfo('name'),
+                    'domain'   => '',
+                    'type'     => $info->getInfo('type'),
+                    'size'     => $info->getInfo('size'),
+                    'mtime'    => time(),
+                ];
+            } else {
+                $error[] = $file->getError();
+            }
         }
+        Db::name('File')->insertAll($insert);
+
+        return ajax_return_adv($data);
+    }
+
+    /**
+     * 远程图片抓取
+     */
+    public function remote()
+    {
+        $url = $this->request->post('url');
+        // validate
+        $name = '/tmp/uploads/' . get_random();
+        $name = \File::downloadImage($url, $name);
+
+        return ajax_return(['url' => $name], '抓取成功');
+    }
+
+    /**
+     * 图片列表
+     */
+    public function listImage()
+    {
+        $page = $this->request->param('p', 1);
+        if ($this->request->param('count')) {
+            $ret['count'] = Db::name('File')->field('id,name,original')->count();
+        }
+        $ret['list'] = Db::name('File')->field('id,name,original')->page($page, 10)->select();
+        return ajax_return($ret);
     }
 }

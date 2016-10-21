@@ -79,7 +79,10 @@ class File
         }
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
         if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'tif', 'tiff'])) {
-            $ext = 'jpg';
+            $ext = pathinfo($url, PATHINFO_EXTENSION);
+            if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'tif', 'tiff'])) {
+                $ext = 'jpg';
+            }
             $filename = $filename . "." . $ext;
         }
 
@@ -100,15 +103,15 @@ class File
         }
 
         //保存文件
-        try {
+//        try {
             $fp2 = fopen($filename, 'w');
             fwrite($fp2, $img);
             fclose($fp2);
             return $filename;
-        } catch (\think\Exception $e) {
+        /*} catch (\think\Exception $e) {
             //TODO 异常处理
             return false;
-        }
+        }*/
     }
 
     /**

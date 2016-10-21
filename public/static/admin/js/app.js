@@ -156,6 +156,11 @@ function ajax_progress(data,callback,param){
             layer.msg(data.msg);
         }
         if (typeof callback == "function"){
+            if (typeof param != "undefined") {
+                param.unshift(data)
+            } else {
+                param = [data];
+            }
             callback.apply(this, param);
         }
     } else {
@@ -213,6 +218,33 @@ function loadFile(src, callback, type) {
     }
     head.appendChild(node);
 }
+
+/**
+ * 高级版 Tab 切换
+ * @param tabBar Tab 标签
+ * @param tabCon Tab 容器
+ * @param class_name 被选中标签class
+ * @param tabEvent 触发 Tab 切换的事件
+ * @param i 被激活索引
+ * @param callback 切换回调函数 callback(index,$tabCon,$tabBar)
+ * @param finished 初始化完成之后的回调函数 finished(index,$tabCon,$tabBar)
+ */
+jQuery.tpTab =function(tabBar,tabCon,class_name,tabEvent,i,callback,finished){
+    var $tabBar=$(tabBar),$tabCon=$(tabCon);
+    function chg(index) {
+        $tabBar.removeClass(class_name).eq(index).addClass(class_name);
+        $tabCon.hide().eq(index).show();
+    }
+    // 初始化操作
+    chg(i||0);
+    typeof finished === "function" && finished(i,$tabCon,$tabBar);
+
+    $tabBar.bind(tabEvent,function(){
+        var index=$tabBar.index(this);
+        chg(index);
+        typeof callback === "function" && callback(index,$tabCon,$tabBar);
+    });
+};
 
 /**
  * 永久删除操作项
