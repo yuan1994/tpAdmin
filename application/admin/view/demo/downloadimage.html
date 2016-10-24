@@ -46,9 +46,9 @@
 ---
 方法
 ```
-/File::downloadImage($url,$filename,$type=0);
+/File::downloadImage($url, $filename, $type=0);
 ```
-html代码：
+html 代码：
 ```
 <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
     <div class="row cl">
@@ -67,7 +67,7 @@ html代码：
     </div>
 </form>
 ```
-javascript代码：
+javascript 代码：
 ```
 $("#form").Validform({
     tiptype:2,
@@ -80,19 +80,19 @@ $("#form").Validform({
     }
 });
 ```
-php代码：
+php 代码：
 ```
-$url = \\think\\Request::instance()->post("url");
-if (substr($url,0,4) != "http"){
-    ajax_return_adv_error("url非法");
+$url = $this->request->post("url");
+if (substr($url, 0, 4) != "http") {
+    return ajax_return_adv_error("url非法");
 }
-$name = "./tmp/".get_random();
-$filename = \File::downloadImage($url,$name);
-if (!$filename){
-    ajax_return_adv_error($filename);
+$name = "./tmp/" . get_random();
+$filename = \File::downloadImage($url, $name);
+if (!$filename) {
+    return  ajax_return_adv_error($filename);
 } else {
-    $url = request()->domain().substr($filename,1);
-    ajax_return_adv("下载成功","图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
+    $url = $this->request->domain() . substr($filename, 1);
+    return ajax_return_adv("下载成功", '', "图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
 }
 ```
 </script>

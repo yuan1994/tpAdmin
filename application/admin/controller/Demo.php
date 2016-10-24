@@ -34,7 +34,7 @@ class Demo extends Controller
                 throw new Exception($error);
             }
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -45,9 +45,9 @@ class Demo extends Controller
     public function download()
     {
         if ($this->request->param('file')) {
-            return download("../build.php");
+            return \File::download("../build.php");
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -55,7 +55,7 @@ class Demo extends Controller
      * 下载远程图片
      * @return mixed
      */
-    public function download_image()
+    public function downloadImage()
     {
         if (Request::instance()->isPost()) {
             $url = $this->request->post("url");
@@ -65,13 +65,14 @@ class Demo extends Controller
             $name = "./tmp/" . get_random();
             $filename = \File::downloadImage($url, $name);
             if (!$filename) {
-                return  ajax_return_adv_error($filename);
+                return ajax_return_adv_error($filename);
             } else {
                 $url = $this->request->domain() . substr($filename, 1);
-                return ajax_return_adv("下载成功", "图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
+
+                return ajax_return_adv("下载成功", '', "图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
             }
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -93,13 +94,22 @@ class Demo extends Controller
             $html = "<p>这是一封来自tpadmin的测试邮件，请勿回复</p><p><br></p><p>该邮件由访问发送，本站不承担任何责任，如有骚扰请屏蔽此邮件地址</p>";
             $result = \Mail::instance()->mail($receive, $html, "测试邮件");
             if ($result !== true) {
-                return ajax_return_adv_error($result);
+                return ajax_return_adv_error(\Mail::instance()->getError());
             } else {
                 return ajax_return_adv("邮件发送成功，请注意查收");
             }
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
+    }
+
+    /**
+     * 百度编辑器
+     * @return mixed
+     */
+    public function ueditor()
+    {
+        return $this->view->fetch();
     }
 
     /**
@@ -113,7 +123,7 @@ class Demo extends Controller
             /*$result = \Qiniu::instance()->upload();
             p($result);*/
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -130,7 +140,7 @@ class Demo extends Controller
             $decode_id = $hashids->decode($encode_id); //解密
             return ajax_return_adv("操作成功", '', false, '', '', ['encode' => $encode_id, 'decode' => $decode_id]);
         } else {
-            return $this->fetch();
+            return $this->view->fetch();
         }
     }
 
@@ -139,7 +149,7 @@ class Demo extends Controller
      */
     public function layer()
     {
-        return $this->fetch();
+        return $this->view->fetch();
     }
 
     /**
@@ -147,6 +157,6 @@ class Demo extends Controller
      */
     public function table_fixed()
     {
-        return $this->fetch();
+        return $this->view->fetch();
     }
 }

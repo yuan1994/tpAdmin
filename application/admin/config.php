@@ -10,13 +10,13 @@
 // +----------------------------------------------------------------------
 
 return [
-    //模板参数替换
+    // 模板参数替换
     'view_replace_str' => [
         '__STATIC__' => '/static/admin',
         '__LIB__'    => '/static/admin/lib',
     ],
 
-    // 异常处理handle类 留空使用 \think\exception\Handle
+    // 异常处理 handle 类 留空使用 \think\exception\Handle
     'exception_handle' => '\\TpException',
 
     'template' => [
@@ -28,7 +28,7 @@ return [
         'view_suffix'     => '.html',
         // 预先加载的标签库
         'taglib_pre_load' => 'app\\admin\\taglib\\Tp',
-        //默认主题
+        // 默认主题
         'default_theme'   => '',
     ],
 ];

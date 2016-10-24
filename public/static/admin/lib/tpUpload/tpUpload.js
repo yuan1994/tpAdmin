@@ -151,7 +151,12 @@
                     xhr.onreadystatechange = function (e) {
                         if (xhr.readyState == 4) {
                             if (xhr.status == 200) {
-                                typeof settings.success == "function" && settings.success(xhr.responseText);
+                                try {
+                                    var jsonData = JSON.parse(xhr.responseText);
+                                } catch(e){
+                                    throw '请返回json格式的数据';
+                                }
+                                typeof settings.success == "function" && settings.success(jsonData);
                             } else {
                                 typeof settings.error == "function" && settings.error(xhr.responseText, xhr.status);
                             }
@@ -197,7 +202,12 @@
                 // 取回数据用text
                 var data = $(this).contents().find('body').text();
                 $(this).contents().find('body').html('');
-                typeof settings.success == "function" && settings.success(data);
+                try {
+                    var jsonData = JSON.parse(xhr.responseText);
+                } catch(e){
+                    throw '请返回json格式的数据';
+                }
+                typeof settings.success == "function" && settings.success(jsonData);
                 typeof settings.end == "function" && settings.end();
                 $self.val('');
                 $self.find("[type='file']").val('');

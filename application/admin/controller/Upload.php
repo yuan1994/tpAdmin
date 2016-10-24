@@ -48,7 +48,7 @@ class Upload extends Controller
         }
         Db::name('File')->insertAll($insert);
 
-        return ajax_return_adv($data);
+        return ajax_return($data);
     }
 
     /**
@@ -58,7 +58,7 @@ class Upload extends Controller
     {
         $url = $this->request->post('url');
         // validate
-        $name = '/tmp/uploads/' . get_random();
+        $name = APP_PATH . '../public/tmp/uploads/' . get_random();
         $name = \File::downloadImage($url, $name);
 
         return ajax_return(['url' => $name], '抓取成功');

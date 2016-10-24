@@ -1,6 +1,7 @@
 {extend name="template/base" /}
 {block name="content"}
 <div class="page-container">
+    <input type="hidden" id="callbackId" value="{:\\think\\Request::instance()->param('id')}">
     <div id="tab_upload" class="HuiTab">
         <div class="tabBar cl">
             <span>本地上传</span>
@@ -28,57 +29,7 @@
             </div>
         </div>
         <div class="tabCon">
-            <div class="photo-list mt-30">
-                <div class="photo-list-item">
-                    <img src="/tmp/1.jpg" class="photo-sub" alt="图片1" title="图片1">
-                    <div class="photo-mask">
-                        <a class="photo-list-btn photo-list-preview radius" href="javascript:;" src="/tmp/1.jpg">预览</a>
-                        <a class="photo-list-btn radius" href="#">选择</a>
-                    </div>
-                </div>
-                <div class="photo-list-item">
-                    <img src="/tmp/2.jpg" class="photo-sub" alt="图片1" title="图片1">
-                    <div class="photo-mask">
-                        <a class="photo-list-btn photo-list-preview radius" href="javascript:;" src="/tmp/1.jpg">预览</a>
-                        <a class="photo-list-btn radius" href="#">选择</a>
-                    </div>
-                </div>
-                <div class="photo-list-item">
-                    <img src="/tmp/3.jpg" class="photo-sub" alt="图片1" title="图片1">
-                    <div class="photo-mask">
-                        <a class="photo-list-btn photo-list-preview radius" href="javascript:;" src="/tmp/1.jpg">预览</a>
-                        <a class="photo-list-btn radius" href="#">选择</a>
-                    </div>
-                </div>
-                <div class="photo-list-item">
-                    <img src="/tmp/4.jpg" class="photo-sub" alt="图片1" title="图片1">
-                    <div class="photo-mask">
-                        <a class="photo-list-btn photo-list-preview radius" href="javascript:;" src="/tmp/1.jpg">预览</a>
-                        <a class="photo-list-btn radius" href="#">选择</a>
-                    </div>
-                </div>
-                <div class="photo-list-item">
-                    <img src="/tmp/5.jpg" class="photo-sub" alt="图片1" title="图片1">
-                    <div class="photo-mask">
-                        <a class="photo-list-btn photo-list-preview radius" href="javascript:;" src="/tmp/1.jpg">预览</a>
-                        <a class="photo-list-btn radius" href="#">选择</a>
-                    </div>
-                </div>
-                <div class="photo-list-item">
-                    <img src="/tmp/6.jpg" class="photo-sub" alt="图片1" title="图片1">
-                    <div class="photo-mask">
-                        <a class="photo-list-btn photo-list-preview radius" href="javascript:;" src="/tmp/1.jpg">预览</a>
-                        <a class="photo-list-btn radius" href="#">选择</a>
-                    </div>
-                </div>
-                <div class="photo-list-item">
-                    <img src="/tmp/7.jpg" class="photo-sub" alt="图片1" title="图片1">
-                    <div class="photo-mask">
-                        <a class="photo-list-btn photo-list-preview radius" href="javascript:;" src="/tmp/1.jpg">预览</a>
-                        <a class="photo-list-btn radius" href="#">选择</a>
-                    </div>
-                </div>
-            </div>
+            <div class="photo-list mt-30"></div>
             <div class="photo-page" id="photo-page"></div>
         </div>
     </div>
@@ -107,14 +58,16 @@
      console.log(arguments);
      },
      'onFallback' : function () {
-     layer.alert('您的浏览器不支持文件上传');
+     layer.alert('您的浏览器不支持Flash文件上传');
      }
      });*/
     $(function () {
+        var callbackId = $("#callbackId").val();
         // Tab 切换
-        $.tpTab("#tab_upload .tabBar span", "#tab_upload .tabCon", "current", "click", "2", function (index, tabCon, tabBar) {
-//            console.log(index);
-//            console.log(tabCon.eq(index).html());
+        $.tpTab("#tab_upload .tabBar span", "#tab_upload .tabCon", "current", "click", "0", function (index, tabCon, tabBar) {
+            if (index == 2 && tabCon.eq(index).find('.photo-list').html() == '') {
+                getListImage({p:p,'count':'1'});
+            }
         }, function (i) {
 
         });
@@ -124,21 +77,19 @@
             data: {a: 'a'},
             drag: '#drag',
             start: function () {
-                layer_msg = layer.msg('已上传0.00%', {time: 100000000});
+                layer_msg = layer.msg('正在上传中…', {time: 100000000});
             },
             progress: function (loaded, total, file) {
                 $('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
             },
             success: function (ret) {
-                console.log('success');
-                console.log(ret);
+                callback(callbackId,ret.data[0]);
             },
             error: function (ret) {
-                console.log('error');
-                console.log(ret);
+                layer.alert(ret);
             },
             end: function () {
-                layer.close(layer_msg)
+                layer.close(layer_msg);
             }
         });
 
@@ -154,7 +105,7 @@
             });
         }).on('click', '#remote-btn', function () {
             var url = $("#remote-input").val();
-            // TODO
+            callback(callbackId,url);
         });
 
         // 已上传图片列表
@@ -162,9 +113,10 @@
         var p = location.hash.replace('#!p=', '') || 1;
         var pages = 0;
         var photo_index = null;
-        getListImage({p:p,'count':'1'});
         $(".photo-list").on("click",'.photo-list-btn',function () {
-            $(this).parent().prev().click()
+            $(this).parent().prev().click();
+        }).on("click", '.photo-list-select', function () {
+            callback(callbackId, $(this).parent().prev().attr('data-src'))
         });
 
         function getListImage(param) {
@@ -181,10 +133,10 @@
                     for(var i in ret.data.list) {
                         var current = ret.data.list[i];
                         html += '<div class="photo-list-item">'
-                                + '<img src="'+current.name+'" class="photo-sub" alt="'+current.original+'" title="'+current.original+'">'
+                                + '<img src="'+current.name+'" data-src="'+current.name+'" class="photo-sub" alt="'+current.original+'" title="'+current.original+'">'
                                 + '<div class="photo-mask">'
                                 + '<a class="photo-list-btn photo-list-preview radius" href="javascript:;">预览</a>'
-                                + '<a class="photo-list-btn photo-list-select radius ml-10" href="#">选择</a>'
+                                + '<a class="photo-list-btn photo-list-select radius ml-10" href="javascript:;">选择</a>'
                                 + '</div>'
                                 + '</div>';
                     }
@@ -210,9 +162,19 @@
             });
         }
     });
-    
+
+    /**
+     * 数据回调
+     * @param id
+     * @param value
+     */
     function callback(id,value) {
-        parent.document.getElementById(id).value = value;
+        if (window.parent.frames.length == 0){
+            layer.alert('请在弹层中打开此页');
+        } else {
+            parent.document.getElementById(id).value = value;
+            layer_close();
+        }
     }
 
 </script>

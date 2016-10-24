@@ -38,7 +38,7 @@ class Generate extends Controller
         $model = Loader::model('Generate');
         //检查目录是否可写
         if (!$model::checkWritable()) {
-            return ajax_return_adv_error("目录没有权限不可写，请执行一下命令修改权限：<br>sudo chmod -R 777 " . realpath(APP_PATH . $this->request->module()));
+            return ajax_return_adv_error("目录没有权限不可写，请执行一下命令修改权限：<br>chmod -R 755 " . realpath(APP_PATH . $this->request->module()));
         }
 
         $model->build();

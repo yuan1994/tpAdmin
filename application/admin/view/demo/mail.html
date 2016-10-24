@@ -46,9 +46,9 @@
 ---
 方法
 ```
-/Mail::instance()->mail($receive, $content, $subject = 'No Subject');
+\Mail::instance()->mail($receive, $content, $subject = 'No Subject');
 ```
-html代码：
+html 代码：
 ```
 <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
     <div class="row cl">
@@ -67,7 +67,7 @@ html代码：
     </div>
 </form>
 ```
-javascript代码：
+javascript 代码：
 ```
 $("#form").Validform({
     tiptype:2,
@@ -80,22 +80,22 @@ $("#form").Validform({
     }
 });
 ```
-php代码：
+php 代码：
 ```
-$receive = \\think\\Request::instance()->post("receiver");
+$receive = $this->request->post("receiver");
 $result = $this->validate(
     ['receiver' => $receive],
     ['receiver|收件人' => 'require|email']
 );
-if ($result !== true){
-    ajax_return_adv_error($result);
+if ($result !== true) {
+    return ajax_return_adv_error($result);
 }
 $html = "<p>这是一封来自tpadmin的测试邮件，请勿回复</p><p><br></p><p>该邮件由访问发送，本站不承担任何责任，如有骚扰请屏蔽此邮件地址</p>";
-$result = \Mail::instance()->mail($receive,$html,"测试邮件");
-if ($result !== true){
-    ajax_return_adv_error($result);
+$result = \Mail::instance()->mail($receive, $html, "测试邮件");
+if ($result !== true) {
+    return ajax_return_adv_error(\Mail::instance()->getError());
 } else {
-    ajax_return_adv("邮件发送成功，请注意查收");
+    return ajax_return_adv("邮件发送成功，请注意查收");
 }
 ```
 </script>

@@ -39,7 +39,7 @@ function layer_open(title,url,opt){
                 layer.getChildFrame('#nav-title',index).html($('#nav-title').html()+' <span class="c-gray en">&gt;</span> '+$('.layui-layer-title').html());
             }
             if (typeof opt.fn === "function"){
-                opt.fn();
+                opt.fn(layero,index);
             }
         }
     });

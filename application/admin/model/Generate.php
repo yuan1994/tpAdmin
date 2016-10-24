@@ -130,7 +130,7 @@ class Generate
             $path = APP_PATH . $this->module . DS . $dir;
             if (!is_dir($path)) {
                 // 创建目录
-                mkdir($path, 0777, true);
+                mkdir($path, 0755, true);
             }
         }
     }
