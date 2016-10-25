@@ -53,7 +53,9 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script>
     $(function () {
+        /* 单选按钮组初始化选中状态，可以设定默认值 */
         $("[name='status'][value='{:isset($vo.status)?$vo.status:'1'}']").attr("checked",true);
+        /* 下拉框初始化选中状态，可以设定默认值 */
         $("[name='select']").find("[value='{:isset($vo.select)?$vo.select:''}']").attr("selected",true);
 
         $('.skin-minimal input').iCheck({

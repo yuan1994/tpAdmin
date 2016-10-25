@@ -16,6 +16,9 @@ use think\Db;
 
 class Upload extends Controller
 {
+    /**
+     * 首页
+     */
     public function index()
     {
         return $this->view->fetch();
@@ -74,6 +77,7 @@ class Upload extends Controller
             $ret['count'] = Db::name('File')->where('cate=3')->count();
         }
         $ret['list'] = Db::name('File')->where('cate=3')->field('id,name,original')->page($page, 10)->select();
+
         return ajax_return($ret);
     }
 }

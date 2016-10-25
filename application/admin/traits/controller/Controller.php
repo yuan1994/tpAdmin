@@ -29,8 +29,8 @@ trait Controller
 
         //列表过滤器，生成查询Map对象
         $map = $this->search($model);
-        if (self::$isdelete !== false) {
-            $map['isdelete'] = self::$isdelete;
+        if ($this::$isdelete !== false) {
+            $map['isdelete'] = $this::$isdelete;
         }
 
         //自定义过滤器
@@ -49,7 +49,7 @@ trait Controller
      */
     public function recycleBin()
     {
-        self::$isdelete = 1;
+        $this::$isdelete = 1;
 
         return $this->index();
     }

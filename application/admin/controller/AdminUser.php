@@ -55,7 +55,7 @@ class AdminUser extends Controller
             if (false === Loader::model('AdminUser')->uploadPassword($id, $password)) {
                 return ajax_return_adv_error("密码修改失败");
             }
-            return ajax_return_adv("密码已修改为{$password}");
+            return ajax_return_adv("密码已修改为{$password}", '');
         } else {
             //禁止修改管理员的密码，管理员id为1
             if ($id < 2) {

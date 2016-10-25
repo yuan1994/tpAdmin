@@ -55,7 +55,7 @@ class Controller
         }
 
         //黑名单方法
-        if (self::$blacklist && in_array($this->request->action(), self::$blacklist)) {
+        if ($this::$blacklist && in_array($this->request->action(), $this::$blacklist)) {
             throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($this))->getName() . '->' . $this->request->action());
         }
 

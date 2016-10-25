@@ -22,6 +22,9 @@ use think\Exception;
 
 class WebLog extends Controller
 {
+    /**
+     * 列表
+     */
     public function index()
     {
         $model = Loader::model('WebLog');
@@ -29,13 +32,12 @@ class WebLog extends Controller
         // 列表过滤器，生成查询Map对象
         $map = $this->search($model);
 
-        // 自定义过滤器
-        if (method_exists($this, 'filter')) {
-            $this->filter($map);
-        }
+        // 过滤器
+        if ($this->request->param('map')) $map['w.map'] = ['like', '%' . $this->request->param('map') . '%'];
+        if ($this->request->param('comment')) $map['m.comment'] = ['like', '%' . $this->request->param('comment') . '%'];
 
         // 查询字段
-        $field = 'w.id,w.data,w.otime,w.map,u.realname,m.comment';
+        $field = 'w.id,w.data,w.otime,w.map,w.is_ajax,u.realname,m.comment';
         $listRows = 20;
 
         // 分页查询
@@ -44,12 +46,12 @@ class WebLog extends Controller
                 ['__ADMIN_USER__ u', 'u.id=w.uid', 'LEFT'],
                 ['__NODE_MAP__ m', 'm.is_ajax=w.is_ajax AND m.module=w.module AND m.map=w.map', 'LEFT']
             ])
-            ->where($map)->paginate($listRows, false, ['query' => $this->request->get()]);
+            ->where($map)->order('w.id desc')->paginate($listRows, false, ['query' => $this->request->get()]);
 
         // 数据处理
         foreach ($list as &$item) {
             if (null !== $item['comment']) {
-                $comment = '{:__user__}' . $item['comment'];
+                $comment = $item['comment'];
                 $data = unserialize($item['data']);
                 $data['__user__'] = $item['realname'];
                 $item['desc'] = Lang::get($comment, $data);
@@ -68,6 +70,9 @@ class WebLog extends Controller
         return $this->view->fetch();
     }
 
+    /**
+     * 详情
+     */
     public function detail()
     {
         $id = $this->request->param('id');
@@ -75,6 +80,32 @@ class WebLog extends Controller
             throw new Exception('缺少必要参数ID');
         }
 
+        // 条件
+        $map['w.id'] = $id;
 
+        // 查询字段
+        $field = 'w.*,account,realname,last_login_time,last_login_ip,login_count,comment';
+
+        // 查询
+        $item = Loader::model('WebLog')->alias('w')->field($field)
+            ->join([
+                ['__ADMIN_USER__ u', 'u.id=w.uid', 'LEFT'],
+                ['__NODE_MAP__ m', 'm.is_ajax=w.is_ajax AND m.module=w.module AND m.map=w.map', 'LEFT']
+            ])
+            ->where($map)->find();
+
+        // 数据处理
+        if (null !== $item['comment']) {
+            $comment = $item['comment'];
+            $data = unserialize($item['data']);
+            $data['__user__'] = $item['realname'];
+            $item['desc'] = Lang::get($comment, $data);
+        } else {
+            $item['desc'] = '<span class="c-red">请先完善节点图</span>';
+        }
+
+        $this->view->assign('vo', $item);
+
+        return $this->view->fetch();
     }
 }

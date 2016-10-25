@@ -1,0 +1,86 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <div class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">用户</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.realname} （帐号：{$vo.account} ， ID：{$vo.uid}）
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">描述</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.desc}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">操作时间</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.otime|date='Y-m-d H:i:s',###}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">操作IP</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.ip}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">操作地点</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.location}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">操作系统</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.os}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">操作浏览器</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.browser}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">操作链接</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.url}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">节点图</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.map} ({$vo.module})
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">是否AJAX</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                {$vo.is_ajax?'是':'否'}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">操作数据</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <pre>
+{$vo.data|unserialize|var_export}
+                </pre>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+    </div>
+</div>
+{/block}

@@ -16,7 +16,7 @@ use think\Model;
 
 class WebLog extends Model
 {
-    protected $name = 'web_log_001';
+    protected $name = 'web_log_all';
 
     public function user()
     {

@@ -1,0 +1,44 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <form class="mb-20" method="get" action="{:\\think\\Url::build(\\think\\Request::instance()->action())}">
+        <input type="text" class="input-text" style="width:250px" placeholder="节点图" name="map" value="{:\\think\\Request::instance()->param('map')}">
+        <input type="text" class="input-text" style="width:250px" placeholder="描述" name="comment" value="{:\\think\\Request::instance()->param('comment')}">
+        <button type="submit" class="btn btn-success"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+    </form>
+    <div class="cl pd-5 bg-1 bk-gray">
+        <span class="r pt-5 pr-5">
+            共有数据 ：<strong>{$count}</strong> 条
+        </span>
+    </div>
+    <table class="table table-border table-bordered table-hover table-bg mt-20">
+        <thead>
+        <tr class="text-c">
+            <th width="80">用户</th>
+            <th width="60">是否AJAX</th>
+            <th width="200">节点图</th>
+            <th width="">描述</th>
+            <th width="150">时间</th>
+            <th width="50">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+        <tr class="text-c">
+            <td>{$vo.realname}</td>
+            <td>{$vo.is_ajax?'<span class="c-red">是</span>':'否'}</td>
+            <td>{$vo.map|high_light=\\think\\Request::instance()->param('map')}</td>
+            <td>{$vo.desc|high_light=\\think\\Request::instance()->param('comment')}</td>
+            <td>{$vo.otime|date='Y-m-d H:i:s',###}</td>
+            <td>
+                {tp:access action="detail"}
+                    <a href="javascript:;" class="label label-success radius" onclick="layer_open('详情','{:\\think\\Url::build(\'detail\', [\'id\'=>$vo[\'id\']])}')">详情</a>
+                {/tp:access}
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    <div class="page-bootstrap">{$page}</div>
+</div>
+{/block}

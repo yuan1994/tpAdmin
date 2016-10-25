@@ -22,7 +22,7 @@ class WebLog
     private static $instance;
 
     private $config = [
-        'max_rows'              => 20, // 单表最大纪录值
+        'max_rows'              => 200000, // 单表最大纪录值
         'not_record_controller' => [], // 不记录的控制器
         'not_record_map'        => [], // 不记录的节点图
         'web_log_table'         => 'web_log', // 操作日志存储表
@@ -63,18 +63,22 @@ class WebLog
         $logId = Db::table($table)->insertGetId($insert);
         // 自动分表
         if ($logId % $this->config['max_rows'] == 0) {
+            // 获取建表语句
             $result = Db::query("SHOW CREATE TABLE {$table}");
             $sql = array_pop($result[0]);
-            preg_match('/UNION=\(([^\)]*)/',$sql,$matches);
-            $tables = explode(',',  $matches[1]);
+            // 获取联合表的所有表名
+            preg_match('/UNION=\(([^\)]*)/', $sql, $matches);
+            $tables = explode(',', $matches[1]);
+            // 取到最后一个表名，作为取 id 的依据
             $tableLast = end($tables);
-            $id = intval(substr($tableLast,-4,-1));
-            $tableNew = $this->prefix . $this->config['web_log_table'] . sprintf('%03d', $id + 1);
+            // 表名都是包含零填充的三位整数
+            $id = intval(substr($tableLast, -4, -1));
+            $tableNew = $this->prefix . $this->config['web_log_table'] . '_' . sprintf('%03d', $id + 1);
+            // 建表并给设置自动递增 id
             self::createTable($tableNew, $id * intval($this->config['max_rows']) + 1);
-
             // 更新 merge 表的 union 信息
             array_push($tables, $tableNew);
-            Db::query("ALTER TABLE {$table} UNION = (" . implode(',', $table) . ")");
+            Db::execute("ALTER TABLE {$table} UNION = (" . implode(',', $tables) . ")");
         }
 
         return true;
@@ -107,6 +111,6 @@ class WebLog
             "KEY `otime` (`otime`)" .
             ") ENGINE=MyISAM AUTO_INCREMENT={$autoIncrement} DEFAULT CHARSET=utf8 COMMENT='网站日志';";
 
-        return Db::execute($sql);
+        Db::execute($sql);
     }
 }
