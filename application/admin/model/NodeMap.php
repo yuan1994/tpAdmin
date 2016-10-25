@@ -9,10 +9,11 @@
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
 
-return [
-    //七牛云存储配置信息
-    "accessKey" => "auyz6-tUO9x0lh_hYlCLQLvu7WaKkPZ0GzbN3jG9",
-    "secretKey" => "CiieYpCFh93ApW63MWVhD08n2X_pMkQeKOI3FCVQ",
-    "bucket" => "test", //存储空间
-    "domain" => "http://qiniu.tianpian.net.cn/", //访问域名
-];
+namespace app\admin\model;
+
+use think\Model;
+
+class NodeMap extends Model
+{
+
+}

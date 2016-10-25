@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 
 //------------------------
-// 节点验证器
+// 节点图验证器
 //-------------------------
 
 namespace app\admin\validate;
@@ -18,25 +18,22 @@ namespace app\admin\validate;
 use think\Validate;
 use think\Db;
 
-class AdminNode extends Validate
+class NodeMap extends Validate
 {
     protected $rule = [
-        "title|标题"  => "require",
-        "name|名称"   => "require|checkNode:1",
-        "sort|排序"   => "require",
-        "status|状态" => "require",
+        "module|模块"      => "require",
+        "map|节点图"        => "require|checkMap:1",
+        "is_ajax|是否AJAX" => "require",
+        "comment|备注"     => "require",
     ];
 
-    /**
-     * 验证节点是否唯一
-     */
-    protected function checkNode($value, $rule, $data)
+    protected function checkMap($value, $rule, $data)
     {
         if (isset($data['id']) && $data['id']) $where['id'] = ["neq", $data['id']];
-        $where['pid'] = $data['pid'];
-        $where['name'] = $data['name'];
-        $where['isdelete'] = 0;
+        $where['module'] = $data['module'];
+        $where['map'] = $data['map'];
+        $where['is_ajax'] = $data['is_ajax'];
 
-        return Db::name("AdminNode")->where($where)->find() ? "节点已经存在" : true;
+        return Db::name("NodeMap")->where($where)->find() ? "该节点图已经存在" : true;
     }
 }

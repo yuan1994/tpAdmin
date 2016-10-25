@@ -22,10 +22,13 @@ class WebLog
     private static $instance;
 
     private $config = [
-        'max_rows'              => 200000, // 单表最大纪录值
+        'max_rows'              => 20, // 单表最大纪录值
         'not_record_controller' => [], // 不记录的控制器
         'not_record_map'        => [], // 不记录的节点图
+        'web_log_table'         => 'web_log', // 操作日志存储表
     ];
+
+    private $prefix; // 表前缀
 
     public static function instance($config = [])
     {
@@ -39,6 +42,7 @@ class WebLog
     public function __construct($config = [])
     {
         $this->config = array_merge($this->config, Config::get('weblog') ?: [], $config);
+        $this->prefix = Config::get('database.prefix');
     }
 
     /**
@@ -48,29 +52,29 @@ class WebLog
      */
     public function record($insert)
     {
-        //不记录已排除的日志
+        // 不记录已排除的日志
         if (
             in_array(Request::instance()->controller(), $this->config['not_record_controller']) ||
             in_array($insert['map'], $this->config['not_record_map'])
         ) {
             return true;
         }
-        $tableWebLog = 'web_log';
-        $tableId = Db::name('WebLogRecord')->order('id desc')->value('table_id');
-        $logId = Db::name($tableWebLog . '_' . sprintf('%03d', $tableId))->insertGetId($insert);
-        // 大于最大单表纪录值自动分表
-        if ($logId >= $this->config['max_rows']) {
-            $tableIdLast = intval($tableId) + 1;
-            if (false === $this->createWebLog($tableWebLog . '_' . sprintf('%03d', $tableIdLast))) {
-                //TODO 表创建异常处理
-            }
+        $table = $this->prefix . $this->config['web_log_table'] . '_all';
+        $logId = Db::table($table)->insertGetId($insert);
+        // 自动分表
+        if ($logId % $this->config['max_rows'] == 0) {
+            $result = Db::query("SHOW CREATE TABLE {$table}");
+            $sql = array_pop($result[0]);
+            preg_match('/UNION=\(([^\)]*)/',$sql,$matches);
+            $tables = explode(',',  $matches[1]);
+            $tableLast = end($tables);
+            $id = intval(substr($tableLast,-4,-1));
+            $tableNew = $this->prefix . $this->config['web_log_table'] . sprintf('%03d', $id + 1);
+            self::createTable($tableNew, $id * intval($this->config['max_rows']) + 1);
 
-            // 更新记录分表情况的数据表
-            Db::name('WebLogRecord')->where('table_id', $tableId)->update(['end_time' => $insert['otime']]);
-            Db::name('WebLogRecord')->insert([
-                'table_id'   => $tableIdLast,
-                'start_time' => $insert['otime'],
-            ]);
+            // 更新 merge 表的 union 信息
+            array_push($tables, $tableNew);
+            Db::query("ALTER TABLE {$table} UNION = (" . implode(',', $table) . ")");
         }
 
         return true;
@@ -81,9 +85,8 @@ class WebLog
      * @param $tableName
      * @return int
      */
-    private function createWebLog($tableName)
+    private function createTable($tableName, $autoIncrement = 1)
     {
-        $tableName = Config::get('database.prefix') . $tableName;
         $sql = "CREATE TABLE `{$tableName}` (" .
             "`id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '日志主键'," .
             "`uid` smallint(5) unsigned NOT NULL COMMENT '用户id'," .
@@ -102,7 +105,7 @@ class WebLog
             "KEY `ip` (`ip`)," .
             "KEY `map` (`map`)," .
             "KEY `otime` (`otime`)" .
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='网站日志';";
+            ") ENGINE=MyISAM AUTO_INCREMENT={$autoIncrement} DEFAULT CHARSET=utf8 COMMENT='网站日志';";
 
         return Db::execute($sql);
     }

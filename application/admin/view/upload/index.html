@@ -35,9 +35,13 @@
     </div>
 </div>
 {/block}
+{block name="style"}
+<link rel="stylesheet" href="__LIB__/lightbox2/css/lightbox.min.css">
+{/block}
 {block name="script"}
 <script src="__LIB__/laypage/1.3/laypage.js"></script>
 <script src="__LIB__/tpUpload/tpUpload.js"></script>
+<script src="__LIB__/lightbox2/js/lightbox.min.js"></script>
 <script>
 
     /*
@@ -112,10 +116,7 @@
         // 初始化
         var p = location.hash.replace('#!p=', '') || 1;
         var pages = 0;
-        var photo_index = null;
-        $(".photo-list").on("click",'.photo-list-btn',function () {
-            $(this).parent().prev().click();
-        }).on("click", '.photo-list-select', function () {
+        $(".photo-list").on("click", '.photo-list-select', function () {
             callback(callbackId, $(this).parent().prev().attr('data-src'))
         });
 
@@ -135,17 +136,12 @@
                         html += '<div class="photo-list-item">'
                                 + '<img src="'+current.name+'" data-src="'+current.name+'" class="photo-sub" alt="'+current.original+'" title="'+current.original+'">'
                                 + '<div class="photo-mask">'
-                                + '<a class="photo-list-btn photo-list-preview radius" href="javascript:;">预览</a>'
+                                + '<a class="photo-list-btn photo-list-preview radius" href="'+current.name+'" data-lightbox="preview" data-title="'+current.original+'">预览</a>'
                                 + '<a class="photo-list-btn photo-list-select radius ml-10" href="javascript:;">选择</a>'
                                 + '</div>'
                                 + '</div>';
                     }
-                    photo_index && layer.close(photo_index);
                     $(".photo-list").html(html);
-                    photo_index = layer.photos({
-                        photos: '.photo-list'
-                        ,shift: 1 //0-6的选择，指定弹出图片动画类型，默认随机
-                    });
                     //显示分页
                     laypage({
                         cont: 'photo-page', //容器。值支持id名、原生dom对象，jquery对象。【如该容器为】：<div id="page1"></div>

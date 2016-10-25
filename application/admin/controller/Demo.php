@@ -155,7 +155,15 @@ class Demo extends Controller
     /**
      * 表格溢出
      */
-    public function table_fixed()
+    public function tableFixed()
+    {
+        return $this->view->fetch();
+    }
+
+    /**
+     * 图片上传回调
+     */
+    public function imageUpload()
     {
         return $this->view->fetch();
     }

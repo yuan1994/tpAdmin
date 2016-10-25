@@ -34,7 +34,7 @@ class Upload extends Controller
             if ($info) {
                 $data[] = $info->getSaveName();
                 $insert[] = [
-                    'cate'     => 1,
+                    'cate'     => 3,
                     'name'     => '/tmp/uploads/' . $info->getSaveName(),
                     'original' => $info->getInfo('name'),
                     'domain'   => '',
@@ -71,9 +71,9 @@ class Upload extends Controller
     {
         $page = $this->request->param('p', 1);
         if ($this->request->param('count')) {
-            $ret['count'] = Db::name('File')->field('id,name,original')->count();
+            $ret['count'] = Db::name('File')->where('cate=3')->count();
         }
-        $ret['list'] = Db::name('File')->field('id,name,original')->page($page, 10)->select();
+        $ret['list'] = Db::name('File')->where('cate=3')->field('id,name,original')->page($page, 10)->select();
         return ajax_return($ret);
     }
 }

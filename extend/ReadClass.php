@@ -32,11 +32,14 @@ class ReadClass
 
         $reflection = new \ReflectionClass($class);
         $class_name = $reflection->name;
+        $staticProperties = $reflection->getStaticProperties();
+        // 黑名单方法
+        $blacklist = isset($staticProperties['blacklist']) ? $staticProperties['blacklist'] : [];
         $ret = [];
         //遍历public方法
         foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
             if ($parents || (!$parents && $method->class == $class_name)) {
-                if (substr($method->name, 0, 2) != '__') {
+                if (substr($method->name, 0, 2) != '__' && !in_array($method->name, $blacklist)) {
                     //根据phpDoc获取方法说明
                     $title = '';
                     $docComment = $method->getDocComment();

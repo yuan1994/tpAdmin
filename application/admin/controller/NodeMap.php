@@ -10,34 +10,36 @@
 // +----------------------------------------------------------------------
 
 //------------------------
-// 登录日志控制器
+// 节点图控制器
 //-------------------------
 
 namespace app\admin\controller;
 
 use app\admin\Controller;
+use think\Db;
+use think\Loader;
 
-class LoginLog extends Controller
+class NodeMap extends Controller
 {
     use \app\admin\traits\controller\Controller;
 
-    protected static $isdelete = false; //禁用该字段
+    protected static $isdelete = false;
 
-    protected static $blacklist = ['add', 'edit', 'delete', 'deleteForever', 'forbid', 'resume', 'recycle', 'recycleBin'];
+    protected static $blacklist = ['resume', 'recycle', 'recycleBin', 'delete', 'forbid', 'clear'];
 
     protected function filter(&$map)
     {
-        if ($this->request->param('login_location')) {
-            $map['login_location'] = ["like", "%" . $this->request->param('login_location') . "%"];
-        }
+        if ($this->request->param("map")) $map['map'] = ["like", "%" . $this->request->param("map") . "%"];
+        if ($this->request->param("comment")) $map['comment'] = ["like", "%" . $this->request->param("comment") . "%"];
+    }
 
-        //关联筛选
-        if ($this->request->param('account')) $map['admin_user.account'] = $this->request->param('account');
-        if ($this->request->param('name')) $map['admin_user.realname'] = ["like", "%" . $this->request->param('name') . "%"];
+    /**
+     * 自动导入
+     */
+    public function load()
+    {
+        Loader::model('NodeMap', 'logic')->load('admin', ['Ueditor', 'Generate', 'Error']);
 
-        //设置属性
-        $map['_table'] = "login_log";
-        $map['_relation'] = "user";
-        $map['_order_by'] = false;
+        return ajax_return_adv('导入成功', 'current');
     }
 }

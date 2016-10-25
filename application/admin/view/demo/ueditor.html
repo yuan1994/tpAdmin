@@ -2,6 +2,7 @@
 {block name="content"}
 <div class="page-container">
     <div>
+        <p class="c-red">集成七牛上传，请在编辑器里上传图片</p>
         <script id="editor" type="text/plain" style="height:400px"></script>
     </div>
     <div id="markdown" class="mt-20"></div>
@@ -28,33 +29,7 @@
 ---
 方法
 ```
-\Qiniu::instance()->upload();
-```
-html代码：
-```
-<iframe name="upload" style="display: none"></iframe>
-<form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:\\think\\Request::instance()->baseUrl()}">
-    <div class="row cl">
-        <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>图片：</label>
-        <div class="formControls col-xs-6 col-sm-6">
-            <input type="file" class="input-text" placeholder="图片" name="file" datatype="*" nullmsg="请选择上传文件">
-        </div>
-        <div class="col-xs-3 col-sm-3"></div>
-    </div>
-
-    <div class="row cl">
-        <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
-            <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
-            <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
-        </div>
-    </div>
-</form>
-```
-php代码：
-```
-return '<s1cript>parent.layer.alert("仅做演示")</s1cript>'; //去掉sc中间的1，markdown解析失败
-/*$result = \Qiniu::instance()->upload();
-p($result);*/
+将 ueditor 的服务地址修改为 Ueditor 控制器，使用方法请参考该示例源码
 ```
 </script>
 {/literal}

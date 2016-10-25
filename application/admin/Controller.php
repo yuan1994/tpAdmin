@@ -29,9 +29,9 @@ class Controller
     // Request实例
     protected $request;
     // 黑名单方法，禁止访问某些方法
-    protected $blacklist = [];
+    protected static $blacklist = [];
     // 是否删除标志，0-正常|1-删除|false-不包含该字段
-    protected $isdelete = 0;
+    protected static $isdelete = 0;
 
     public function __construct()
     {
@@ -55,7 +55,7 @@ class Controller
         }
 
         //黑名单方法
-        if ($this->blacklist && in_array($this->request->action(), $this->blacklist)) {
+        if (self::$blacklist && in_array($this->request->action(), self::$blacklist)) {
             throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($this))->getName() . '->' . $this->request->action());
         }
 

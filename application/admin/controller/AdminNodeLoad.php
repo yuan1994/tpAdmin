@@ -21,9 +21,9 @@ class AdminNodeLoad extends Controller
 {
     use \app\admin\traits\controller\Controller;
 
-    protected $isdelete = false;
+    protected static $isdelete = false;
 
-    protected $blacklist = ['delete', 'recycle'];
+    protected static $blacklist = ['delete', 'recycle'];
 
     protected function filter(&$map)
     {
