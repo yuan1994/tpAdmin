@@ -57,7 +57,7 @@ class AdminUser extends Controller
             }
             return ajax_return_adv("密码已修改为{$password}", '');
         } else {
-            //禁止修改管理员的密码，管理员id为1
+            // 禁止修改管理员的密码，管理员 id 为 1
             if ($id < 2) {
                 throw new Exception("缺少必要参数");
             }

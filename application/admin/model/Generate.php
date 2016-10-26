@@ -36,9 +36,9 @@ class Generate
     private $nameLower;
     private $post;
     // 控制器黑名单
-    private $blacklist_name = ['AdminGroup', 'AdminNode', 'AdminRole', 'AdminUser', 'AdminNodeLoad', 'Pub', 'Demo', 'Generate', 'Index', 'LogLogin', 'Ueditor'];
+    private $blacklistName = ['AdminGroup', 'AdminNode', 'AdminRole', 'AdminUser', 'AdminNodeLoad', 'Pub', 'Demo', 'Generate', 'Index', 'LogLogin', 'Ueditor'];
     // 数据表黑名单
-    private $blacklist_table = ['admin_group', 'admin_node', 'admin_role', 'admin_user', 'admin_node_load', 'log_login', 'file'];
+    private $blacklistTable = ['admin_group', 'admin_node', 'admin_role', 'admin_user', 'admin_node_load', 'log_login', 'file'];
 
     public function build()
     {
@@ -58,20 +58,20 @@ class Generate
             $this->namespace = "";
         }
 
-        //数据表表名
+        // 数据表表名
         $tableName = str_replace(DS, '_', $this->dir) . $this->nameLower;
 
-        //判断是否在黑名单中
-        if (in_array($this->post['controller_name'], $this->blacklist_name)) {
+        // 判断是否在黑名单中
+        if (in_array($this->post['controller_name'], $this->blacklistName)) {
             throw new Exception('该控制器不允许创建');
         }
 
-        //判断是否在数据表黑名单中
-        if (isset($this->post['table']) && $this->post['table'] && in_array($tableName, $this->blacklist_table)) {
+        // 判断是否在数据表黑名单中
+        if (isset($this->post['table']) && $this->post['table'] && in_array($tableName, $this->blacklistTable)) {
             throw new Exception('该数据表不允许创建');
         }
 
-        //创建目录
+        // 创建目录
         $dir_list = ["view" . DS . $this->dir . $this->nameLower];
         if (isset($this->post['model']) && $this->post['model']) {
             array_push($dir_list, "model" . DS . $this->dir);
@@ -143,7 +143,7 @@ class Generate
     {
         $el = "";
         foreach ($this->post['form_search'] as $k => $v) {
-            //只筛选出选择为表单筛选的字段
+            // 只筛选出选择为表单筛选的字段
             if ($v) {
                 $el .= '    <input type="text" class="input-text" style="width:250px" placeholder="' . $this->post['form_title'][$k] . '" name="' . $this->post['form_name'][$k] . '" value="{:\\\\think\\\\Request::instance()->param(\'' . $this->post['form_name'][$k] . '\')}">' . "\n";
             }
@@ -166,7 +166,8 @@ class Generate
     {
         $el = ['<th width="25"><input type="checkbox"></th>'];
         foreach ($this->post['form_title'] as $k => $v) {
-            if ($this->post['form_sort'][$k]) { //带有表单排序的需使用表单排序方法
+            if ($this->post['form_sort'][$k]) {
+                // 带有表单排序的需使用表单排序方法
                 array_push($el, '<th width="">' . "{:sort_by('{$v}','{$this->post['form_name'][$k]}')}" . '</th>');
             } else {
                 array_push($el, '<th width="">' . $v . '</th>');
@@ -188,7 +189,7 @@ class Generate
         foreach ($this->post['form_name'] as $k => $v) {
             if ($this->post['form_search'][$k]) { //带有表单搜索筛选的自动添加关键词高亮方法
                 array_push($el, '<td>{$vo.' . $v . "|high_light=\\\\think\\\\Request::instance()->param('" . $v . "')}</td>");
-            } else { //对于status字段采用框架提供的get_status方法显示图标
+            } else { // 对于 status 字段采用框架提供的 get_status 方法显示图标
                 array_push($el, '<td>{$vo.' . $v . ($v == "status" ? '|get_status' : '') . '}</td>');
             }
         }
@@ -203,11 +204,11 @@ class Generate
      */
     private function buildRecyclebin($path)
     {
-        //首页菜单选择了回收站才创建回收站
+        // 首页菜单选择了回收站才创建回收站
         if (isset($this->post['menu']) && in_array("recycleBin", $this->post['menu'])) {
             $file = $path . "recyclebin.html";
 
-            //默认直接继承模板
+            // 默认直接继承模板
             return file_put_contents($file, '{extend name="template/recyclebin" /}');
         }
 
@@ -221,12 +222,12 @@ class Generate
     private function buildIndex($path)
     {
         $file = $path . "index.html";
-        //菜单全选的默认直接继承模板
+        // 菜单全选的默认直接继承模板
         $this->post['menu'] = isset($this->post['menu']) ? $this->post['menu'] : [];
         if (count($this->post['menu']) == 5) {
             return file_put_contents($file, '{extend name="template/index" /}');
         } else {
-            //菜单部分选择的使用模板替换相关参数创建自定义html文件
+            // 菜单部分选择的使用模板替换相关参数创建自定义html文件
             $template = file_get_contents(APP_PATH . $this->module . DS . "view" . DS . "template" . DS . "index.html");
 
             return file_put_contents($file, str_replace('table_menu"', 'table_menu" menu="' . implode(",", $this->post['menu']) . '"', $template));
@@ -240,22 +241,24 @@ class Generate
     private function buildEdit($path, $pathTemplate)
     {
         $el = "";
-        $set_checked = [];//radio类型的表单控件编辑状态使用javascript赋值
-        $set_selected = [];//select类型的表单控件编辑状态使用javascript赋值
+        // radio 类型的表单控件编辑状态使用 javascript 赋值
+        $set_checked = [];
+        // select 类型的表单控件编辑状态使用 javascript 赋值
+        $set_selected = [];
         foreach ($this->post['form_title'] as $k => $v) {
             $type = $this->post['form_type'][$k];
             $name = $this->post['form_name'][$k];
 
-            //像id这种白名单字段不需要自动生成到编辑页
+            // 像 id 这种白名单字段不需要自动生成到编辑页
             if (in_array($name, ["id", "create_time", "update_time", "isdelete"])) continue;
 
-            //str_repeat重复输出空格和每行末加换行符是为了生成的模板有缩进，方便二次编辑
+            // str_repeat 重复输出空格和每行末加换行符是为了生成的模板有缩进，方便二次编辑
             $el .= str_repeat(' ', 8) . '<div class="row cl">' . "\n" .
                 str_repeat(' ', 12) . '<label class="form-label col-xs-3 col-sm-3">' .
                 ($this->post['form_require'][$k] ? '<span class="c-red">*</span>' : '') .
                 $v . '：</label>' . "\n";
 
-            //使用Validform插件前端验证数据格式，生成在表单控件上的验证规则
+            // 使用 Validform 插件前端验证数据格式，生成在表单控件上的验证规则
             $validate = ($this->post['form_validate'][$k] ?
                     ' datatype="' . $this->post['form_validate'][$k] . '"' :
                     '') .
@@ -269,44 +272,44 @@ class Generate
                     ' ignore="ignore"' :
                     '');
 
-            //注意checkbox,radio类型控件需要加.skin-minimal，方便iCheck插件对控件进行美化
+            // 注意 checkbox,radio 类型控件需要加 .skin-minimal，方便 iCheck 插件对控件进行美化
             $el .= str_repeat(' ', 12) . '<div class="formControls col-xs-6 col-sm-6' .
                 (in_array($type, ['radio', 'checkbox']) ? ' skin-minimal' : '') .
                 '">' . "\n";
             switch ($type) {
                 case "radio":
                 case "checkbox":
-                    //只对radio类型的控件进行编辑状态赋值，checkbox类型控件请自行根据情况赋值
+                    // 只对 radio 类型的控件进行编辑状态赋值，checkbox类型控件请自行根据情况赋值
                     if ($type == "radio") {
                         array_push($set_checked, str_repeat(' ', 8) . '$("[name=\'' . $name . '\'][value=\'{:isset($vo.' . $name . ')?$vo.' . $name . ':\'\'}\']").attr("checked",true);');
                     }
-                    //默认只生成一个空的示例控件，请根据情况自行复制编辑
+                    // 默认只生成一个空的示例控件，请根据情况自行复制编辑
                     $el .= str_repeat(' ', 16) . '<div class="radio-box">' . "\n";
                     $el .= str_repeat(' ', 20) . '<input type="' . $type . '" name="' . $name . ($type == "checkbox" ? '[]' : '') . '" id="' . $name . '-0" value=""' . $validate . '>' . "\n";
                     $el .= str_repeat(' ', 20) . '<label for="' . $name . '-0">选项一</label>' . "\n";
                     $el .= str_repeat(' ', 16) . '</div>' . "\n";
                     break;
                 case "select":
-                    //select类型的控件进行编辑状态赋值
+                    // select 类型的控件进行编辑状态赋值
                     array_push($set_selected, str_repeat(' ', 8) . '$("[name=\'' . $name . '\']").find("[value=\'{:isset($vo.' . $name . ')?$vo.' . $name . ':\'\'}\']").attr("selected",true);');
                     $el .= str_repeat(' ', 16) . '<div class="select-box">' . "\n";
                     $el .= str_repeat(' ', 20) . '<select name="' . $name . '" class="select"' . $validate . '>' . "\n";
-                    //默认只生成一个空的示例控件，请根据情况自行复制编辑
+                    // 默认只生成一个空的示例控件，请根据情况自行复制编辑
                     $el .= str_repeat(' ', 24) . '<option value="">选项一</option>' . "\n";
                     $el .= str_repeat(' ', 20) . '</select>' . "\n";
                     $el .= str_repeat(' ', 16) . '</div>' . "\n";
                     break;
                 case "textarea":
-                    //默认生成的textarea加入了输入字符长度实时统计，H-ui.admin官方的textarealength方法有问题，请使用tpadmin框架修改后的源码，也可拷贝H-ui.js里相应的方法
-                    //如果不需要字符长度实时统计，请在生成代码中删除textarea上的onKeyUp事件和下面p标签那行
+                    // 默认生成的 textarea 加入了输入字符长度实时统计，H-ui.admin 官方的 textarealength 方法有问题，请使用 tpadmin 框架修改后的源码，也可拷贝 H-ui.js 里相应的方法
+                    // 如果不需要字符长度实时统计，请在生成代码中删除 textarea 上的 onKeyUp 事件和下面 p 标签那行
                     $el .= str_repeat(' ', 16) . '<textarea class="textarea" placeholder="" name="' . $name . '" onKeyUp="textarealength(this,100)"' . $validate . '>{:isset($vo.' . $name . ')?$vo.' . $name . ':\'\'}</textarea>' . "\n";
                     $el .= str_repeat(' ', 16) . '<p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>' . "\n";
                     break;
                 case "text":
                 case "password":
                 case "number":
-                    //如需要时间选择器，请选择text类型，然后根据WdatePicker插件示例演示代码修改，请注意使用ThinkPHP原样输出标签literal原样输出，否则会出现模板编译错误
-                    //literal标签使用方法见：http://www.kancloud.cn/manual/thinkphp5/125010
+                    // 如需要时间选择器，请选择 text 类型，然后根据 WdatePicker 插件示例演示代码修改，请注意使用 ThinkPHP 原样输出标签 literal 原样输出，否则会出现模板编译错误
+                    // literal 标签使用方法见：http://www.kancloud.cn/manual/thinkphp5/125010
                 default:
                     $el .= str_repeat(' ', 16) . '<input type="' . $type . '" class="input-text" value="{:isset($vo.' . $name . ')?$vo.' . $name . ':\'\'}" placeholder="" name="' . $name . '"' . $validate . '>' . "\n";
             }
@@ -327,7 +330,7 @@ class Generate
     private function buildController($fileName, $pathTemplate)
     {
         $el = "";
-        //自动生成表单搜索的模糊查询条件过滤器
+        // 自动生成表单搜索的模糊查询条件过滤器
         foreach ($this->post['form_search'] as $k => $v) {
             if ($v) {
                 $el .= '        if ($this->request->param("' . $this->post['form_name'][$k] . '")) $map[\'' . $this->post['form_name'][$k] . '\'] = ["like", "%" . $this->request->param("' . $this->post['form_name'][$k] . '") . "%"];' . "\n";
@@ -338,7 +341,7 @@ class Generate
         } else {
             $filter = '';
         }
-        //自动屏蔽查询条件isdelete字段
+        // 自动屏蔽查询条件 isdelete 字段
         if (!isset($this->post['menu']) || (isset($this->post['menu']) && !in_array("delete", $this->post['menu']) && !in_array("recyclebin", $this->post['menu']))) {
             $filter = 'protected $isdelete = false;' . "\n\n" . str_repeat(" ", 4) . $filter;
         }
@@ -359,7 +362,7 @@ class Generate
     private function buildModel($fileName, $pathTemplate, $tableName)
     {
         if (isset($this->post['model']) && $this->post['model']) {
-            //直接生成空模板
+            // 直接生成空模板
             $template = file_get_contents($pathTemplate . "Model.tpl");
             $file = str_replace('%NAME%', 'model', $fileName);
 
@@ -381,7 +384,7 @@ class Generate
     {
         if (isset($this->post['validate']) && $this->post['validate']) {
             $el = "";
-            //根据前端校验规则自动生成验证器校验规则，考虑到二者语法不同，只生成必填字段的规则require，其他规则留空，自己前往验证器完善相关规则
+            // 根据前端校验规则自动生成验证器校验规则，考虑到二者语法不同，只生成必填字段的规则 require，其他规则留空，自己前往验证器完善相关规则
             foreach ($this->post['form_validate'] as $k => $v) {
                 if ($v) {
                     $el .= '        "' . $this->post['form_name'][$k] . '|' . $this->post['form_title'][$k] . '" => "' . ($this->post['form_require'][$k] ? "require" : "") . '",' . "\n";

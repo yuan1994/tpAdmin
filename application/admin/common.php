@@ -52,6 +52,7 @@ function flash($key, $value = false)
         if (false === $value) {
             // 获取flash
             $ret = Session::pull($flash_key);
+
             return null === $ret ? null : unserialize($ret);
         } else {
             // 设置flash
@@ -73,6 +74,7 @@ function sort_by($name, $field = '')
     $param['_sort'] = ($sort == 'asc' ? 'desc' : 'asc');
     $param['_order'] = $field;
     $url = Url::build(Request::instance()->action(), $param);
+
     return Request::instance()->param('_order') == $field ?
         "<a href='{$url}' title='点击排序' class='sorting-box sorting-{$sort}'>{$name}</a>" :
         "<a href='{$url}' title='点击排序' class='sorting-box sorting'>{$name}</a>";
@@ -115,6 +117,7 @@ function show_status($status, $id, $field = 'id', $controller = '')
             $ret = '<a href="javascript:;" onclick="ajax_req(\'' . Url::build($controller . '/recycle', [$field => $id]) . '\')" class="label label-secondary radius" title="点击还原">还原</a>';
             break;
     }
+
     return $ret;
 }
 
@@ -141,63 +144,62 @@ function get_status($status, $imageShow = true)
             $showImg = '<i class="Hui-iconfont c-success status" title="正常">&#xe615;</i>';
 
     }
+
     return ($imageShow === true) ? $showImg : $showText;
 }
 
 /**
  * 框架内部默认ajax返回
  * @param string $msg      提示信息
- * @param string $redirect 是否重定向
+ * @param string $redirect 重定向类型 current|parent|''
  * @param string $alert    父层弹框信息
  * @param bool $close      是否关闭当前层
  * @param string $url      重定向地址
  * @param string $data     附加数据
  * @param int $code        错误码
+ * @param array $extend    扩展数据
  */
-function ajax_return_adv($msg = '操作成功', $redirect = 'parent', $alert = '', $close = false, $url = '', $data = '', $code = 0)
+function ajax_return_adv($msg = '操作成功', $redirect = 'parent', $alert = '', $close = false, $url = '', $data = '', $code = 0, $extend = [])
 {
-    if (1 == $redirect) $redirect = 'current';
-    if (2 == $redirect) $redirect = 'parent';
-    $ret = [
-        'code' => $code,
-        'msg'  => $msg,
-        'data' => $data,
-        'opt'  => [
-            'alert'    => $alert,
-            'close'    => $close,
-            'redirect' => $redirect,
-            'url'      => $url,
-        ],
+    $extend['opt'] = [
+        'alert'    => $alert,
+        'close'    => $close,
+        'redirect' => $redirect,
+        'url'      => $url,
     ];
-    return Response::create($ret, 'json');
+
+    return ajax_return($data, $msg, $code, $extend);
 }
 
 /**
  * 返回错误json信息
  */
-function ajax_return_adv_error($msg = '', $code = 1, $redirect = '', $alert = '', $close = false, $url = '', $data = '')
+function ajax_return_adv_error($msg = '', $code = 1, $redirect = '', $alert = '', $close = false, $url = '', $data = '', $extend = [])
 {
-    return ajax_return_adv($msg, $alert, $close, $redirect, $url, $data, $code);
+    return ajax_return_adv($msg, $alert, $close, $redirect, $url, $data, $code, $extend);
 }
 
 /**
  * ajax数据返回，规范格式
- * @param array $data 返回的数据，默认空数组
- * @param string $msg 信息
- * @param int $code   错误码，0-未出现错误|其他出现错误
+ * @param array $data   返回的数据，默认空数组
+ * @param string $msg   信息
+ * @param int $code     错误码，0-未出现错误|其他出现错误
+ * @param array $extend 扩展数据
  */
-function ajax_return($data = [], $msg = "", $code = 0)
+function ajax_return($data = [], $msg = "", $code = 0, $extend = [])
 {
     $ret = ["code" => $code, "msg" => $msg, "data" => $data];
+    $ret = array_merge($ret, $extend);
+
     return Response::create($ret, 'json');
 }
 
 /**
  * 返回标准错误json信息
  */
-function ajax_return_error($msg = "出现错误", $code = 1, $data = [])
+function ajax_return_error($msg = "出现错误", $code = 1, $data = [], $extend = [])
 {
-    return ajax_return($data, $msg, $code);
+    return ajax_return($data, $msg, $code, $extend);
 }
 
 /**
@@ -217,6 +219,7 @@ function filter_value($arrData, $key, $im = false)
         $re = array_flip(array_flip($re));
         sort($re);
     }
+
     return $im ? implode(',', $re) : $re;
 }
 
@@ -232,6 +235,7 @@ function reset_by_key($arr, $key)
     foreach ($arr as $v) {
         $re[$v[$key]] = $v;
     }
+
     return $re;
 }
 
@@ -267,6 +271,7 @@ function list_to_tree($list, $pk = 'id', $pid = 'pid', $child = '_child', $root 
             }
         }
     }
+
     return $tree;
 }
 

@@ -35,7 +35,8 @@ class AdminRole extends Controller
     public function user()
     {
         $role_id = $this->request->param('id/d');
-        if ($this->request->isPost()) { //提交
+        if ($this->request->isPost()) {
+            // 提交
             if (!$role_id) {
                 return ajax_return_adv_error("缺少必要参数");
             }
@@ -55,15 +56,16 @@ class AdminRole extends Controller
                 }
                 $db_role_user->insertAll($insert_all);
             }
-            return ajax_return_adv("分配角色成功");
-        } else { //编辑页
+            return ajax_return_adv("分配角色成功", '');
+        } else {
+            // 编辑页
             if (!$role_id) {
                 throw new Exception("缺少必要参数");
             }
-            //读取系统的用户列表
+            // 读取系统的用户列表
             $list_user = Db::name("AdminUser")->field('id,account,realname')->where('status=1 AND id > 1')->select();
 
-            //已授权权限
+            // 已授权权限
             $list_role_user = Db::name("AdminRoleUser")->where("role_id", $role_id)->select();
             $checks = filter_value($list_role_user, "user_id", true);
 
@@ -89,7 +91,7 @@ class AdminRole extends Controller
             if (true !== $error = Loader::model('AdminAccess', 'logic')->insertAccess($role_id, $this->request->post())) {
                 return ajax_return_adv_error($error);
             }
-            return ajax_return_adv("权限分配成功");
+            return ajax_return_adv("权限分配成功", '');
         } else {
             if (!$role_id) {
                 throw new Exception("缺少必要参数");

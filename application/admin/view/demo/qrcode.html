@@ -1,0 +1,78 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <div class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>Url 地址：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" placeholder="请填写链接，包含 http 等协议前缀，支持 URL Scheme" name="url" id="qrcode-input">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="button" class="btn btn-primary radius generate">&nbsp;&nbsp;生成&nbsp;&nbsp;</button>
+            </div>
+        </div>
+
+        <div class="row cl mt-50">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <div id="qrcode"></div>
+                <p class="mt-10 c-red" id="qrcode-url"></p>
+            </div>
+        </div>
+    </div>
+    <div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/qrcode/qrcode.min.js"></script>
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>
+    $(function () {
+        var url = '{:\\think\\Request::instance()->url(true)}';
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: url,
+            width: 128,
+            height: 128,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+        $("#qrcode-url").html(url);
+
+        $(".generate").click(function () {
+            url = $("#qrcode-input").val();
+            if (!url || !/^[\w]*:\/\//i.test(url)) {
+                layer.alert('请输入正确的链接，支持 URL Scheme');
+                return ;
+            }
+            qrcode.makeCode(url);
+            $("#qrcode-url").html(url);
+        });
+
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+{literal}
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+<div id="qrcode"></div>
+var qrcode = new QRCode(document.getElementById("qrcode"), {
+	text: "http://tpadmin.demo.tianpian.net.cn",
+	width: 128,
+	height: 128,
+	colorDark : "#000000",
+	colorLight : "#ffffff",
+	correctLevel : QRCode.CorrectLevel.H
+});
+```
+详细使用请参考 path/to/tpadmin/public/static/lib/qrcode/README.md
+</script>
+{/literal}
+{/block}

@@ -123,39 +123,47 @@ function ajax_req(url,data,callback,param,shade){
  * @param callback 成功回调函数
  * @param param 回调参数
  */
-function ajax_progress(data,callback,param){
-    if(data.code == 0){
+function ajax_progress(data, callback, param) {
+    if (data.code == 0) {
         if (typeof data.opt == "object") {
             var index = parent.layer.getFrameIndex(window.name);
-            if(data.opt.close){
+            if (data.opt.close) {
                 parent.layer.close(index);
             }
-            if(data.opt.redirect == 'current'){ //是否当前页重定向
-                if(!data.opt.url){ //刷新
+            if (data.opt.redirect == 'current') {
+                // 当前页重定向
+                if (!data.opt.url) {
+                    // 刷新
                     window.location.reload();
-                } else { //重定向到url
+                } else {
+                    // 重定向到 url
                     window.location.href = data.opt.url;
                 }
-            } else if(data.opt.redirect == 'parent'){ //是否父层重定向
-                if(!data.opt.url){ //刷新
+            } else if (data.opt.redirect == 'parent') {
+                // 父层重定向
+                if (!data.opt.url) {
+                    // 刷新
                     window.parent.location.reload();
-                } else { //重定向到url
+                } else {
+                    // 重定向到 url
                     window.parent.location.href = data.opt.url;
                 }
-                parent.layer.close(index); //关闭当前层
+                // 关闭当前层
+                parent.layer.close(index);
             }
-            if(data.opt.alert){ //父层弹出信息
+            // 父层弹出信息
+            if (data.opt.alert) {
                 parent.layer.alert(data.opt.alert);
                 parent.layer.close(index);
             }
-            if(!data.opt.close && !data.opt.redirect && !data.opt.alert){
+            if (!data.opt.close && !data.opt.redirect && !data.opt.alert) {
                 parent.layer.msg(data.msg);
                 parent.layer.close(index);
             }
         } else {
             layer.msg(data.msg);
         }
-        if (typeof callback == "function"){
+        if (typeof callback == "function") {
             if (typeof param != "undefined") {
                 param.unshift(data)
             } else {
@@ -164,7 +172,7 @@ function ajax_progress(data,callback,param){
             callback.apply(this, param);
         }
     } else {
-        layer.alert(data.msg, {title:"错误信息", icon:2});
+        layer.alert(data.msg, {title: "错误信息", icon: 2});
     }
 }
 

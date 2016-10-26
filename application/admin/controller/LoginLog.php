@@ -38,6 +38,6 @@ class LoginLog extends Controller
         //设置属性
         $map['_table'] = "login_log";
         $map['_relation'] = "user";
-        $map['_order_by'] = false;
+        $map['_order_by'] = "login_log.id desc";
     }
 }

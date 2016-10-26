@@ -29,7 +29,7 @@ class Demo extends Controller
     {
         if ($this->request->isPost()) {
             $header = ['用户ID', '登录IP', '登录地点', '登录浏览器', '登录操作系统', '登录时间'];
-            $data = Db::name("LoginLog")->field("id", true)->order("id asc")->limit(20)->select();
+            $data = Db::name("LoginLog")->field("id", true)->order("id desc")->limit(20)->select();
             if ($error = \Excel::export($header, $data, "示例Excel导出", '2007')) {
                 throw new Exception($error);
             }
@@ -164,6 +164,14 @@ class Demo extends Controller
      * 图片上传回调
      */
     public function imageUpload()
+    {
+        return $this->view->fetch();
+    }
+
+    /**
+     * 二维码生成
+     */
+    public function qrcode()
     {
         return $this->view->fetch();
     }

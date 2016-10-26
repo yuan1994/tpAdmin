@@ -42,27 +42,27 @@ class Controller
             $this->request = Request::instance();
         }
 
-        //用户ID
+        // 用户ID
         defined('UID') or define('UID', Session::get(Config::get('rbac.user_auth_key')));
-        //是否是管理员
+        // 是否是管理员
         defined('ADMIN') or define('ADMIN', true === Session::get(Config::get('rbac.admin_auth_key')));
 
-        //检查认证识别号
+        // 检查认证识别号
         if (null === UID) {
             $this->notLogin();
         } else {
             $this->auth();
         }
 
-        //黑名单方法
+        // 黑名单方法
         if ($this::$blacklist && in_array($this->request->action(), $this::$blacklist)) {
             throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($this))->getName() . '->' . $this->request->action());
         }
 
-        //前置方法
-        $before_action = "before" . ucfirst($this->request->action());
-        if (method_exists($this, $before_action)) {
-            $this->$before_action();
+        // 前置方法
+        $beforeAction = "before" . ucfirst($this->request->action());
+        if (method_exists($this, $beforeAction)) {
+            $this->$beforeAction();
         }
     }
 
