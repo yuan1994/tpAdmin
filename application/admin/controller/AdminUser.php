@@ -71,7 +71,7 @@ class AdminUser extends Controller
      */
     protected function beforeForbid()
     {
-        //禁止禁用Admin模块,权限设置节点
+        // 禁止禁用 Admin 模块,权限设置节点
         $this->filterId(1, '该用户不能被禁用', '=');
     }
 }

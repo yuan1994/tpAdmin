@@ -60,30 +60,30 @@ class Rbac
      */
     public static function checkAccess()
     {
-        //如果项目要求认证，并且当前模块需要认证，则进行权限认证
+        // 如果项目要求认证，并且当前控制器需要认证，则进行权限认证
         if (Config::get('rbac.user_auth_on')) {
             $controller = [];
             $action = [];
             if ('' != Config::get('rbac.require_auth_controller')) {
-                //需要认证的模块
+                // 需要认证的模块
                 $controller['yes'] = explode(',', strtoupper(Config::get('rbac.require_auth_controller')));
             } else {
-                //无需认证的模块
+                // 无需认证的模块
                 $controller['no'] = explode(',', strtoupper(Config::get('rbac.not_auth_controller')));
             }
-            //检查当前模块是否需要认证
+            // 检查当前控制器是否需要认证
             if (
                 ($controller['no'] && !in_array(strtoupper(Request::instance()->controller()), $controller['no'])) ||
                 ($controller['yes'] && in_array(strtoupper(Request::instance()->controller()), $controller['yes']))
             ) {
                 if (Config::get('rbac.require_auth_action')) {
-                    //需要认证的操作
+                    // 需要认证的操作
                     $action['yes'] = explode(',', strtoupper(Config::get('rbac.require_auth_action')));
                 } else {
-                    //无需认证的操作
+                    // 无需认证的操作
                     $action['no'] = explode(',', strtoupper(Config::get('rbac.not_auth_action')));
                 }
-                //检查当前操作是否需要认证
+                // 检查当前操作是否需要认证
                 if (
                     ($action['no'] && !in_array(strtoupper(Request::instance()->action()), $action['no'])) ||
                     ($action['yes'] && in_array(strtoupper(Request::instance()->action()), $action['yes']))
