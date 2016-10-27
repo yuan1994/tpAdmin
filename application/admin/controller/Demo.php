@@ -135,7 +135,7 @@ class Demo extends Controller
     {
         if ($this->request->isPost()) {
             $id = $this->request->post("id");
-            $hashids = hashids(8, "tpadmin");
+            $hashids = \Hashids\Hashids::instance(8, "tpadmin");
             $encode_id = $hashids->encode($id); //加密
             $decode_id = $hashids->decode($encode_id); //解密
             return ajax_return_adv("操作成功", '', false, '', '', ['encode' => $encode_id, 'decode' => $decode_id]);
