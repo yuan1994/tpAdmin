@@ -54,7 +54,11 @@ class WebLog extends Controller
                 $comment = $item['comment'];
                 $data = unserialize($item['data']);
                 $data['__user__'] = $item['realname'];
-                $item['desc'] = Lang::get($comment, $data);
+                try {
+                    $item['desc'] = Lang::get($comment, $data);
+                } catch (Exception $e) {
+                    $item['desc'] = '该节点图统计出错，有文件上传的稍后解决';
+                }
             } else {
                 $item['desc'] = '<span class="c-red">请先完善节点图</span>';
             }
@@ -99,7 +103,11 @@ class WebLog extends Controller
             $comment = $item['comment'];
             $data = unserialize($item['data']);
             $data['__user__'] = $item['realname'];
-            $item['desc'] = Lang::get($comment, $data);
+            try {
+                $item['desc'] = Lang::get($comment, $data);
+            } catch (Exception $e) {
+                $item['desc'] = '该节点图统计出错，有文件上传的稍后解决';
+            }
         } else {
             $item['desc'] = '<span class="c-red">请先完善节点图</span>';
         }

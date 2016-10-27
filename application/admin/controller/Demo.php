@@ -45,7 +45,7 @@ class Demo extends Controller
     public function download()
     {
         if ($this->request->param('file')) {
-            return \File::download("../build.php");
+            return \File::download("../README.md");
         } else {
             return $this->view->fetch();
         }
