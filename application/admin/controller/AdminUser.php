@@ -23,7 +23,7 @@ class AdminUser extends Controller
 {
     use \app\admin\traits\controller\Controller;
 
-    protected static $blacklist = ['delete', 'clear', 'deleteForever'];
+//    protected static $blacklist = ['delete', 'clear', 'deleteforever', 'recyclebin', 'recycle'];
 
     protected function filter(&$map)
     {

@@ -23,7 +23,7 @@ class LoginLog extends Controller
 
     protected static $isdelete = false; //禁用该字段
 
-    protected static $blacklist = ['add', 'edit', 'delete', 'deleteForever', 'forbid', 'resume', 'recycle', 'recycleBin'];
+    protected static $blacklist = ['add', 'edit', 'delete', 'deleteforever', 'forbid', 'resume', 'recycle', 'recyclebin', 'clear'];
 
     protected function filter(&$map)
     {

@@ -115,7 +115,7 @@ class Ueditor
         $info = $upload->upload($prefix);
         $error = $upload->getError();
 
-        //保存图片到数据库
+        // 保存图片到数据库
         if ($info) {
             $model = Loader::model("File");
             foreach ($info as $v) {
@@ -198,7 +198,7 @@ class Ueditor
     {
         $data = Request::instance()->param();
 
-        //遍历上传
+        // 遍历上传
         $ret["list"] = [];
         $upload = \Qiniu::instance();
         $model = Loader::model("File");
@@ -206,15 +206,15 @@ class Ueditor
             $file_name = basename($source);
             $file_path = TEMP_PATH . $file_name;
 
-            //远程下载图片到本地
+            // 远程下载图片到本地
             $file_path = \File::downloadImage($source, $file_path, 1);
 
-            //上传图片
+            // 上传图片
             $info = $upload->uploadOne($file_path, "image/");
             if ($error = $upload->getError()) {
                 $ret['list'][] = ['state' => $error];
             } else {
-                //上传成功，将数据写入到本地数据库中
+                // 上传成功，将数据写入到本地数据库中
                 $model->insertRecord($info, 1);
 
                 $ret['list'][] = [
@@ -223,7 +223,7 @@ class Ueditor
                     'source' => $source,
                 ];
             }
-            //删除临时下载的文件
+            // 删除临时下载的文件
             unlink($file_path);
         }
 

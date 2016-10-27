@@ -42,6 +42,11 @@ class Controller
             $this->request = Request::instance();
         }
 
+        // 黑名单方法
+        if ($this::$blacklist && in_array($this->request->action(), $this::$blacklist)) {
+            throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($this))->getName() . '->' . $this->request->action());
+        }
+
         // 用户ID
         defined('UID') or define('UID', Session::get(Config::get('rbac.user_auth_key')));
         // 是否是管理员
@@ -52,11 +57,6 @@ class Controller
             $this->notLogin();
         } else {
             $this->auth();
-        }
-
-        // 黑名单方法
-        if ($this::$blacklist && in_array($this->request->action(), $this::$blacklist)) {
-            throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($this))->getName() . '->' . $this->request->action());
         }
 
         // 前置方法

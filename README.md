@@ -9,7 +9,7 @@ tpadmin 是一个基于 ThinkPHP5.0 正式版和 Hui.admin v2.5 的管理后台�
 
 默认管理员帐号：admin，默认管理员密码：123456
 
-tpadmin官方交流群：518162472
+tpadmin 官方交流群：518162472
 
 ##仓库地址
 [https://github.com/yuan1994/tpadmin](https://github.com/yuan1994/tpadmin)

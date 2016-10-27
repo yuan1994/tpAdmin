@@ -23,6 +23,8 @@ class AdminNode extends Controller
 {
     use \app\admin\traits\controller\Controller;
 
+//    protected static $blacklist = ['recyclebin', 'delete', 'deleteforever', 'clear', 'recycle'];
+
     protected function filter(&$map)
     {
         if ($this->request->action() == 'index') {

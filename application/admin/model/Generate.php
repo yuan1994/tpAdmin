@@ -36,9 +36,9 @@ class Generate
     private $nameLower;
     private $post;
     // 控制器黑名单
-    private $blacklistName = ['AdminGroup', 'AdminNode', 'AdminRole', 'AdminUser', 'AdminNodeLoad', 'Pub', 'Demo', 'Generate', 'Index', 'LogLogin', 'Ueditor'];
+    private $blacklistName = ['AdminGroup', 'AdminNode', 'AdminNodeLoad', 'AdminRole', 'AdminUser', 'Pub', 'Demo', 'Generate', 'Index', 'LogLogin', 'Ueditor', 'Upload', 'WebLog', 'NodeMap', 'Error'];
     // 数据表黑名单
-    private $blacklistTable = ['admin_group', 'admin_node', 'admin_role', 'admin_user', 'admin_node_load', 'log_login', 'file'];
+    private $blacklistTable = ['admin_access', 'admin_group', 'admin_node', 'admin_node_load', 'admin_role', 'admin_role_user', 'admin_user', 'file', 'log_login', 'node_map', 'web_log_001', 'web_log_all'];
 
     public function build()
     {

@@ -19,11 +19,11 @@ class Qiniu
      * 默认上传配置
      */
     private $config = [
-        'mimes'    => [], //允许上传的文件MiMe类型
-        'max_size' => 0,  //上传的文件大小限制 (0-不做限制)
-        'exts'     => [], //允许上传的文件后缀
-        'url'      => "http://upload.qiniu.com/", //上传的地址
-        'param'    => [], //参数
+        'mimes'    => [], // 允许上传的文件 mime 类型
+        'max_size' => 0,  // 上传的文件大小限制 (0-不做限制)
+        'exts'     => [], // 允许上传的文件后缀
+        'url'      => "http://upload.qiniu.com/", // 上传的地址
+        'param'    => [], // 参数
     ];
 
     private $error = ''; //上传错误信息

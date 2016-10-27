@@ -2,18 +2,55 @@
 {block name="title"}我的桌面{/block}
 {block name="content"}
 <div class="page-container">
-    <p class="f-20 text-success">欢迎使用{$Think.config.site.name} <span class="f-14">{$Think.config.site.version}</span>后台管理系统！</p>
+    <p class="f-20 text-success">欢迎使用 {$Think.config.site.name} <span class="f-14">{$Think.config.site.version}</span> 后台管理系统！</p>
     <p>登录次数：{$info.login_count} </p>
     {if condition="session('last_login_time')"}
     <p>上次登录IP：{$last_login_ip} &nbsp;&nbsp;&nbsp; 上次登录时间：{$Think.session.last_login_time|date='Y-m-d H:i:s',###} &nbsp;&nbsp;&nbsp; 上次登录地点：{$last_login_loc}</p>
     {/if}
     <p>本次登录IP：{$current_login_ip} &nbsp;&nbsp;&nbsp; 本次登录时间：{$info.last_login_time|date='Y-m-d H:i:s',###} &nbsp;&nbsp;&nbsp; 本次登录地点：{$current_login_loc}</p>
-    <p><br></p>
-    <p><a href="https://github.com/yuan1994/tpadmin" target="_blank" class="c-blue">github仓库地址</a></p>
-    <p><a href="http://www.kancloud.cn/yuan1994/tpadmin/" target="_blank" class="c-blue">在线文档地址</a></p>
-    <p class="c-red">不推荐直接下载，请到github克隆最新代码</p>
-    <p><a href="https://github.com/yuan1994/tpadmin/archive/v1.0.1.tar.gz" target="_blank" class="c-blue">源码直接下载(tar.gz格式)</a></p>
-    <p><a href="https://github.com/yuan1994/tpadmin/archive/v1.0.1.zip" target="_blank" class="c-blue">源码直接下载(zip格式)</a></p>
+    <div class="view-body think-editor-content">
+
+        <h2>官方文档</h2>
+
+        <p><a target="_blank" class="c-blue" href="http://www.kancloud.cn/yuan1994/tpadmin">http://www.kancloud.cn/yuan1994/tpadmin</a></p>
+
+        <p class="c-red">tpadmin 官方交流群：518162472</p>
+
+        <h2>仓库地址</h2>
+
+        <p class="c-red">如果觉得不错就到 github 给个星哦</p>
+
+        <p><a target="_blank" class="c-blue" href="https://github.com/yuan1994/tpadmin">https://github.com/yuan1994/tpadmin</a></p>
+
+        <h2>使用方法</h2>
+
+        <h3 id="git-">git克隆：</h3>
+
+        <p>git clone git@github.com:yuan1994/tpadmin.git</p>
+
+        <h3 id="-">直接下载：</h3>
+
+        <p><a target="_blank" class="c-blue" href="https://github.com/yuan1994/tpadmin/archive/master.zip">https://github.com/yuan1994/tpadmin/archive/master.zip</a></p>
+
+        <blockquote class="info">
+            <p>框架的依赖需要通过 composer 下载，请在框架根目录执行 composer update ，已确保依赖的类库能下载下来</p>
+        </blockquote>
+
+        <h2>部署</h2>
+
+        <p>参考 <a target="_blank" class="c-blue" href="http://www.kancloud.cn/manual/thinkphp5/129745">ThinkPHP5 - 部署</a></p>
+
+        <p>部署成功后，建立新建数据库 tpadmin，导入项目根目录的 tpadmin.sql 文件，默认管理员帐号：admin，默认管理员密码：123456，然后访问 http://your-tpadmin-root-domain/admin</p>
+
+        <h2>开发规范</h2>
+
+        <p>请参考ThinkPHP5官方开发规范 <a href="http://www.kancloud.cn/manual/thinkphp5/118007">ThinkPHP5 - 开发规范</a></p>
+
+        <h2>注意</h2>
+
+        <p>为了确保代码自动生成可用，请在Linux/MacOS系统上使用项目时保证application文件夹有可写权限，本地开发可用将文件夹的权限改为777，线上部署请注意修改成安全的权限</p>
+    </div>
+
     <p class="c-red">以下为静态展示内容</p>
     <table class="table table-border table-bordered table-bg">
         <thead>

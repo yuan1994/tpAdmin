@@ -34,7 +34,7 @@ function layer_open(title,url,opt){
                     });
                 });
             }
-            //自动添加面包屑导航
+            // 自动添加面包屑导航
             if (true === opt.nav) {
                 layer.getChildFrame('#nav-title',index).html($('#nav-title').html()+' <span class="c-gray en">&gt;</span> '+$('.layui-layer-title').html());
             }
@@ -118,7 +118,7 @@ function ajax_req(url,data,callback,param,shade){
 }
 
 /**
- * ajax处理，对应服务端ajax_return_adv方法返回的json数据处理
+ * ajax 处理，对应服务端 ajax_return_adv 方法返回的 json 数据处理
  * @param data ajax返回数据
  * @param callback 成功回调函数
  * @param param 回调参数
@@ -178,10 +178,11 @@ function ajax_progress(data, callback, param) {
 
 /**
  * 恢复禁用等状态改变回调函数
+ * @param ret
  * @param obj
  * @param type
  */
-function change_status(obj,type) {
+function change_status(ret, obj, type) {
     //配置数据，TYPE:['下一状态文字描述','当前状态class颜色','下一状态class颜色','下一状态方法名','状态标签选择器','下一状态标签icon','下一状态标签title']
     var  data = {
         'resume':['禁用','success','warning','forbid','.status','&#xe615;','正常'],
@@ -198,7 +199,7 @@ function change_status(obj,type) {
  * @param callback
  * @param type
  */
-function loadFile(src, callback, type) {
+function load_file(src, callback, type) {
     type = type || 'script';
     var head = document.getElementsByTagName('head')[0];
     if (type == 'script') {
@@ -214,13 +215,13 @@ function loadFile(src, callback, type) {
 
     if (node.addEventListener) {
         node.addEventListener('load', function () {
-            callback();
+            typeof callback == "function" && callback();
         }, false);
     } else if (node.attachEvent) {
         node.attachEvent('onreadystatechange', function () {
             var target = window.event.srcElement;
             if (target.readyState == 'loaded') {
-                callback();
+                typeof callback == "function" && callback();
             }
         });
     }
