@@ -177,9 +177,11 @@ class Controller
         //跳转到认证网关
         if ($this->request->isAjax()) {
             ajax_return_adv_error("登录超时，请先登陆", "", "", "current", Url::build("Pub/loginFrame"))->send();
+            exit();
         } else {
             if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
                 Response::create(Url::build('Pub/login'), 'redirect')->send();
+                exit();
             } else {
                 //判断是弹出登录框还是直接跳转到登录页
                 $ret = '<script>' .
@@ -189,6 +191,7 @@ class Controller
                     'parent.login("' . Url::build('Pub/loginFrame') . '");' .
                     '</script>';
                 Response::create($ret)->send();
+                exit();
             }
         }
     }

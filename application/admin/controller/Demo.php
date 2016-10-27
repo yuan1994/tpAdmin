@@ -96,7 +96,7 @@ class Demo extends Controller
             if ($result !== true) {
                 return ajax_return_adv_error(\Mail::instance()->getError());
             } else {
-                return ajax_return_adv("邮件发送成功，请注意查收");
+                return ajax_return_adv("邮件发送成功，请注意查收", '');
             }
         } else {
             return $this->view->fetch();

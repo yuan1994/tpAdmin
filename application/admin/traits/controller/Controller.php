@@ -240,7 +240,7 @@ trait Controller
     {
         $data = $this->request->param();
         if (!isset($data[$key])) {
-            ajax_return_adv_error("缺少必要参数")->send();
+            throw new Exception('缺少必要参数');
         }
         $ids = is_array($data[$key]) ? $data[$key] : explode(",", $data[$key]);
         foreach ($ids as $id) {
@@ -266,7 +266,7 @@ trait Controller
                     break;
             }
             if ($ret) {
-                ajax_return_adv_error($error)->send();
+                throw new Exception($error);
             }
         }
     }
