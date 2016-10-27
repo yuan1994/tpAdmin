@@ -322,7 +322,7 @@ class Loader
                 //加载当前模块应用类库
                 $baseUrl = App::$modulePath;
             } elseif (is_dir(EXTEND_PATH . $name)) {
-                $baseUrl = EXTEND_PATH;
+                $baseUrl = EXTEND_PATH . $name . DS;
             } else {
                 // 加载其它模块的类库
                 $baseUrl = APP_PATH . $name . DS;
@@ -365,8 +365,9 @@ class Loader
      */
     public static function model($name = '', $layer = 'model', $appendSuffix = false, $common = 'common')
     {
-        if (isset(self::$instance[$name . $layer])) {
-            return self::$instance[$name . $layer];
+        $guid = $name . $layer;
+        if (isset(self::$instance[$guid])) {
+            return self::$instance[$guid];
         }
         if (strpos($name, '/')) {
             list($module, $name) = explode('/', $name, 2);
@@ -384,7 +385,7 @@ class Loader
                 throw new ClassNotFoundException('class not exists:' . $class, $class);
             }
         }
-        self::$instance[$name . $layer] = $model;
+        self::$instance[$guid] = $model;
         return $model;
     }
 
@@ -427,9 +428,9 @@ class Loader
         if (empty($name)) {
             return new Validate;
         }
-
-        if (isset(self::$instance[$name . $layer])) {
-            return self::$instance[$name . $layer];
+        $guid = $name . $layer;
+        if (isset(self::$instance[$guid])) {
+            return self::$instance[$guid];
         }
         if (strpos($name, '/')) {
             list($module, $name) = explode('/', $name);
@@ -447,7 +448,7 @@ class Loader
                 throw new ClassNotFoundException('class not exists:' . $class, $class);
             }
         }
-        self::$instance[$name . $layer] = $validate;
+        self::$instance[$guid] = $validate;
         return $validate;
     }
 
@@ -491,21 +492,17 @@ class Loader
     /**
      * 字符串命名风格转换
      * type 0 将Java风格转换为C的风格 1 将C风格转换为Java的风格
-     * @param string $name  字符串
+     * @param string  $name 字符串
      * @param integer $type 转换类型
      * @return string
      */
     public static function parseName($name, $type = 0)
     {
         if ($type) {
-//            return ucfirst(preg_replace_callback('/_([a-zA-Z])/', function ($match) {
-//                return strtoupper($match[1]);
-//            }, $name));
             return preg_replace_callback(['/\_([a-zA-Z])/', '/([^.][a-zA-Z]*$)/'], function ($match) {
                 return ucfirst($match[1]);
             }, $name);
         } else {
-//            return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
             return strtolower(preg_replace('/((?<=[a-z])(?=[A-Z]))/', '_', $name));
         }
     }

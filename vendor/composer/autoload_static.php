@@ -16,6 +16,7 @@ class ComposerStaticInit42f1a2b06c32df0543aaa7dd0a10f07a
         array (
             'think\\composer\\' => 15,
             'think\\captcha\\' => 14,
+            'think\\' => 6,
         ),
         'Q' => 
         array (
@@ -31,6 +32,10 @@ class ComposerStaticInit42f1a2b06c32df0543aaa7dd0a10f07a
         'think\\captcha\\' => 
         array (
             0 => __DIR__ . '/..' . '/topthink/think-captcha/src',
+        ),
+        'think\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/thinkphp/library/think',
         ),
         'Qiniu\\' => 
         array (

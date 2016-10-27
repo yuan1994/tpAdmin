@@ -58,6 +58,8 @@ return [
     'default_validate'       => '',
     // 默认的空控制器名
     'empty_controller'       => 'Error',
+    // 操作方法前缀
+    'use_action_prefix'      => false,
     // 操作方法后缀
     'action_suffix'          => '',
     // 自动搜索控制器
@@ -83,6 +85,8 @@ return [
     'url_route_on'           => true,
     // 路由配置文件（支持配置多个）
     'route_config_file'      => ['route'],
+    // 路由使用完整匹配
+    'route_complete_match'   => false,
     // 是否强制使用路由
     'url_route_must'         => false,
     // 域名部署

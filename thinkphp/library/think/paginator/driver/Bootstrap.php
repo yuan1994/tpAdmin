@@ -21,7 +21,7 @@ class Bootstrap extends Paginator
      * @param string $text
      * @return string
      */
-    protected function getPreviousButton($text = "<<")
+    protected function getPreviousButton($text = "&laquo;")
     {
 
         if ($this->currentPage() <= 1) {
@@ -40,7 +40,7 @@ class Bootstrap extends Paginator
      * @param string $text
      * @return string
      */
-    protected function getNextButton($text = '>>')
+    protected function getNextButton($text = '&raquo;')
     {
         if (!$this->hasMore) {
             return $this->getDisabledTextWrapper($text);

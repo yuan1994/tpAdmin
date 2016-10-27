@@ -12,6 +12,7 @@
 namespace think;
 
 use think\File;
+use think\Lang;
 use think\Request;
 use think\Session;
 
@@ -347,16 +348,22 @@ class Validate
                     $result = call_user_func_array($rule, [$value, $data]);
                 } else {
                     // 判断验证类型
-                    if (is_numeric($key) && strpos($rule, ':')) {
-                        list($type, $rule) = explode(':', $rule, 2);
-                        if (isset($this->alias[$type])) {
-                            // 判断别名
-                            $type = $this->alias[$type];
+                    if (is_numeric($key)) {
+                        if (strpos($rule, ':')) {
+                            list($type, $rule) = explode(':', $rule, 2);
+                            if (isset($this->alias[$type])) {
+                                // 判断别名
+                                $type = $this->alias[$type];
+                            }
+                            $info = $type;
+                        } elseif (method_exists($this, $rule)) {
+                            $type = $rule;
+                            $info = $rule;
+                            $rule = '';
+                        } else {
+                            $type = 'is';
+                            $info = $rule;
                         }
-                        $info = $type;
-                    } elseif (is_numeric($key)) {
-                        $type = 'is';
-                        $info = $rule;
                     } else {
                         $info = $type = $key;
                     }
@@ -376,6 +383,9 @@ class Validate
                     // 验证失败 返回错误信息
                     if (isset($msg[$i])) {
                         $message = $msg[$i];
+                        if (is_string($message) && strpos($message, '{%') === 0) {
+                            $message = Lang::get(substr($message, 2, -1));
+                        }
                     } else {
                         $message = $this->getRuleMsg($field, $title, $info, $rule);
                     }
@@ -603,6 +613,9 @@ class Validate
      */
     protected function activeUrl($value, $rule)
     {
+        if (!in_array($rule, ['A', 'MX', 'NS', 'SOA', 'PTR', 'CNAME', 'AAAA', 'A6', 'SRV', 'NAPTR', 'TXT', 'ANY'])) {
+            $rule = 'MX';
+        }
         return checkdnsrr($value, $rule);
     }
 
@@ -711,19 +724,24 @@ class Validate
         if (!($file instanceof File)) {
             return false;
         }
-        $rule                        = explode(',', $rule);
-        list($width, $height, $type) = getimagesize($file->getRealPath());
-        if (isset($rule[2])) {
-            $imageType = strtolower($rule[2]);
-            if ('jpeg' == $imageType) {
-                $imageType = 'jpg';
+        if ($rule) {
+            $rule                        = explode(',', $rule);
+            list($width, $height, $type) = getimagesize($file->getRealPath());
+            if (isset($rule[2])) {
+                $imageType = strtolower($rule[2]);
+                if ('jpeg' == $imageType) {
+                    $imageType = 'jpg';
+                }
+                if (image_type_to_extension($type, false) != $imageType) {
+                    return false;
+                }
             }
-            if (image_type_to_extension($type, false) != $imageType) {
-                return false;
-            }
+
+            list($w, $h) = $rule;
+            return $w == $width && $h == $height;
+        } else {
+            return in_array($this->getImageType($file->getRealPath()), [1, 2, 3, 6]);
         }
-        list($w, $h) = $rule;
-        return $w == $width && $h == $height;
     }
 
     /**
@@ -1163,7 +1181,11 @@ class Validate
         } else {
             $msg = $title . '规则错误';
         }
-        // TODO 多语言支持
+
+        if (is_string($msg) && strpos($msg, '{%')) {
+            $msg = Lang::get(substr($msg, 2, -1));
+        }
+
         if (is_string($msg) && false !== strpos($msg, ':')) {
             // 变量替换
             if (strpos($rule, ',')) {

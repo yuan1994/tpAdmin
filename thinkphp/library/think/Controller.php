@@ -146,19 +146,6 @@ class Controller
     }
 
     /**
-     * 设置模板主题
-     * tianpian <tianpian0805@gmail.com>
-     * @access protected
-     * @param string $theme
-     * @return $this
-     */
-    protected function theme($theme = '')
-    {
-        $this->view->theme($theme);
-        return $this;
-    }
-
-    /**
      * 设置验证失败后是否抛出异常
      * @access protected
      * @param bool $fail 是否抛出异常

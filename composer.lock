@@ -66,16 +66,16 @@
         },
         {
             "name": "qiniu/php-sdk",
-            "version": "v7.0.8",
+            "version": "v7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/qiniu/php-sdk.git",
-                "reference": "d1bca450b56d85beb7ba21f374a47bfeb59c288b"
+                "reference": "4b53b16783a5d153b0aad117125966c148edb7b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/qiniu/php-sdk/d1bca450b56d85beb7ba21f374a47bfeb59c288b.zip",
-                "reference": "d1bca450b56d85beb7ba21f374a47bfeb59c288b",
+                "url": "https://packagist.phpcomposer.com/files/qiniu/php-sdk/4b53b16783a5d153b0aad117125966c148edb7b9.zip",
+                "reference": "4b53b16783a5d153b0aad117125966c148edb7b9",
                 "shasum": ""
             },
             "require": {
@@ -113,20 +113,20 @@
                 "sdk",
                 "storage"
             ],
-            "time": "2016-07-19 06:18:08"
+            "time": "2016-10-25 12:58:33"
         },
         {
             "name": "topthink/framework",
-            "version": "v5.0.1",
+            "version": "v5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/top-think/framework.git",
-                "reference": "0e39004f5661ad6c11e1b00026aa9d857068dbbc"
+                "reference": "0674c774981517e48911eafc0f1102a8fe56a022"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/top-think/framework/0e39004f5661ad6c11e1b00026aa9d857068dbbc.zip",
-                "reference": "0e39004f5661ad6c11e1b00026aa9d857068dbbc",
+                "url": "https://packagist.phpcomposer.com/files/top-think/framework/0674c774981517e48911eafc0f1102a8fe56a022.zip",
+                "reference": "0674c774981517e48911eafc0f1102a8fe56a022",
                 "shasum": ""
             },
             "require": {
@@ -143,6 +143,11 @@
                 "squizlabs/php_codesniffer": "2.*"
             },
             "type": "think-framework",
+            "autoload": {
+                "psr-4": {
+                    "think\\": "library/think"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
@@ -160,7 +165,7 @@
                 "orm",
                 "thinkphp"
             ],
-            "time": "2016-09-28 03:40:39"
+            "time": "2016-10-24 06:15:09"
         },
         {
             "name": "topthink/think-captcha",

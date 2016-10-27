@@ -124,10 +124,10 @@ class Request
 
     /**
      * 架构函数
-     * @access public
+     * @access protected
      * @param array $options 参数
      */
-    public function __construct($options = [])
+    protected function __construct($options = [])
     {
         foreach ($options as $name => $item) {
             if (property_exists($this, $name)) {
@@ -248,7 +248,7 @@ class Request
         $options['baseUrl']     = $info['path'];
         $options['pathinfo']    = '/' == $info['path'] ? '/' : ltrim($info['path'], '/');
         $options['method']      = $server['REQUEST_METHOD'];
-        $options['domain']      = $info['scheme'] . '://' . $server['HTTP_HOST'];
+        $options['domain']      = isset($info['scheme']) ? $info['scheme'] . '://' . $server['HTTP_HOST'] : '';
         $options['content']     = $content;
         self::$instance         = new self($options);
         return self::$instance;
@@ -910,18 +910,22 @@ class Request
     {
         if (empty($this->header)) {
             $header = [];
-            $server = $this->server ?: $_SERVER;
-            foreach ($server as $key => $val) {
-                if (0 === strpos($key, 'HTTP_')) {
-                    $key          = str_replace('_', '-', strtolower(substr($key, 5)));
-                    $header[$key] = $val;
+            if (function_exists('apache_request_headers') && $result = apache_request_headers()) {
+                $header = $result;
+            } else {
+                $server = $this->server ?: $_SERVER;
+                foreach ($server as $key => $val) {
+                    if (0 === strpos($key, 'HTTP_')) {
+                        $key          = str_replace('_', '-', strtolower(substr($key, 5)));
+                        $header[$key] = $val;
+                    }
                 }
-            }
-            if (isset($server['CONTENT_TYPE'])) {
-                $header['content-type'] = $server['CONTENT_TYPE'];
-            }
-            if (isset($server['CONTENT_LENGTH'])) {
-                $header['content-length'] = $server['CONTENT_LENGTH'];
+                if (isset($server['CONTENT_TYPE'])) {
+                    $header['content-type'] = $server['CONTENT_TYPE'];
+                }
+                if (isset($server['CONTENT_LENGTH'])) {
+                    $header['content-length'] = $server['CONTENT_LENGTH'];
+                }
             }
             $this->header = array_change_key_case($header);
         }
@@ -1237,8 +1241,7 @@ class Request
                 if (false !== $pos) {
                     unset($arr[$pos]);
                 }
-
-                $ip = trim($arr[0]);
+                $ip = trim(current($arr));
             } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
                 $ip = $_SERVER['HTTP_CLIENT_IP'];
             } elseif (isset($_SERVER['REMOTE_ADDR'])) {
@@ -1366,7 +1369,7 @@ class Request
      * 设置或者获取当前的模块名
      * @access public
      * @param string $module 模块名
-     * @return string|$this
+     * @return string|Request
      */
     public function module($module = null)
     {
@@ -1382,7 +1385,7 @@ class Request
      * 设置或者获取当前的控制器名
      * @access public
      * @param string $controller 控制器名
-     * @return string|$this
+     * @return string|Request
      */
     public function controller($controller = null)
     {
@@ -1398,7 +1401,7 @@ class Request
      * 设置或者获取当前的操作名
      * @access public
      * @param string $action 操作名
-     * @return string
+     * @return string|Request
      */
     public function action($action = null)
     {
@@ -1414,7 +1417,7 @@ class Request
      * 设置或者获取当前的语言
      * @access public
      * @param string $lang 语言名
-     * @return string
+     * @return string|Request
      */
     public function langset($lang = null)
     {
@@ -1495,12 +1498,14 @@ class Request
                     return;
                 }
             }
-            if (Cache::has($key)) {
+
+            if (strtotime($this->server('HTTP_IF_MODIFIED_SINCE')) + $expire > $_SERVER['REQUEST_TIME']) {
                 // 读取缓存
-                $content  = Cache::get($key);
-                $response = Response::create($content)
-                    ->code(304)
-                    ->header('Content-Type', Cache::get($key . '_header'));
+                $response = Response::create()->code(304);
+                throw new \think\exception\HttpResponseException($response);
+            } elseif (Cache::has($key)) {
+                list($content, $header) = Cache::get($key);
+                $response               = Response::create($content)->header($header);
                 throw new \think\exception\HttpResponseException($response);
             } else {
                 $this->cache = [$key, $expire];
