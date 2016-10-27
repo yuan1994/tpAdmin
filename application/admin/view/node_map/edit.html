@@ -1,0 +1,79 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
+        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>模块：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <div class="select-box">
+                    <select name="module" class="select" datatype="*">
+                        <option value="admin">admin</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>节点图：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" value="{:isset($vo.map)?$vo.map:''}" placeholder="" name="map" datatype="*">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>是否AJAX：</label>
+            <div class="formControls col-xs-6 col-sm-6 skin-minimal">
+                <div class="radio-box">
+                    <input type="radio" name="is_ajax" id="is_ajax-0" value="0" datatype="*">
+                    <label for="is_ajax-0">否</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" name="is_ajax" id="is_ajax-1" value="1">
+                    <label for="is_ajax-0">是</label>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>备注：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <textarea class="textarea" placeholder="" name="comment" onKeyUp="textarealength(this,100)" datatype="*">{:isset($vo.comment)?$vo.comment:''}</textarea>
+                <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+                <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+<script>
+    $(function () {
+        $("[name='is_ajax'][value='{:isset($vo.is_ajax)?$vo.is_ajax:'0'}']").attr("checked",true);
+        $("[name='module']").find("[value='{:isset($vo.module)?$vo.module:''}']").attr("selected",true);
+
+        $('.skin-minimal input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        $("#form").Validform({
+            tiptype:2,
+            ajaxPost:true,
+            showAllError:true,
+            callback:function(ret){
+                ajax_progress(ret);
+            }
+        });
+    })
+</script>
+{/block}

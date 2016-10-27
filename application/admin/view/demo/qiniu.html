@@ -2,7 +2,7 @@
 {block name="content"}
 <div class="page-container">
     <iframe name="upload" style="display: none"></iframe>
-    <form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:request()->baseUrl()}">
+    <form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:\\think\\Url::build(\\think\\Request::instance()->action())}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>图片：</label>
             <div class="formControls col-xs-6 col-sm-6">
@@ -18,6 +18,7 @@
             </div>
         </div>
     </form>
+    <p class="c-red">请参考百度编辑器，百度编辑器集成七牛上传</p>
     <div id="markdown" class="mt-20"></div>
 </div>
 {/block}
@@ -40,7 +41,7 @@
 html代码：
 ```
 <iframe name="upload" style="display: none"></iframe>
-<form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:request()->baseUrl()}">
+<form class="form form-horizontal" id="form" method="post" target="upload" enctype="multipart/form-data" action="{:\\think\\Request::instance()->baseUrl()}">
     <div class="row cl">
         <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>图片：</label>
         <div class="formControls col-xs-6 col-sm-6">
@@ -59,7 +60,7 @@ html代码：
 ```
 php代码：
 ```
-return '<s1cript>parent.layer.alert("仅做演示")</s1cript>'; //去掉sc中间的1，markdown解析失败
+return '<s1cript>parent.layer.alert("仅做演示")</s1cript>'; // 去掉sc中间的1，markdown解析失败
 /*$result = \Qiniu::instance()->upload();
 p($result);*/
 ```

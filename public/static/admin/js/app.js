@@ -14,7 +14,7 @@ $(function () {
  * @param opt 选项 {w:WIDTH('800px|80%'),h:HEIGHT('600px|80%'),type:1|2,fn:CALLBACK(回调函数),confirm:BOOL(关闭弹层警告)}
  */
 function layer_open(title,url,opt){
-    if (typeof opt === "undefined") opt = {};
+    if (typeof opt === "undefined") opt = {nav:true};
     return layer.open({
         type: opt.type || 2,
         area: [opt.w || "80%", opt.h || "80%"],
@@ -34,8 +34,12 @@ function layer_open(title,url,opt){
                     });
                 });
             }
+            // 自动添加面包屑导航
+            if (true === opt.nav) {
+                layer.getChildFrame('#nav-title',index).html($('#nav-title').html()+' <span class="c-gray en">&gt;</span> '+$('.layui-layer-title').html());
+            }
             if (typeof opt.fn === "function"){
-                opt.fn();
+                opt.fn(layero,index);
             }
         }
     });
@@ -114,53 +118,71 @@ function ajax_req(url,data,callback,param,shade){
 }
 
 /**
- *  * ajax处理，对应服务端ajax_return_adv方法返回的json数据处理
+ * ajax 处理，对应服务端 ajax_return_adv 方法返回的 json 数据处理
  * @param data ajax返回数据
  * @param callback 成功回调函数
  * @param param 回调参数
  */
-function ajax_progress(data,callback,param){
-    if(data.status == 'y'){
-        var index = parent.layer.getFrameIndex(window.name);
-        if(data.close){
-            parent.layer.close(index);
-        }
-        if(data.redirect == 'current'){ //是否当前页重定向
-            if(!data.url){ //刷新
-                window.location.reload();
-            } else { //重定向到url
-                window.location.href = data.url;
+function ajax_progress(data, callback, param) {
+    if (data.code == 0) {
+        if (typeof data.opt == "object") {
+            var index = parent.layer.getFrameIndex(window.name);
+            if (data.opt.close) {
+                parent.layer.close(index);
             }
-        } else if(data.redirect == 'parent'){ //是否父层重定向
-            if(!data.url){ //刷新
-                window.parent.location.reload();
-            } else { //重定向到url
-                window.parent.location.href = data.url;
+            if (data.opt.redirect == 'current') {
+                // 当前页重定向
+                if (!data.opt.url) {
+                    // 刷新
+                    window.location.reload();
+                } else {
+                    // 重定向到 url
+                    window.location.href = data.opt.url;
+                }
+            } else if (data.opt.redirect == 'parent') {
+                // 父层重定向
+                if (!data.opt.url) {
+                    // 刷新
+                    window.parent.location.reload();
+                } else {
+                    // 重定向到 url
+                    window.parent.location.href = data.opt.url;
+                }
+                // 关闭当前层
+                parent.layer.close(index);
             }
-            parent.layer.close(index); //关闭当前层
+            // 父层弹出信息
+            if (data.opt.alert) {
+                parent.layer.alert(data.opt.alert);
+                parent.layer.close(index);
+            }
+            if (!data.opt.close && !data.opt.redirect && !data.opt.alert) {
+                parent.layer.msg(data.msg);
+                parent.layer.close(index);
+            }
+        } else {
+            layer.msg(data.msg);
         }
-        if(data.alert){ //父层弹出信息
-            parent.layer.alert(data.alert);
-            parent.layer.close(index);
-        }
-        if(!data.close && !data.redirect && !data.alert){
-            parent.layer.msg(data.info);
-            parent.layer.close(index);
-        }
-        if (typeof callback == "function"){
-            callback.apply(this,param);
+        if (typeof callback == "function") {
+            if (typeof param != "undefined") {
+                param.unshift(data)
+            } else {
+                param = [data];
+            }
+            callback.apply(this, param);
         }
     } else {
-        layer.alert(data.info,{title:"错误信息",icon:2});
+        layer.alert(data.msg, {title: "错误信息", icon: 2});
     }
 }
 
 /**
  * 恢复禁用等状态改变回调函数
+ * @param ret
  * @param obj
  * @param type
  */
-function change_status(obj,type) {
+function change_status(ret, obj, type) {
     //配置数据，TYPE:['下一状态文字描述','当前状态class颜色','下一状态class颜色','下一状态方法名','状态标签选择器','下一状态标签icon','下一状态标签title']
     var  data = {
         'resume':['禁用','success','warning','forbid','.status','&#xe615;','正常'],
@@ -170,6 +192,68 @@ function change_status(obj,type) {
     $this.html(data[type][0]).attr("title","点击"+data[type][0]).removeClass("label-"+data[type][1]).addClass("label-"+data[type][2]).attr("onclick",$this.attr("onclick").replace(new RegExp(type,'g'),data[type][3]));
     $this.parents("tr").find(data[type][4]).html(data[type][5]).removeClass("c-"+data[type][2]).addClass("c-"+data[type][1]).attr("title",data[type][6]);
 }
+
+/**
+ * 动态加载javascript或style文件
+ * @param src
+ * @param callback
+ * @param type
+ */
+function load_file(src, callback, type) {
+    type = type || 'script';
+    var head = document.getElementsByTagName('head')[0];
+    if (type == 'script') {
+        var node = document.createElement('script');
+        node.type = 'text/javascript';
+        node.charset = 'UTF-8';
+        node.src = src;
+    } else {
+        var node = document.createElement('link');
+        node.rel = 'stylesheet';
+        node.href = src;
+    }
+
+    if (node.addEventListener) {
+        node.addEventListener('load', function () {
+            typeof callback == "function" && callback();
+        }, false);
+    } else if (node.attachEvent) {
+        node.attachEvent('onreadystatechange', function () {
+            var target = window.event.srcElement;
+            if (target.readyState == 'loaded') {
+                typeof callback == "function" && callback();
+            }
+        });
+    }
+    head.appendChild(node);
+}
+
+/**
+ * 高级版 Tab 切换
+ * @param tabBar Tab 标签
+ * @param tabCon Tab 容器
+ * @param class_name 被选中标签class
+ * @param tabEvent 触发 Tab 切换的事件
+ * @param i 被激活索引
+ * @param callback 切换回调函数 callback(index,$tabCon,$tabBar)
+ * @param finished 初始化完成之后的回调函数 finished(index,$tabCon,$tabBar)
+ */
+jQuery.tpTab =function(tabBar,tabCon,class_name,tabEvent,i,callback,finished){
+    var $tabBar=$(tabBar),$tabCon=$(tabCon);
+    function chg(index) {
+        $tabBar.removeClass(class_name).eq(index).addClass(class_name);
+        $tabCon.hide().eq(index).show();
+    }
+    // 初始化操作
+    chg(i||0);
+    typeof finished === "function" && finished(i,$tabCon,$tabBar);
+
+    $tabBar.bind(tabEvent,function(){
+        var index=$tabBar.index(this);
+        chg(index);
+        typeof callback === "function" && callback(index,$tabCon,$tabBar);
+    });
+};
 
 /**
  * 永久删除操作项
@@ -257,11 +341,11 @@ function clear_recyclebin(url){
         icon:3
     }, function(){
         $.post(url,'',function(data){
-            if(data.status == 'y'){
+            if(data.code == 0){
                 layer.msg("已清空",{icon:1,time:1000});
                 window.location.reload();
             } else {
-                layer.alert(data.info);
+                layer.alert(data.msg);
             }
         },'json')
     }, function(index){
@@ -297,8 +381,12 @@ function table_fixed(selector,width) {
     $obj.wrap('<div style="width:100%;overflow:auto"></div>');
 }
 
-//生成随机字符串
-var get_random = function (prefix) {
+/**
+ * 生成随机字符串
+ * @param prefix
+ * @returns {string}
+ */
+function get_random(prefix) {
     prefix = prefix || "";
     return prefix + Date.now().toString(36) + "_" + Math.random().toString(36).substr(2);
 };
@@ -310,11 +398,11 @@ function _del_recycle(obj,id,url,msg,returnMsg){
         icon:3
     }, function(){
         $.post(url,{id:id},function(data){
-            if(data.status == 'y'){
+            if(data.code == 0){
                 layer.msg(returnMsg,{icon:1,time:1000});
                 $(obj).parents("tr").fadeOut();
             } else {
-                layer.alert(data.info);
+                layer.alert(data.msg);
             }
         },'json')
     }, function(index){
@@ -330,7 +418,7 @@ function _recycle(obj,id,url,msg){
     _del_recycle(obj,id,url,msg,"已还原！")
 }
 
-function _del_recycle_all(url,checkbox_group,msg,returnMsg){
+function _del_recycle_all(url,checkbox_group,msg,return_msg){
     layer.confirm(msg, {
         btn: ['确定','取消'],
         title:'提示',
@@ -341,11 +429,11 @@ function _del_recycle_all(url,checkbox_group,msg,returnMsg){
             id.push($(this).val())
         });
         $.post(url,{id:id.join(',')},function(data){
-            if(data.status == 'y'){
-                parent.layer.msg(returnMsg,{icon:1,time:1000});
+            if(data.code == 0){
+                parent.layer.msg(return_msg,{icon:1,time:1000});
                 window.location.reload();
             } else {
-                layer.alert(data.info);
+                layer.alert(data.msg);
             }
         },'json')
     }, function(index){

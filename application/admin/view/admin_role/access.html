@@ -23,7 +23,7 @@
 
         $(".save").click(function () {
             var node = $("#tree").getCheckedNodes();
-            ajax_req('{:request()->baseUrl()}',{id:'{:input("id")}','node_id':node},undefined,undefined,true);
+            ajax_req('{:\\think\\Request::instance()->baseUrl()}',{id:'{:\\think\\Request::instance()->param("id")}','node_id':node},undefined,undefined,true);
         });
     })
 </script>

@@ -1,7 +1,7 @@
 {extend name="template/base" /}
 {block name="content"}
 <div class="page-container">
-    <a class="btn btn-success" href="{:url('','file=build.php')}" target="download">下载文件</a>
+    <a class="btn btn-success" href="{:\\think\\Url::build('','file=build.php')}" target="download">下载文件</a>
     <div id="markdown" class="mt-20"></div>
 </div>
 {/block}
@@ -16,21 +16,27 @@
 </script>
 <script type="text/plain" id="markdown_tpl">
 ---
-方法
+方法：
 ```
-download($file_path,$file_name = '',$file_size = '',$ext=''); //助手函数
 /File::download($file_path,$file_name = '',$file_size = '',$ext='');
 ```
-html代码：
+助手函数：
 ```
-<a class="btn btn-success" href="{:url('','file=build.php')}" target="download">下载文件</a>
+download($file_path,$file_name = '',$file_size = '',$ext='');
 ```
-php代码：
+html 代码：
 ```
-if (input("param.file")){
-    return download("../build.php");
-} else {
-    return $this->fetch();
+<a class="btn btn-success" href="{:\\think\\Url::build('','file=build.php')}" target="download">下载文件</a>
+```
+php 代码：
+```
+public function download()
+{
+    if ($this->request->param('file')) {
+        return \File::download("../build.php");
+    } else {
+        return $this->view->fetch();
+    }
 }
 ```
 </script>

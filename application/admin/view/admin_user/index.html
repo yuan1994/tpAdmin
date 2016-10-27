@@ -23,8 +23,12 @@
             {include file="td" /}
             <td class="f-14">
                 {$vo.status|show_status=$vo.id}
-                <a title="编辑" href="javascript:;" onclick="layer_open('编辑','{:url(\'edit\',[\'id\'=>$vo[\'id\']])}')" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>
-                <a title="修改密码" href="javascript:;" onclick="layer_open('修改密码','{:url(\'password\',[\'id\'=>$vo[\'id\']])}')" class="ml-5 label label-secondary radius" style="text-decoration:none">修改密码</a>
+                {tp:access action='edit'}
+                <a title="编辑" href="javascript:;" onclick="layer_open('编辑','{:\\think\\Url::build(\'edit\',[\'id\'=>$vo[\'id\']])}')" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>
+                {/tp:access}
+                {tp:access action='password'}
+                <a title="修改密码" href="javascript:;" onclick="layer_open('修改密码','{:\\think\\Url::build(\'password\',[\'id\'=>$vo[\'id\']])}')" class="ml-5 label label-secondary radius" style="text-decoration:none">修改密码</a>
+                {/tp:access}
             </td>
         </tr>
         {/volist}

@@ -2,7 +2,7 @@
 {block name="script"}
 <script>
     $(function () {
-        $("[name='group_id']").find("[value='{:input(\"param.group_id\")}']").attr("selected",true);
+        $("[name='group_id']").find("[value='{:\\think\\Request::instance()->param(\"group_id\")}']").attr("selected",true);
     })
 </script>
 {/block}

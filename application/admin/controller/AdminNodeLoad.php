@@ -2,7 +2,9 @@
 // +----------------------------------------------------------------------
 // | tpadmin [a web admin based ThinkPHP5]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian
+// | Copyright (c) 2016 tianpian All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
@@ -12,13 +14,20 @@
 //-------------------------
 
 namespace app\admin\controller;
+
 use app\admin\Controller;
 
-class AdminNodeLoad extends Controller{
-    protected $isdelete = false;
+class AdminNodeLoad extends Controller
+{
+    use \app\admin\traits\controller\Controller;
 
-    protected function _filter(&$map){
-        if (input("param.title")) $map['title'] = array("like","%".input("param.title")."%");
-        if (input("param.name")) $map['name'] = array("like","%".input("param.name")."%");
+    protected static $isdelete = false;
+
+    protected static $blacklist = ['delete', 'recycle'];
+
+    protected function filter(&$map)
+    {
+        if ($this->request->param('title')) $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
+        if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
     }
 }

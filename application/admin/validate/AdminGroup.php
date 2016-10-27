@@ -2,7 +2,9 @@
 // +----------------------------------------------------------------------
 // | tpadmin [a web admin based ThinkPHP5]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian
+// | Copyright (c) 2016 tianpian All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
@@ -12,9 +14,11 @@
 //-------------------------
 
 namespace app\admin\validate;
+
 use think\Validate;
 
-class AdminGroup extends Validate{
+class AdminGroup extends Validate
+{
     protected $rule = [
         "name|分组名称" => "require|unique:admin_group",
     ];

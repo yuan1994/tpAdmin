@@ -1,0 +1,36 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <div>
+        <p class="c-red">集成七牛上传，请在编辑器里上传图片</p>
+        <script id="editor" type="text/plain" style="height:400px"></script>
+    </div>
+    <div id="markdown" class="mt-20"></div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
+<script>window.UEDITOR_HOME_URL = '__LIB__/ueditor/1.4.3/'</script>
+<script type="text/javascript" charset="utf-8" src="__LIB__/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="__LIB__/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" charset="utf-8" src="__LIB__/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script>
+    $(function () {
+        var ue = UE.getEditor('editor',{
+            serverUrl:'{:\\think\\Url::build("Ueditor/index")}'
+        });
+        var converter = new showdown.Converter(),
+                text      = $("#markdown_tpl").html();
+        $("#markdown").html(converter.makeHtml(text));
+    })
+</script>
+{literal}
+<script type="text/plain" id="markdown_tpl">
+---
+方法
+```
+将 ueditor 的服务地址修改为 Ueditor 控制器，使用方法请参考该示例源码
+```
+</script>
+{/literal}
+{/block}

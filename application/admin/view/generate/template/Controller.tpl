@@ -2,18 +2,24 @@
 // +----------------------------------------------------------------------
 // | tpadmin [a web admin based ThinkPHP5]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian
+// | Copyright (c) 2016 tianpian All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
 
 //------------------------
-// [CONTROLLER_NAME_TITLE]控制器
+// [TITLE]控制器
 //-------------------------
 
-namespace app\admin\controller[CONTROLLER_DIR];
+namespace app\admin\controller[NAMESPACE];
+
 use app\admin\Controller;
 
-class [CONTROLLER_NAME] extends Controller{
+class [NAME] extends Controller
+{
+    use \app\admin\traits\controller\Controller;
+
     [FILTER]
 }

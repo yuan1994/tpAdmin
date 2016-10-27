@@ -1,0 +1,177 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <input type="hidden" id="callbackId" value="{:\\think\\Request::instance()->param('id')}">
+    <div id="tab_upload" class="HuiTab">
+        <div class="tabBar cl">
+            <span>本地上传</span>
+            <span>网络图片</span>
+            <span>历史图片</span>
+        </div>
+        <div class="tabCon">
+            <div>
+                <div id="drag" class="mt-30">
+                    <label for="file-input">
+                        <i class="Hui-iconfont Hui-iconfont-add3" style="font-size: 100px" id="upload-btn"></i>
+                    </label>
+                </div>
+                <input type="file" accept="*/*" name="file[]" id="file-input" multiple class="input-file"
+                       style="display: none">
+            </div>
+        </div>
+        <div class="tabCon">
+            <div class="form form-horizontal mt-30">
+                <div class="formControls" id="net-image">
+                    <input type="text" class="input-text radius" id="remote-input" style="width: 60%">
+                    <button class="btn btn-secondary radius ml-10" type="button" id="crawl-btn">抓取</button>
+                    <button class="btn btn-primary radius ml-10" type="button" id="remote-btn">确定</button>
+                </div>
+            </div>
+        </div>
+        <div class="tabCon">
+            <div class="photo-list mt-30"></div>
+            <div class="photo-page" id="photo-page"></div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="style"}
+<link rel="stylesheet" href="__LIB__/lightbox2/css/lightbox.min.css">
+{/block}
+{block name="script"}
+<script src="__LIB__/laypage/1.3/laypage.js"></script>
+<script src="__LIB__/tpUpload/tpUpload.js"></script>
+<script src="__LIB__/lightbox2/js/lightbox.min.js"></script>
+<script>
+
+    /*
+     // uploadify 上传，需要可以自己使用
+     $("#file-input").uploadify({
+     'fileObjName' : 'file',
+     'buttonText' : '选择文件',
+     'buttonCursor' : 'pointer',
+     'multi' : false,
+     'fileSizeLimit' : '5MB',
+     'fileTypeExts' : '*.gif; *.jpg; *.png',
+     'swf'      : '__LIB__/uploadify/uploadify.swf',
+     'uploader' : '{:\\think\\Url::build("upload")}',
+     'onUploadError' : function (file, errorCode, errorMsg, errorString) {
+     layer.alert('文件'+file.name+'上传失败：'+errorString);
+     },
+     'onUploadSuccess' : function (file, ret, response) {
+     console.log(arguments);
+     },
+     'onFallback' : function () {
+     layer.alert('您的浏览器不支持Flash文件上传');
+     }
+     });*/
+    $(function () {
+        var callbackId = $("#callbackId").val();
+        // Tab 切换
+        $.tpTab("#tab_upload .tabBar span", "#tab_upload .tabCon", "current", "click", "0", function (index, tabCon, tabBar) {
+            if (index == 2 && tabCon.eq(index).find('.photo-list').html() == '') {
+                getListImage({p:p,'count':'1'});
+            }
+        }, function (i) {
+
+        });
+        // 文件上传
+        $("#file-input").tpUpload({
+            url: '{:\\think\\Url::build("upload")}',
+            data: {a: 'a'},
+            drag: '#drag',
+            start: function () {
+                layer_msg = layer.msg('正在上传中…', {time: 100000000});
+            },
+            progress: function (loaded, total, file) {
+                $('.layui-layer-msg .layui-layer-content').html('已上传' + (loaded / total * 100).toFixed(2) + '%');
+            },
+            success: function (ret) {
+                callback(callbackId,ret.data[0]);
+            },
+            error: function (ret) {
+                layer.alert(ret);
+            },
+            end: function () {
+                layer.close(layer_msg);
+            }
+        });
+
+        // 远程图片抓取
+        $("#net-image").on('click', '#crawl-btn', function () {
+            var remote_input = $("#remote-input");
+            if (!remote_input.val()) {
+                layer.alert('请输入远程图片的链接');
+                return ;
+            }
+            ajax_req('{:\\think\\Url::build("remote")}', {'url':remote_input.val()},function (ret) {
+                remote_input.val(ret.data.url);
+            });
+        }).on('click', '#remote-btn', function () {
+            var url = $("#remote-input").val();
+            callback(callbackId,url);
+        });
+
+        // 已上传图片列表
+        // 初始化
+        var p = location.hash.replace('#!p=', '') || 1;
+        var pages = 0;
+        $(".photo-list").on("click", '.photo-list-select', function () {
+            callback(callbackId, $(this).parent().prev().attr('data-src'))
+        });
+
+        function getListImage(param) {
+            $.post('{:\\think\\Url::build("listImage")}', param, function (ret) {
+                if (ret.code) {
+                    layer.alert(ret.msg);
+                } else {
+                    if(typeof ret.data.count != "undefined" && ret.data.count > 0) {
+                        pages = Math.ceil(ret.data.count/10);
+                    }
+
+                    // 数据组装
+                    var html = '';
+                    for(var i in ret.data.list) {
+                        var current = ret.data.list[i];
+                        html += '<div class="photo-list-item">'
+                                + '<img src="'+current.name+'" data-src="'+current.name+'" class="photo-sub" alt="'+current.original+'" title="'+current.original+'">'
+                                + '<div class="photo-mask">'
+                                + '<a class="photo-list-btn photo-list-preview radius" href="'+current.name+'" data-lightbox="preview" data-title="'+current.original+'">预览</a>'
+                                + '<a class="photo-list-btn photo-list-select radius ml-10" href="javascript:;">选择</a>'
+                                + '</div>'
+                                + '</div>';
+                    }
+                    $(".photo-list").html(html);
+                    //显示分页
+                    laypage({
+                        cont: 'photo-page', //容器。值支持id名、原生dom对象，jquery对象。【如该容器为】：<div id="page1"></div>
+                        pages: pages, //通过后台拿到的总页数
+                        curr:  param.p, //当前页
+                        hash: 'p',
+                        jump: function (obj, first) { //触发分页后的回调
+                            if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                                getListImage({'p':obj.curr});
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    /**
+     * 数据回调
+     * @param id
+     * @param value
+     */
+    function callback(id,value) {
+        if (window.parent.frames.length == 0){
+            layer.alert('请在弹层中打开此页');
+        } else {
+            parent.document.getElementById(id).value = value;
+            layer_close();
+        }
+    }
+
+</script>
+{/block}

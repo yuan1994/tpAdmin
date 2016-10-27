@@ -22,8 +22,12 @@
         <tr class="text-c">
             {include file="td" /}
             <td class="f-14">
-                <a href="javascript:;" onclick="recycle(this,'{$vo.id}','{:url(\'recycle\')}')" class="label label-success radius">还原</a>
-                <a href="javascript:;" onclick="del_forever(this,'{$vo.id}','{:url(\'deleteForever\')}')" class="label label-danger radius">彻底删除</a>
+                {tp:access action='recycle'}
+                <a href="javascript:;" onclick="recycle(this,'{$vo.id}','{:\\think\\Url::build(\'recycle\')}')" class="label label-success radius">还原</a>
+                {/tp:access}
+                {tp:access action='deleteForever'}
+                <a href="javascript:;" onclick="del_forever(this,'{$vo.id}','{:\\think\\Url::build(\'deleteForever\')}')" class="label label-danger radius">彻底删除</a>
+                {/tp:access}
             </td>
         </tr>
         {/volist}

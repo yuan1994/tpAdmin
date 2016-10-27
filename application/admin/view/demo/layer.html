@@ -1,28 +1,28 @@
 {extend name="template/base" /}
 {block name="content"}
 <div class="page-container">
-    <button class="btn btn-success" onclick="layer_open('默认弹层','{:url(\'layer\')}')">默认弹层</button>
+    <button class="btn btn-success" onclick="layer_open('默认弹层','{:\\think\\Url::build(\'layer\')}')">默认弹层</button>
     <div class="mt-20 markdown">
 ```
-layer_open('默认弹层','{:url(\'layer\')}'); //默认弹层宽高都为80%
+layer_open('默认弹层','{:\\think\\Url::build(\'layer\')}'); //默认弹层宽高都为80%
 ```
     </div>
-    <button class="btn btn-success" onclick="layer_open('全屏弹层','{:url(\'layer\')}',{w:'100%',h:'100%'})">全屏弹层</button>
+    <button class="btn btn-success" onclick="layer_open('全屏弹层','{:\\think\\Url::build(\'layer\')}',{w:'100%',h:'100%'})">全屏弹层</button>
     <div class="mt-20 markdown">
 ```
-layer_open('全屏弹层','{:url(\'layer\')}',{w:'100%',h:'100%'}); //全屏弹层宽高都为100%
+layer_open('全屏弹层','{:\\think\\Url::build(\'layer\')}',{w:'100%',h:'100%'}); //全屏弹层宽高都为100%
 ```
     </div>
-    <button class="btn btn-success" onclick="layer_open('带警告的弹层','{:url(\'layer\')}',{confirm:true})">带警告的弹层</button>
+    <button class="btn btn-success" onclick="layer_open('带警告的弹层','{:\\think\\Url::build(\'layer\')}',{confirm:true})">带警告的弹层</button>
     <div class="mt-20 markdown">
 ```
-layer_open('带警告的弹层','{:url(\'layer\')}',{confirm:true}); //弹层关闭前会有警告提醒
+layer_open('带警告的弹层','{:\\think\\Url::build(\'layer\')}',{confirm:true}); //弹层关闭前会有警告提醒
 ```
     </div>
-    <button class="btn btn-success" onclick="layer_open('带回调的弹层','{:url(\'layer\')}',{fn:function() {layer.alert('我是回调，会在弹层结束后触发')}})">带警告的弹层</button>
+    <button class="btn btn-success" onclick="layer_open('带回调的弹层','{:\\think\\Url::build(\'layer\')}',{fn:function() {layer.alert('我是回调，会在弹层结束后触发')}})">带警告的弹层</button>
     <div class="mt-20 markdown">
 ```
-layer_open('带回调的弹层','{:url(\'layer\')}',{fn:function() {layer.alert('我是回调，会在弹层结束后触发')}}); //回调会在弹层结束后触发
+layer_open('带回调的弹层','{:\\think\\Url::build(\'layer\')}',{fn:function() {layer.alert('我是回调，会在弹层结束后触发')}}); //回调会在弹层结束后触发
 ```
     </div>
     <button class="btn btn-success" onclick="layer_open('使用HTML内联弹层',$('#tpl').html(),{type:1})">使用HTML内联弹层</button>

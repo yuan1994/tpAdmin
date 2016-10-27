@@ -2,18 +2,22 @@
 // +----------------------------------------------------------------------
 // | tpadmin [a web admin based ThinkPHP5]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian
+// | Copyright (c) 2016 tianpian All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
 
 //------------------------
-// [CONTROLLER_NAME_TITLE]验证器
+// [TITLE]验证器
 //-------------------------
 
-namespace app\admin\validate;
+namespace app\admin\validate[NAMESPACE];
+
 use think\Validate;
 
-class [CONTROLLER_NAME] extends Validate{
+class [NAME] extends Validate
+{
     [RULE]
 }

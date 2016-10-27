@@ -4,7 +4,7 @@
         <dd>
             <ul>
                 {volist id="item" name="menu[$group['id']]"}
-                    {:widget("Index/menu",['list'=>$item])}
+                    {tp:widget url="Index/menu" param="['list' => $item]" /}
                 {/volist}
             </ul>
         </dd>

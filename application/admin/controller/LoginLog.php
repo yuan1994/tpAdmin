@@ -2,7 +2,9 @@
 // +----------------------------------------------------------------------
 // | tpadmin [a web admin based ThinkPHP5]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian
+// | Copyright (c) 2016 tianpian All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: tianpian <tianpian0805@gmail.com>
 // +----------------------------------------------------------------------
@@ -12,21 +14,30 @@
 //-------------------------
 
 namespace app\admin\controller;
+
 use app\admin\Controller;
 
-class LoginLog extends Controller{
-    protected $isdelete = false; //禁用该字段
+class LoginLog extends Controller
+{
+    use \app\admin\traits\controller\Controller;
 
-    protected function _filter(&$map){
-        if (input("param.login_location")) $map['login_location'] = array("like","%".input("param.login_location")."%");
+    protected static $isdelete = false; //禁用该字段
 
-        //关联筛选
-        if (input("param.account")) $map['admin_user.account'] = input("param.account");
-        if (input("param.name")) $map['admin_user.realname'] = array("like","%".input("param.name")."%");
+    protected static $blacklist = ['add', 'edit', 'delete', 'deleteforever', 'forbid', 'resume', 'recycle', 'recyclebin', 'clear'];
 
-        //设置属性
+    protected function filter(&$map)
+    {
+        if ($this->request->param('login_location')) {
+            $map['login_location'] = ["like", "%" . $this->request->param('login_location') . "%"];
+        }
+
+        // 关联筛选
+        if ($this->request->param('account')) $map['admin_user.account'] = $this->request->param('account');
+        if ($this->request->param('name')) $map['admin_user.realname'] = ["like", "%" . $this->request->param('name') . "%"];
+
+        // 设置属性
         $map['_table'] = "login_log";
         $map['_relation'] = "user";
-        $map['_order_by'] = false;
+        $map['_order_by'] = "login_log.id desc";
     }
 }

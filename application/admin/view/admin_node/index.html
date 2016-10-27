@@ -4,14 +4,34 @@
     {include file='form' /}
     <div class="cl pd-5 bg-1 bk-gray">
         <span class="l">
-            <a class="btn btn-primary radius" href="javascript:;" onclick="layer_open('添加','{:url(\'add\',[\'pid\'=>input(\'param.pid\')])}')"><i class="Hui-iconfont">&#xe600;</i> 添加</a>
-            <a href="javascript:;" onclick="forbid_all('{:url(\'forbid\')}')" class="btn btn-warning radius ml-5"><i class="Hui-iconfont">&#xe631;</i> 禁用</a>
-            <a href="javascript:;" onclick="resume_all('{:url(\'resume\')}')" class="btn btn-success radius ml-5"><i class="Hui-iconfont">&#xe615;</i> 恢复</a>
-            <a href="javascript:;" onclick="del_all('{:url(\'delete\')}')" class="btn btn-danger radius ml-5"><i class="Hui-iconfont">&#xe6e2;</i> 删除</a>
-            <a href="javascript:;" onclick="open_window('回收站','{:url(\'recyclebin\')}')" class="btn btn-secondary radius ml-5"><i class="Hui-iconfont">&#xe6b9;</i> 回收站</a>
-            <a href="{:url('index',['pid'=>0])}" class="btn btn-success radius ml-5"><i class="Hui-iconfont">&#xe625;</i> 返回根目录</a>
-            <a href="javascript:;" onclick="history.back()" class="btn btn-secondary radius ml-5"><i class="Hui-iconfont">&#xe66b;</i> 返回上一级</a>
-            <a href="javascript:;" onclick="layer_open('批量导入','{:url(\'load\',[\'pid\'=>input(\'param.pid\')])}')" class="btn btn-primary radius ml-5"><i class="Hui-iconfont">&#xe645;</i> 批量导入</a>
+            {tp:access action='add'}
+            <a class="btn btn-primary radius" href="javascript:;"
+               onclick="layer_open('添加','{:\\think\\Url::build(\'add\',[\'pid\'=>\\think\\Request::instance()->param(\'pid\')])}')"><i class="Hui-iconfont">&#xe600;</i> 添加</a>
+            {/tp:access}
+            {tp:access action='forbid'}
+            <a href="javascript:;" onclick="forbid_all('{:\\think\\Url::build(\'forbid\')}')" class="btn btn-warning radius ml-5"><i
+                    class="Hui-iconfont">&#xe631;</i> 禁用</a>
+            {/tp:access}
+            {tp:access action='resume'}
+            <a href="javascript:;" onclick="resume_all('{:\\think\\Url::build(\'resume\')}')" class="btn btn-success radius ml-5"><i
+                    class="Hui-iconfont">&#xe615;</i> 恢复</a>
+            {/tp:access}
+            {tp:access action='delete'}
+            <a href="javascript:;" onclick="del_all('{:\\think\\Url::build(\'delete\')}')" class="btn btn-danger radius ml-5"><i
+                    class="Hui-iconfont">&#xe6e2;</i> 删除</a>
+            {/tp:access}
+            {tp:access action='recycleBin'}
+            <a href="javascript:;" onclick="open_window('回收站','{:\\think\\Url::build(\'recycleBin\')}')"
+               class="btn btn-secondary radius ml-5"><i class="Hui-iconfont">&#xe6b9;</i> 回收站</a>
+            {/tp:access}
+            <a href="{:\\think\\Url::build('index',['pid'=>0])}" class="btn btn-success radius ml-5"><i
+                    class="Hui-iconfont">&#xe625;</i> 返回根目录</a>
+            <a href="javascript:;" onclick="history.back()" class="btn btn-secondary radius ml-5"><i
+                    class="Hui-iconfont">&#xe66b;</i> 返回上一级</a>
+            {tp:access action='load'}
+            <a href="javascript:;" onclick="layer_open('批量导入','{:\\think\\Url::build(\'load\',[\'pid\'=>\\think\\Request::instance()->param(\'pid\')])}')"
+               class="btn btn-primary radius ml-5"><i class="Hui-iconfont">&#xe645;</i> 批量导入</a>
+            {/tp:access}
         </span>
         <span class="r pt-5 pr-5">
             共有数据 ：<strong>{$count}</strong> 条
@@ -29,16 +49,32 @@
         <tr class="text-c">
             <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
             <td>{$vo.id}</td>
-            <td><a href="{:url('index',['pid'=>$vo.id])}" class="c-blue">{eq name='vo.group_id' value='0'}未分组{else/}{$group_list[$vo.group_id]['name']}{/eq}</a></td>
-            <td><a href="{:url('index',['pid'=>$vo.id])}" class="c-blue">{$vo.title|high_light=input('param.title')}</a></td>
-            <td><a href="{:url('index',['pid'=>$vo.id])}" class="c-blue">{$vo.name|high_light=input('param.name')}</a></td>
+            <td><a class="c-blue" href="{:\\think\\Url::build('index',['pid'=>$vo.id])}">
+                    {:isset($group_list[$vo.group_id])?$group_list[$vo.group_id]['name']:'未分组'}
+                </a>
+            </td>
+            <td><a class="c-blue" href="{:\\think\\Url::build('index',['pid'=>$vo.id])}">
+                    {$vo.title|high_light=\\think\\Request::instance()->param('title')}
+                </a>
+            </td>
+            <td><a class="c-blue" href="{:\\think\\Url::build('index',['pid'=>$vo.id])}">
+                    {$vo.name|high_light=\\think\\Request::instance()->param('name')}
+                </a>
+            </td>
             <td>{$vo.type?'控制器':'<span class="c-red">方法</span>'}</td>
             <td>{$vo.sort}</td>
+
             <td>{$vo.status|get_status}</td>
             <td class="f-14">
                 {$vo.status|show_status=$vo.id}
-                <a title="编辑" href="javascript:;" onclick="layer_open('编辑','{:url(\'edit\',[\'id\'=>$vo[\'id\']])}')" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>
-                <a title="删除" href="javascript:;" onclick="del(this,'{$vo.id}','{:url(\'delete\')}')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
+                {tp:access action='edit'}
+                <a title="编辑" href="javascript:;" onclick="layer_open('编辑','{:\\think\\Url::build(\'edit\',[\'id\'=>$vo[\'id\']])}')"
+                   style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>
+                {/tp:access}
+                {tp:access action='delete'}
+                <a title="删除" href="javascript:;" onclick="del(this,'{$vo.id}','{:\\think\\Url::build(\'delete\')}')" class="ml-5"
+                   style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
+                {/tp:access}
             </td>
         </tr>
         {/volist}
@@ -50,7 +86,7 @@
 {block name="script"}
 <script>
     $(function () {
-        $("[name='group_id']").find("[value='{:input(\"param.group_id\")}']").attr("selected",true);
+        $("[name='group_id']").find("[value='{:\\think\\Request::instance()->param(\"group_id\")}']").attr("selected", true);
     })
 </script>
 {/block}

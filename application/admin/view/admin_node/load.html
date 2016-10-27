@@ -2,7 +2,7 @@
 {block name="nav"}{/block}
 {block name="content"}
 <div class="page-container" id="full">
-    <form class="form form-horizontal" id="form" method="post" action="{:request()->baseUrl()}">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
         <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
         <input type="hidden" name="pid" value="{:isset($vo.pid)?$vo.pid:'0'}">
         <input type="hidden" name="level" value="{:isset($vo.level)?$vo.level:'1'}">
@@ -26,7 +26,7 @@
                 <div class="select-box">
                     <select name="type" class="select">
                         <option value="1">控制器</option>
-                        <option value="0">方法</option>
+                        <option value="0" selected>方法</option>
                     </select>
                 </div>
             </div>

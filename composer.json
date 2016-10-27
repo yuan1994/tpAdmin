@@ -19,7 +19,8 @@
         "php": ">=5.4.0",
         "topthink/framework": "^5.0",
         "topthink/think-captcha": "^1.0",
-        "qiniu/php-sdk": "^7.0"
+        "qiniu/php-sdk": "^7.0",
+        "PHPOffice/PHPExcel": "^1.8"
     },
     "extra": {
         "think-path": "thinkphp"
