@@ -43,10 +43,13 @@ class File
         }
         $content_type = self::getMime($ext);
 
-        //文件类型
+        header("Cache-Control:");
+        header("Cache-Control: public");
+
+        // 文件类型
         header("Content-type: {$content_type}");
 
-        //处理中文文件名
+        // 处理中文文件名
         $ua = $_SERVER["HTTP_USER_AGENT"];
         if (preg_match("/MSIE/", $ua)) {
             $encoded_filename = rawurlencode($file_name);
@@ -56,8 +59,9 @@ class File
         } else {
             header('Content-Disposition: attachment; filename="' . $file_name . '"');
         }
-        //文件大小
+        // 文件大小
         if ($file_size) {
+            header("Accept-Length: ". $file_size);
             header("Content-Length: " . $file_size);
         }
         readfile($file_path);
