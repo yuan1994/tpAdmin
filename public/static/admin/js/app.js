@@ -110,9 +110,9 @@ function open_window(title,url){
  * @param shade 是否遮罩
  */
 function ajax_req(url,data,callback,param,shade){
-    if(shade === true) var loading = layer.load(2);
+    if(shade == true) var loading = layer.load(2);
     $.post(url,data,function(ret){
-        shade === true || layer.close(loading);
+        shade == true && layer.close(loading);
         ajax_progress(ret,callback,param);
     },'json')
 }
@@ -164,7 +164,7 @@ function ajax_progress(data, callback, param) {
             layer.msg(data.msg);
         }
         if (typeof callback == "function") {
-            if (typeof param != "undefined") {
+            if (typeof param != "undefined" && !param) {
                 param.unshift(data)
             } else {
                 param = [data];

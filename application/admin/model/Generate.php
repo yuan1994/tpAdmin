@@ -421,19 +421,15 @@ class Generate
             // http://php.net/manual/zh/pdo.rollback.php
             $tableExist = false;
             // 判断表是否存在
-            try {
-                $ret = Db::query("SHOW CREATE TABLE {$tableName}");
-                // 表存在
-                if ($ret && isset($ret[0])) {
-                    //不 是强制建表但表存在时直接 return
-                    if (!isset($this->post['table_force'])) {
-                        return true;
-                    }
-                    Db::execute("RENAME TABLE {$tableName} to tp_build_tmp_bak");
-                    $tableExist = true;
+            $ret = Db::query("SHOW TABLES LIKE '{$tableName}'");
+            // 表存在
+            if ($ret && isset($ret[0])) {
+                //不 是强制建表但表存在时直接 return
+                if (!isset($this->post['table_force'])) {
+                    return true;
                 }
-            } catch (\Exception $e) {
-
+                Db::execute("RENAME TABLE {$tableName} to tp_build_tmp_bak");
+                $tableExist = true;
             }
 
             // 强制建表和不存在原表执行建表操作
@@ -444,7 +440,20 @@ class Generate
             foreach ($this->post['table_name'] as $k => $v) {
                 if (!in_array($v, ["id", "status", "isdelete", "create_time", "update_time"])) {
                     // 字段属性
-                    $field = "    `{$v}` {$this->post['table_type'][$k]}(" . intval($this->post['table_size'][$k]) . ")" .
+                    $field = "    `{$v}` {$this->post['table_type'][$k]}".
+                        (
+                            in_array($this->post['table_type'][$k], ['text', 'date', 'time', 'datetime', 'tinytext', 'longtext', 'multipolygon', 'timestamp']) ?
+                            '' :
+                            (
+                                in_array($this->post['table_type'][$k], ['float']) ?
+                                    (
+                                        strpos($this->post['table_size'][$k], ",") ?
+                                            "({$this->post['table_size'][$k]})" :
+                                            "({$this->post['table_size'][$k]},0)"
+                                    ) :
+                                    "(" . intval($this->post['table_size'][$k]) . ")"
+                            )
+                        ) .
                         ($this->post['table_null'][$k] ? " NOT NULL" : "") .
                         ($this->post['table_default'][$k] === "" ? "" : " DEFAULT '{$this->post['table_default'][$k]}'") .
                         ($this->post['table_comment'][$k] === "" ? "" : " COMMENT '{$this->post['table_comment'][$k]}'");
@@ -492,7 +501,7 @@ class Generate
             // 默认字符编码为utf8，表引擎默认 InnoDB，其他都是默认
             $sql_create = "CREATE TABLE `{$tableName}` (\n" . implode(",\n", array_merge($el, $key)) . "\n)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '{$this->post['controller_title']}'";
 
-            //写入执行的 SQL 到日志中，如果不是想要的表结构，请到日志中搜索 BUILD_SQL，找到执行的 SQL 到数据库 GUI 软件中修改执行，修改表结构
+            // 写入执行的 SQL 到日志中，如果不是想要的表结构，请到日志中搜索 BUILD_SQL，找到执行的 SQL 到数据库 GUI 软件中修改执行，修改表结构
             Log::write("BUILD_SQL：\n{$sql_drop};\n{$sql_create};", Log::SQL);
             // execute 和 query 方法都不支持传入分号 (;)，不支持一次执行多条 SQL
             try {
@@ -505,7 +514,7 @@ class Generate
                     Db::execute("RENAME TABLE tp_build_tmp_bak to {$tableName}");
                 }
 
-                return $e->getMessage();
+                throw new Exception($e->getMessage());
             }
 
             return true;

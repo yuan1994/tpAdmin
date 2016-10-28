@@ -35,7 +35,7 @@ class Upload extends Controller
             $path = APP_PATH . '../public/tmp/uploads/';
             $info = $file->move($path);
             if ($info) {
-                $data[] = $info->getSaveName();
+                $data[] = '/tmp/uploads/' . $info->getSaveName();
                 $insert[] = [
                     'cate'     => 3,
                     'name'     => '/tmp/uploads/' . $info->getSaveName(),
@@ -64,7 +64,9 @@ class Upload extends Controller
         $name = APP_PATH . '../public/tmp/uploads/' . get_random();
         $name = \File::downloadImage($url, $name);
 
-        return ajax_return(['url' => $name], '抓取成功');
+        $ret = $this->request->domain() . '/tmp/uploads/' . basename($name);
+
+        return ajax_return(['url' => $ret], '抓取成功');
     }
 
     /**
