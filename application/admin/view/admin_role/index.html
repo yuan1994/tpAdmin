@@ -30,10 +30,10 @@
                 <a title="删除" href="javascript:;" onclick="del(this,'{$vo.id}','{:\\think\\Url::build(\'delete\')}')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
                 {/tp:access}
                 {tp:access action='user'}
-                <a href="javascript:layer_open('用户列表','{:\\think\\Url::build(\'user\',[\'id\'=>$vo[\'id\']])}')" class="label label-primary radius">用户列表</a>
+                <a href="javascript:;" onclick="layer_open('用户列表','{:\\think\\Url::build(\'user\',[\'id\'=>$vo[\'id\']])}')" class="label label-primary radius">用户列表</a>
                 {/tp:access}
                 {tp:access action='access'}
-                <a href="javascript:layer_open('授权','{:\\think\\Url::build(\'access\',[\'id\'=>$vo[\'id\']])}',{confirm:true})" class="label label-primary radius">授权</a>
+                <a href="javascript:;" onclick="layer_open('授权','{:\\think\\Url::build(\'access\',[\'id\'=>$vo[\'id\']])}',{confirm:true})" class="label label-primary radius">授权</a>
                 {/tp:access}
             </td>
         </tr>
