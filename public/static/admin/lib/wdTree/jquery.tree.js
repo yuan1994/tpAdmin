@@ -139,7 +139,7 @@
         }
         //endregion
         function buildnode(nd, ht, deep, path, isend) {
-            var nid = nd.id.replace(/[^\w]/gi, "_");
+            var nid = String(nd.id).replace(/[^\w]/gi, "_");
             ht.push("<li class='bbit-tree-node'>");
             ht.push("<div id='", id, "_", nid, "' tpath='", path, "' unselectable='on' title='", nd.text, "'");
             var cs = [];
@@ -249,7 +249,7 @@
             }
             //change show
             if (item.render && pstate != item.checkstate) {
-                var nid = item.id.replace(/[^\w]/gi, "_");
+                var nid = String(item.id).replace(/[^\w]/gi, "_");
                 var et = $("#" + id + "_" + nid + "_cb");
                 if (et.length == 1) {
                     et.attr("src", dfop.cbiconpath + dfop.icons[item.checkstate]);
@@ -341,7 +341,7 @@
             }
             else {
                 if (dfop.citem) {
-                    var nid = dfop.citem.id.replace(/[^\w]/gi, "_");
+                    var nid = String(dfop.citem.id).replace(/[^\w]/gi, "_");
                     $("#" + id + "_" + nid).removeClass("bbit-tree-selected");
                 }
                 dfop.citem = item;
@@ -356,7 +356,7 @@
         }
         function expandnode() {
             var item = this;
-            var nid = item.id.replace(/[^\w]/gi, "_");
+            var nid = String(item.id).replace(/[^\w]/gi, "_");
             var img = $("#" + id + "_" + nid + " img.bbit-tree-ec-icon");
             if (img.length > 0) {
                 img.click();
@@ -420,7 +420,7 @@
             nodes.each(bindevent);
         }
         function reflash(itemId) {
-            var nid = itemId.replace(/[^\w-]/gi, "_");
+            var nid = String(itemId).replace(/[^\w-]/gi, "_");
             var node = $("#" + id + "_" + nid);
             if (node.length > 0) {
                 node.addClass("bbit-tree-node-loading");
