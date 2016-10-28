@@ -11,6 +11,6 @@
 
 return [
     'module_init' => [
-        'app\\admin\\behavior\\WebLog',
+//        'app\\admin\\behavior\\WebLog',
     ],
 ];

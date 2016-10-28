@@ -164,7 +164,7 @@ function ajax_progress(data, callback, param) {
             layer.msg(data.msg);
         }
         if (typeof callback == "function") {
-            if (typeof param != "undefined" && !param) {
+            if (typeof param != "undefined" && param) {
                 param.unshift(data)
             } else {
                 param = [data];
@@ -189,6 +189,7 @@ function change_status(ret, obj, type) {
         'forbid':['恢复','warning','success','resume','.status','&#xe631;','禁用'],
     };
     var $this = $(obj);
+    console.log(arguments);
     $this.html(data[type][0]).attr("title","点击"+data[type][0]).removeClass("label-"+data[type][1]).addClass("label-"+data[type][2]).attr("onclick",$this.attr("onclick").replace(new RegExp(type,'g'),data[type][3]));
     $this.parents("tr").find(data[type][4]).html(data[type][5]).removeClass("c-"+data[type][2]).addClass("c-"+data[type][1]).attr("title",data[type][6]);
 }

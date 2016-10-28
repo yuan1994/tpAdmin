@@ -106,7 +106,7 @@
             }
             ajax_req('{:\\think\\Url::build("remote")}', {'url':remote_input.val()},function (ret) {
                 remote_input.val(ret.data.url);
-            }, {}, true);
+            }, undefined, true);
         }).on('click', '#remote-btn', function () {
             var url = $("#remote-input").val();
             callback(callbackId,url);

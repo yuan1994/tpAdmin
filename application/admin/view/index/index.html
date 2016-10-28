@@ -31,7 +31,7 @@
 <body>
 <header class="navbar-wrapper">
     <div class="navbar navbar-fixed-top">
-        <div class="container-fluid cl"> <a class="logo navbar-logo f-l mr-10 hidden-xs" href="{:\\think\\Url::build('/admin')}">tpadmin</a> <a class="logo navbar-logo-m f-l mr-10 visible-xs" href="{:\\think\\Url::build('/admin')}">tp</a> <span class="logo navbar-slogan f-l mr-10 hidden-xs">v1.0</span> <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
+        <div class="container-fluid cl"> <a class="logo navbar-logo f-l mr-10 hidden-xs" href="{:\\think\\Url::build('/admin')}">{$Think.config.site.name}</a> <a class="logo navbar-logo-m f-l mr-10 visible-xs" href="{:\\think\\Url::build('/admin')}">tp</a> <span class="logo navbar-slogan f-l mr-10 hidden-xs">{$Think.config.site.version}</span> <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
             {include file='template/nav_left' /}
             <nav id="Hui-userbar" class="nav navbar-nav navbar-userbar hidden-xs">
                 <ul class="cl">
@@ -43,7 +43,7 @@
                             <li><a href="javascript:;" onclick="logout()">退出</a></li>
                         </ul>
                     </li>
-                    <li id="Hui-msg"> <a href="#" title="消息"><span class="badge badge-danger">1</span><i class="Hui-iconfont" style="font-size:18px">&#xe68a;</i></a> </li>
+                    <li id="Hui-msg"> <a href="javascript:;" onclick="layer.msg('这个功能自己做咯，反正不难')" title="消息"><span class="badge badge-danger">1</span><i class="Hui-iconfont" style="font-size:18px">&#xe68a;</i></a> </li>
                     <li id="Hui-skin" class="dropDown right dropDown_hover"> <a href="javascript:;" class="dropDown_A" title="换肤"><i class="Hui-iconfont" style="font-size:18px">&#xe62a;</i></a>
                         <ul class="dropDown-menu menu radius box-shadow">
                             <li><a href="javascript:;" data-val="default" title="默认（黑色）">默认（黑色）</a></li>
