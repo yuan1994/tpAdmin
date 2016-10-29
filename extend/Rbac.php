@@ -73,8 +73,8 @@ class Rbac
             }
             // 检查当前控制器是否需要认证
             if (
-                ($controller['no'] && !in_array(strtoupper(Request::instance()->controller()), $controller['no'])) ||
-                ($controller['yes'] && in_array(strtoupper(Request::instance()->controller()), $controller['yes']))
+                (isset($controller['no']) && !in_array(strtoupper(Request::instance()->controller()), $controller['no'])) ||
+                (isset($controller['yes']) && in_array(strtoupper(Request::instance()->controller()), $controller['yes']))
             ) {
                 if (Config::get('rbac.require_auth_action')) {
                     // 需要认证的操作
@@ -85,8 +85,8 @@ class Rbac
                 }
                 // 检查当前操作是否需要认证
                 if (
-                    ($action['no'] && !in_array(strtoupper(Request::instance()->action()), $action['no'])) ||
-                    ($action['yes'] && in_array(strtoupper(Request::instance()->action()), $action['yes']))
+                    (isset($action['no']) && !in_array(strtoupper(Request::instance()->action()), $action['no'])) ||
+                    (isset($action['yes']) && in_array(strtoupper(Request::instance()->action()), $action['yes']))
                 ) {
                     return true;
                 } else {

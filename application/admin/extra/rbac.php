@@ -17,10 +17,10 @@ return [
     'admin_auth_key'          => 'administrator',
     'user_auth_model'         => 'AdminUser',    // 默认验证数据表模型
     'user_auth_gateway'       => 'Pub/login',    // 默认认证网关
-    'not_auth_controller'     => '',        // 默认无需认证控制器
-    'require_auth_controller' => '',        // 默认需要认证控制器
-    'not_auth_action'         => '',        // 默认无需认证方法
-    'require_auth_action'     => '',        // 默认需要认证方法
+    'not_auth_controller'     => 'Index',        // 默认无需认证控制器，多级控制器使用点语法，严格大小写，多个逗号隔开
+    'require_auth_controller' => '',        // 默认需要认证控制器，多级控制器使用点语法，严格大小写，多个逗号隔开
+    'not_auth_action'         => '',        // 默认无需认证方法，全部小写，多个逗号隔开
+    'require_auth_action'     => '',        // 默认需要认证方法，全部小写，多个逗号隔开
     'common_auth_name'        => 'common',        // 公共授权控制器名称和方法名称
     'guest_auth_on'           => false,    // 是否开启游客授权访问
     'guest_auth_id'           => 0,     // 游客的用户ID
