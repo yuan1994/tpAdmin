@@ -32,8 +32,6 @@ class Pub
     // Request实例
     protected $request;
 
-    // 黑名单方法，禁止访问某
-
     public function __construct()
     {
         if (null === $this->view) {
@@ -43,7 +41,7 @@ class Pub
             $this->request = Request::instance();
         }
 
-        //用户ID
+        // 用户ID
         defined('UID') or define('UID', Session::get(Config::get('rbac.user_auth_key')));
     }
 
@@ -90,7 +88,7 @@ class Pub
      */
     public function index()
     {
-        //如果通过认证跳转到首页
+        // 如果通过认证跳转到首页
         $this->redirect("Index/index");
     }
 
@@ -124,7 +122,7 @@ class Pub
             $map['status'] = 1;
             $auth_info = \Rbac::authenticate($map);
 
-            //使用用户名、密码和状态的方式进行认证
+            // 使用用户名、密码和状态的方式进行认证
             if (null === $auth_info) {
                 return ajax_return_adv_error('帐号不存在或已禁用！');
             } else {
@@ -132,25 +130,25 @@ class Pub
                     return ajax_return_adv_error('密码错误！');
                 }
 
-                //生成session信息
+                // 生成 session 信息
                 Session::set(Config::get('rbac.user_auth_key'), $auth_info['id']);
                 Session::set('user_name', $auth_info['account']);
                 Session::set('real_name', $auth_info['realname']);
                 Session::set('last_login_ip', $auth_info['last_login_ip']);
                 Session::set('last_login_time', $auth_info['last_login_time']);
 
-                //超级管理员标记
+                // 超级管理员标记
                 if ($auth_info['id'] == 1) {
                     Session::set(Config::get('rbac.admin_auth_key'), true);
                 }
 
-                //保存登录信息
+                // 保存登录信息
                 $update['last_login_time'] = time();
                 $update['login_count'] = ['exp', 'login_count+1'];
                 $update['last_login_ip'] = $this->request->ip();
                 Db::name("AdminUser")->where('id', $auth_info['id'])->update($update);
 
-                //记录登录日志
+                // 记录登录日志
                 $log['uid'] = $auth_info['id'];
                 $log['login_ip'] = $this->request->ip();
                 $log['login_location'] = implode(" ", \Ip::find($log['login_ip']));
@@ -176,19 +174,19 @@ class Pub
         $this->checkUser();
         if ($this->request->isPost()) {
             $data = $this->request->post();
-            //数据校验
+            // 数据校验
             $validate = Loader::validate('Pub');
             if (!$validate->scene('password')->check($data)) {
                 return ajax_return_adv_error($validate->getError());
             }
 
-            //查询旧密码进行比对
+            // 查询旧密码进行比对
             $info = Db::name("AdminUser")->where("id", UID)->field("password")->find();
             if ($info['password'] != password_hash_tp($data['oldpassword'])) {
                 return ajax_return_adv_error("旧密码错误");
             }
 
-            //写入新密码
+            // 写入新密码
             if (false === Loader::model('AdminUser')->updatePassword(UID, $data['password'])) {
                 return ajax_return_adv_error("密码修改失败");
             }
@@ -205,14 +203,16 @@ class Pub
     public function profile()
     {
         $this->checkUser();
-        if ($this->request->isPost()) { //修改资料
+        if ($this->request->isPost()) {
+            // 修改资料
             $data = $this->request->only(['realname', 'email', 'mobile', 'remark'], 'post');
             if (Db::name("AdminUser")->where("id", UID)->update($data) === false) {
                 return ajax_return_adv_error("信息修改失败");
             }
 
             return ajax_return_adv("信息修改成功", '');
-        } else { //查看用户信息
+        } else {
+            // 查看用户信息
             $vo = Db::name("AdminUser")->field('realname,email,mobile,remark')->where("id", UID)->find();
             $this->view->assign('vo', $vo);
 

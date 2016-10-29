@@ -15,7 +15,7 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\admin\Controller;
 use think\Db;
 use think\Exception;
 use think\Request;

@@ -312,3 +312,28 @@ function get_conf($name, $conf, $key = true)
         }
     }
 }
+
+
+/**
+ * 多维数组合并（支持多数组）
+ * @return array
+ */
+function array_merge_multi()
+{
+    $args = func_get_args();
+    $array = [];
+    foreach ($args as $arg) {
+        if (is_array($arg)) {
+            foreach ($arg as $k => $v) {
+                if (is_array($v)) {
+                    $array[$k] = isset($array[$k]) ? $array[$k] : [];
+                    $array[$k] = array_merge_multi($array[$k], $v);
+                } else {
+                    $array[$k] = $v;
+                }
+            }
+        }
+    }
+
+    return $array;
+}

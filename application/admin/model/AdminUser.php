@@ -33,7 +33,7 @@ class AdminUser extends Model
     /**
      * 修改密码
      */
-    public function uploadPassword($uid, $password)
+    public function updatePassword($uid, $password)
     {
         return $this->where("id", $uid)->update(['password' => password_hash_tp($password)]);
     }

@@ -52,7 +52,7 @@ class AdminUser extends Controller
             if (!$password) {
                 return ajax_return_adv_error("密码不能为空");
             }
-            if (false === Loader::model('AdminUser')->uploadPassword($id, $password)) {
+            if (false === Loader::model('AdminUser')->updatePassword($id, $password)) {
                 return ajax_return_adv_error("密码修改失败");
             }
             return ajax_return_adv("密码已修改为{$password}", '');

@@ -248,9 +248,10 @@ class Rbac
         $apps = Db::query($sql);
         //转化为树
         $tree = list_to_tree($apps);
-
         //递归生成权限树
-        return self::treeToMultiArray($tree, "name", "id", "_child");
+        $ret = self::treeToMultiArray($tree, "name", "id", "_child");
+
+        return $ret;
     }
 
 
@@ -267,12 +268,39 @@ class Rbac
         $return = [];
         if (is_array($tree)) {
             foreach ($tree as $v) {
-                $return[strtoupper($v[$key])] = isset($v[$key_child]) ?
-                    self::treeToMultiArray($v[$key_child], $key, $key_default, $key_child) :
-                    $v[$key_default];
+                // 默认值
+                if (isset($v[$key_child])) {
+                    $default = self::treeToMultiArray($v[$key_child], $key, $key_default, $key_child);
+                } else {
+                    $default = $v[$key_default];
+                }
+
+                // 存在高阶节点，转为多维数组 (one.two/index 或 one/index 类型高阶节点)
+                $nodes = explode("/", strtoupper(str_replace(".", "/", $v[$key])));
+                $return = array_merge_multi($return, self::arrayOneToMulti($nodes, count($nodes), $default));
             }
         }
 
         return $return;
+    }
+
+    /**
+     * 一维数组转多维数组
+     * @param array $source 原一维数组
+     * @param int $length 原一维数组长度
+     * @param string|array $default 多维数组默认值
+     * @param int $i 开始索引
+     * @param array $target 转化为的目标数组
+     * @return array
+     */
+    private static function arrayOneToMulti($source, $length, $default = '', $i = 0, $target = [])
+    {
+        if ($i == $length - 1) {
+            $target[$source[$i]] = $default;
+        } else {
+            $target[$source[$i]] = self::arrayOneToMulti($source, $length, $default, $i + 1, $target);
+        }
+
+        return $target;
     }
 }
