@@ -32,13 +32,13 @@ class Upload extends Controller
         $files = $this->request->file('file');
         $insert = [];
         foreach ($files as $file) {
-            $path = APP_PATH . '../public/tmp/uploads/';
+            $path = ROOT_PATH . 'public/tmp/uploads/';
             $info = $file->move($path);
             if ($info) {
-                $data[] = '/tmp/uploads/' . $info->getSaveName();
+                $data[] = $this->request->root() . '/tmp/uploads/' . $info->getSaveName();
                 $insert[] = [
                     'cate'     => 3,
-                    'name'     => '/tmp/uploads/' . $info->getSaveName(),
+                    'name'     => $data[] = $this->request->root() . '/tmp/uploads/' . $info->getSaveName(),
                     'original' => $info->getInfo('name'),
                     'domain'   => '',
                     'type'     => $info->getInfo('type'),
@@ -61,10 +61,10 @@ class Upload extends Controller
     {
         $url = $this->request->post('url');
         // validate
-        $name = APP_PATH . '../public/tmp/uploads/' . get_random();
+        $name = ROOT_PATH . 'public/tmp/uploads/' . get_random();
         $name = \File::downloadImage($url, $name);
 
-        $ret = $this->request->domain() . '/tmp/uploads/' . basename($name);
+        $ret = $this->request->root() . '/tmp/uploads/' . basename($name);
 
         return ajax_return(['url' => $ret], '抓取成功');
     }

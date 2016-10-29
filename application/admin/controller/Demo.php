@@ -67,7 +67,7 @@ class Demo extends Controller
             if (!$filename) {
                 return ajax_return_adv_error($filename);
             } else {
-                $url = $this->request->domain() . substr($filename, 1);
+                $url = $this->request->root() . substr($filename, 1);
 
                 return ajax_return_adv("下载成功", '', "图片下载成功，<a href='{$url}' target='_blank' class='c-blue'>点击查看</a><br>{$url}");
             }
