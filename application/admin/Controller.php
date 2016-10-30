@@ -1,17 +1,15 @@
 <?php
-// +----------------------------------------------------------------------
-// | tpadmin [a web admin based ThinkPHP5]
-// +----------------------------------------------------------------------
-// | Copyright (c) 2016 tianpian All rights reserved.
-// +----------------------------------------------------------------------
-// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
-// | Author: tianpian <tianpian0805@gmail.com>
-// +----------------------------------------------------------------------
+/**
+ * tpAdmin [a web admin based ThinkPHP5]
+ *
+ * @author yuan1994 <tianpian0805@gmail.com>
+ * @link http://tpadmin.yuan1994.com/
+ * @copyright 2016 yuan1994 all rights reserved.
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 namespace app\admin;
 
-use think\Exception;
 use think\Url;
 use think\View;
 use think\Request;
@@ -20,7 +18,10 @@ use think\Db;
 use think\Response;
 use think\Config;
 use think\Loader;
+use think\response\Redirect;
+use think\Exception;
 use think\exception\HttpException;
+use think\exception\HttpResponseException;
 
 class Controller
 {
@@ -174,24 +175,22 @@ class Controller
      */
     protected function notLogin()
     {
-        //跳转到认证网关
+        // 跳转到认证网关
         if ($this->request->isAjax()) {
-            ajax_return_adv_error("登录超时，请先登陆", "", "", "current", Url::build("Pub/loginFrame"))->send();
-            exit();
+            $response = ajax_return_adv_error("登录超时，请先登陆", 400, "", "", false, "", Url::build("Pub/loginFrame"));
+            throw new HttpResponseException($response);
         } else {
             if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
-                Response::create(Url::build('Pub/login'), 'redirect')->send();
-                exit();
+                throw new HttpResponseException(new Redirect('Pub/login'));
             } else {
-                //判断是弹出登录框还是直接跳转到登录页
+                // 判断是弹出登录框还是直接跳转到登录页
                 $ret = '<script>' .
                     'if(window.parent.frames.length == 0) ' .
                     'window.location = "' . Url::build('Pub/login') . '?callback=' . urlencode($this->request->url(true)) . '";' .
                     ' else ' .
                     'parent.login("' . Url::build('Pub/loginFrame') . '");' .
                     '</script>';
-                Response::create($ret)->send();
-                exit();
+                throw new HttpResponseException(new Response($ret));
             }
         }
     }

@@ -1,13 +1,12 @@
 <?php
-// +----------------------------------------------------------------------
-// | ThinkPHP [ WE CAN DO IT JUST THINK ]
-// +----------------------------------------------------------------------
-// | Copyright (c) 2006~2016 http://thinkphp.cn All rights reserved.
-// +----------------------------------------------------------------------
-// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
-// | Author: liu21st <liu21st@gmail.com>
-// +----------------------------------------------------------------------
+/**
+ * tpAdmin [a web admin based ThinkPHP5]
+ *
+ * @author yuan1994 <tianpian0805@gmail.com>
+ * @link http://tpadmin.yuan1994.com/
+ * @copyright 2016 yuan1994 all rights reserved.
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 return [
     // 数据库类型
