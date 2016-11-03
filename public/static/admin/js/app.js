@@ -414,7 +414,7 @@ function table_fixed(selector, width) {
  */
 function get_random(prefix) {
     prefix = prefix || "";
-    return prefix + Date.now().toString(36) + "_" + Math.random().toString(36).substr(2);
+    return prefix + (new Date()).getTime().toString(36) + "_" + Math.random().toString(36).substr(2);
 };
 
 /**
