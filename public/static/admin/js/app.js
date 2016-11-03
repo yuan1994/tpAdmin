@@ -15,9 +15,20 @@ $(function () {
  */
 function layer_open(title, url, opt) {
     if (typeof opt === "undefined") opt = {nav: true};
+    w = opt.w || "80vw";
+    h = opt.h || "80vh";
+    // 不支持vh,vw单位时采取js动态获取
+    if (!attr_support('height', '10vh')) {
+        w = w.replace(/([\d\.]+)(vh|vw)/,function(source, num, unit){
+            return $(window).width() * num / 100 + 'px';
+        });
+        h = h.replace(/([\d\.]+)(vh|vw)/,function(source, num, unit){
+            return $(window).height() * num / 100 + 'px';
+        });
+    }
     return layer.open({
         type: opt.type || 2,
-        area: [opt.w || "80%", opt.h || "80%"],
+        area: [w, h],
         fix: false, // 不固定
         maxmin: true,
         shade: 0.4,
@@ -405,6 +416,26 @@ function get_random(prefix) {
     prefix = prefix || "";
     return prefix + Date.now().toString(36) + "_" + Math.random().toString(36).substr(2);
 };
+
+/**
+ * 检查浏览器是否支持某属性
+ * @param attrName
+ * @param attrValue
+ * @returns {boolean}
+ */
+function attr_support(attrName, attrValue) {
+    try {
+        var element = document.createElement('div');
+        if(attrName in element.style){
+            element.style[attrName] = attrValue;
+            return element.style[attrName] === attrValue;
+        }else{
+            return false;
+        }
+    } catch (e) {
+        return false;
+    }
+}
 
 function _del_recycle(obj, id, url, msg, returnMsg) {
     layer.confirm(msg, {

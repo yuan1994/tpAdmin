@@ -2,10 +2,10 @@
 /**
  * tpAdmin [a web admin based ThinkPHP5]
  *
- * @author yuan1994 <tianpian0805@gmail.com>
- * @link http://tpadmin.yuan1994.com/
+ * @author    yuan1994 <tianpian0805@gmail.com>
+ * @link      http://tpadmin.yuan1994.com/
  * @copyright 2016 yuan1994 all rights reserved.
- * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
 namespace app\admin;
@@ -278,7 +278,7 @@ class Controller
         $order = $this->request->param('_order') ?: (empty($sortBy) ? $model->getPk() : $sortBy);
 
         // 接受 sort参数 0 表示倒序 非0都 表示正序
-        $sort = $this->request->param('_sort') !== '' ?
+        $sort = null !== $this->request->param('_sort') ?
             ($this->request->param('_sort') == 'asc' ? 'asc' : 'desc') :
             ($asc ? 'asc' : 'desc');
 
