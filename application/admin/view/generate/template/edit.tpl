@@ -14,7 +14,7 @@
 </div>
 {/block}
 {block name="script"}
-<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>[SCRIPT]
 <script>
     $(function () {
 [SET_VALUE]
@@ -26,10 +26,10 @@
         });
 
         $("#form").Validform({
-            tiptype:2,
-            ajaxPost:true,
-            showAllError:true,
-            callback:function(ret){
+            tiptype: 2,
+            ajaxPost: true,
+            showAllError: true,
+            callback: function (ret){
                 ajax_progress(ret);
             }
         });

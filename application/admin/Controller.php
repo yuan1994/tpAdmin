@@ -75,7 +75,7 @@ class Controller
         $map = [];
         $table_info = $model->getTableInfo();
         foreach ($this->request->param() as $key => $val) {
-            if ($val !== "" && in_array($key, $table_info['type'])) {
+            if ($val !== "" && in_array($key, $table_info['fields'])) {
                 $map[$key] = $val;
             }
         }

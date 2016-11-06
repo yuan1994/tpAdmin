@@ -1,3 +1,11 @@
+<!--
+  ~ tpAdmin [a web admin based ThinkPHP5]
+  ~
+  ~ @author yuan1994 <tianpian0805@gmail.com>
+  ~ @link http://tpadmin.yuan1994.com/
+  ~ @copyright 2016 yuan1994 all rights reserved.
+  ~ @license http://www.apache.org/licenses/LICENSE-2.0
+  -->
 {extend name="template/base" /}
 {block name="nav"}
 <nav class="breadcrumb">
@@ -8,82 +16,162 @@
 {/block}
 {block name="content"}
 <div class="page-container">
-    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Url::build('generate')}">
-        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Url::build('run')}">
         <div class="row cl">
-            <label class="form-label col-xs-1"><span class="c-red">*</span>控制器：</label>
+            <label class="form-label col-xs-1">从数据表生成：</label>
             <div class="formControls col-xs-8">
-                <input type="text" class="input-text" placeholder="字母，驼峰式，例如AdminGroup，前面可加小写目录" name="controller_name"
-                       datatype="/^([a-z][a-z0-9]*\.)*[A-Z]\w*$/" nullmsg="控制器英文名必填"
-                       errormsg="必须是(dir.[dir2.dir3....])?Controller的格式"
-                       title="正则：/^([a-z][a-z0-9]*\.)*[A-Z]\w*$/，比如one.Demo或者Demo，注意大小写" style="width: 49%">
-                <input type="text" class="input-text" placeholder="中文，例如分组" name="controller_title" datatype="*"
-                       nullmsg="控制器中文名必填" style="width: 49%">
+                <div class="select-box" style="width: 260px">
+                    <select class="select db-table">
+                        <option value="">不从数据表生成</option>
+                        {foreach name='tables' item='table'}
+                        <option value="{$table}">{$table}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <button type="button" class="btn btn-success db-jump ml-10" title="点击此项选择从数据库生成字段">
+                    走，大神带你飞
+                </button>
             </div>
             <div class="col-xs-2"></div>
         </div>
-        <div class="row cl form-el">
-            <label class="form-label col-xs-1"><span class="c-red">*</span>表单元素：</label>
+        <h2>控制器信息 ：</h2>
+        <div class="row cl">
+            <label class="form-label col-xs-1"><span class="c-red">*</span>模块：</label>
             <div class="formControls col-xs-8">
-                <input type="text" class="input-text" placeholder="中文描述" name="form_title[]" datatype="*"
-                       nullmsg="中文描述不可为空" style="width: 100px">
-                <input type="text" class="input-text" placeholder="字段，字母" name="form_name[]" datatype="*"
-                       nullmsg="字段名不可为空" style="width: 100px">
-                <div class="select-box" style="width:100px">
-                    <select class="select" name="form_type[]" datatype="*" nullmsg="请选择字段类型">
-                        <option value="">字段类型</option>
-                        <option value="text">text</option>
-                        <option value="select">select</option>
-                        <option value="radio">radio</option>
-                        <option value="textarea">textarea</option>
-                        <option value="checkbox">checkbox</option>
-                        <option value="password">password</option>
-                        <option value="number">number</option>
-                    </select>
-                </div>
-                <div class="select-box" style="width:150px">
-                    <select class="select" name="form_sort[]">
-                        <option value="0">筛选排序：否</option>
-                        <option value="1">筛选排序：是</option>
-                    </select>
-                </div>
-                <div class="select-box" style="width:150px">
-                    <select class="select" name="form_search[]">
-                        <option value="0">表单搜索：否</option>
-                        <option value="1">表单搜索：是</option>
-                    </select>
-                </div>
-                <div class="select-box" style="width:150px">
-                    <select class="select" name="form_require[]">
-                        <option value="0">是否必填：否</option>
-                        <option value="1">是否必填：是</option>
-                    </select>
-                </div>
-                <input type="text" class="input-text" placeholder="验证规则，不填不验证" name="form_validate[]"
-                       style="width: 150px">
-                <input type="text" class="input-text" placeholder="验证为空提示信息" name="form_validate_null[]"
-                       style="width: 150px">
-                <input type="text" class="input-text" placeholder="格式错误提示信息" name="form_validate_error[]"
-                       style="width: 150px">
-                <!--<button type="button" class="btn btn-primary op-prev" data-type="form">上移</button>
-                <button type="button" class="btn btn-primary op-next" data-type="form">下移</button>-->
-                <button type="button" class="btn btn-success op-add" data-type="form">增加一栏</button>
+                <input type="text" class="input-text" placeholder="默认为当前模块" name="module"
+                       datatype="/^[a-z]+$/" nullmsg="请填写模块名称"
+                       errormsg="模块名称必须是小写字母"
+                       value="{$Request.module}"
+                       title="默认为当前模块" style="width: 49%">
             </div>
-            <div class="col-xs-3"></div>
+            <div class="col-xs-2"></div>
         </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1"><span class="c-red">*</span>控制器：</label>
+            <div class="formControls col-xs-8">
+                <input type="text" class="input-text" placeholder="字母，驼峰式，例如AdminGroup，前面可加小写目录" name="controller"
+                       errormsg="必须是(dir.[dir2.dir3....])?Controller的格式" value="{$controller ?? ''}"
+                       datatype="/^([a-z][a-z0-9]*\.)*[A-Z]\w*$/" nullmsg="控制器英文名必填"
+                       title="正则：/^([a-z][a-z0-9]*\.)*[A-Z]\w*$/，比如one.Demo或者Demo，注意大小写" style="width: 49%">
+                <input type="text" class="input-text" placeholder="中文，例如 分组" name="title" style="width: 49%">
+            </div>
+            <div class="col-xs-2"></div>
+        </div>
+        <h2>表单信息 ：</h2>
+        <table class="table-form table table-border table-bordered table-hover table-bg mt-20 skin-minimal">
+            <thead>
+            <tr class="text-c">
+                <th width="110" rowspan="2" title="删除后不可恢复，谨慎操作">
+                    操作<br>
+                    <a href="javascript:;" class="label label-success radius op-add" data-type="form" data-header="1">增加一栏</a>
+                </th>
+                <th width="660" colspan="5" title="字段配置信息">字段</th>
+                <th width="90" rowspan="2" title="勾选后自动给字段添加排序功能">筛选排序</th>
+                <th width="220" colspan="2" title="自动生成搜索项">搜索</th>
+                <th width="630" colspan="4" title="如何使用请看该插件文档">ValidForm 验证</th>
+            </tr>
+            <tr class="text-c">
+                <th width="120" title="中文描述，编辑页为对应label标签内容，首页对应表头内容"><span class="c-red">*</span> 标题</th>
+                <th width="120" title="一般为对应数据库字段的名称"><span class="c-red">*</span> 名称</th>
+                <th width="130" title="自动生成编辑页相应的表单控件"><span class="c-red">*</span> 类型</th>
+                <th width="170"
+                    title="只针对select,radio,checkbox控件,支持变量和配置值，例如 {foo}-对应conf.foo对应的配置项，生成foreach循环 | 1:值一#2:值二#3:值三 | 空值的默认标签名">
+                    选项值
+                </th>
+                <th width="120" title="字段编辑页默认值">默认值</th>
+                <th width="90" title="勾选后自动生成控制器筛选项和前端搜索框">表单搜索</th>
+                <th width="130" title="select的取值为字段中的选项值">搜索类型</th>
+                <th width="90" title="勾选后在验证器和前端生成必填校验规则">是否必填</th>
+                <th width="180" title="插件的datatype配置项">datatype</th>
+                <th width="180" title="插件的nullmsg配置项">nullmsg</th>
+                <th width="180" title="插件的errormsg配置项">errormsg</th>
+            </tr>
+            </thead>
+            <tbody id="tbody-form">
+            <tr>
+                <td title="删除后不可恢复，谨慎操作">
+                    <a href="javascript:;" class="label label-success radius mr-10 op-add" data-type="form">增加一栏</a>
+                    <a href="javascript:;" class="label label-danger radius op-delete">删除</a>
+                </td>
+                <td title="中文描述，编辑页为对应label标签内容，首页对应表头内容">
+                    <input type="text" class="input-text form-title" placeholder="中文描述" name="form[0][title]">
+                </td>
+                <td title="一般为对应数据库字段的名称">
+                    <input type="text" class="input-text form-name" placeholder="字段，字母" name="form[0][name]">
+                </td>
+                <td title="自动生成编辑页相应的表单控件">
+                    <div class="select-box">
+                        <select class="select" name="form[0][type]">
+                            <option value="text">text</option>
+                            <option value="select">select</option>
+                            <option value="radio">radio</option>
+                            <option value="textarea">textarea</option>
+                            <option value="checkbox">checkbox</option>
+                            <option value="password">password</option>
+                            <option value="number">number</option>
+                            <option value="date">date</option>
+                        </select>
+                    </div>
+                </td>
+                <td title="只针对select,radio,checkbox控件,支持变量和配置值，例如 {foo}-对应conf.foo对应的配置项，生成foreach循环 | 1:值一#2:值二#3:值三 | 空值的默认标签名">
+                    <input type="text" class="input-text" placeholder="变量或以#隔开" name="form[0][option]">
+                </td>
+                <td title="字段编辑页默认值">
+                    <input type="text" class="input-text" placeholder="表单默认值" name="form[0][default]">
+                </td>
+                <td title="勾选后自动给字段添加排序功能">
+                    <div class="radio-box" style="display:block;margin-top: -10px;margin-left: 45%">
+                        <input type="checkbox" name="form[0][sort]" value="1">
+                    </div>
+                </td>
+                <td class="text-c" title="勾选后自动生成控制器筛选项和前端搜索框">
+                    <div class="radio-box" style="display:block;margin-top: -10px;margin-left: 45%">
+                        <input type="checkbox" name="form[0][search]" value="1">
+                    </div>
+                </td>
+                <td title="select的取值为字段中的选项值">
+                    <div class="select-box">
+                        <select class="select" name="form[0][search_type]">
+                            <option value="text">text</option>
+                            <option value="select">select</option>
+                            <option value="date">date</option>
+                        </select>
+                    </div>
+                </td>
+                <td title="勾选后在验证器和前端生成必填校验规则">
+                    <div class="radio-box" style="display:block;margin-top: -10px;margin-left: 45%">
+                        <input type="checkbox" name="form[0][require]" value="1" class="form-require">
+                    </div>
+                </td>
+                <td title="插件的datatype配置项">
+                    <input type="text" class="input-text form-validate-datatype" placeholder="正则或预定义规则"
+                           name="form[0][validate][datatype]">
+                </td>
+                <td title="插件的nullmsg配置项">
+                    <input type="text" class="input-text" placeholder="必填时为空提示信息" name="form[0][validate][nullmsg]">
+                </td>
+                <td title="插件的errormsg配置项">
+                    <input type="text" class="input-text" placeholder="格式错误时提示信息" name="form[0][validate][errormsg]">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        {if condition="!$Request.param.table"}
+        <h2>数据表信息 ：</h2>
         <div class="row cl">
             <label class="form-label col-xs-1">数据表：</label>
             <div class="formControls col-xs-8 skin-minimal">
-                <div class="radio-box">
-                    <input type="checkbox" name="table" value="1" checked>
-                    <label title="会在数据库自动创建相应模型的数据表">创建数据表</label>
+                <div class="radio-box" title="会在数据库自动创建相应模型的数据表">
+                    <input type="checkbox" name="create_table" value="1" checked>
+                    <label>创建数据表</label>
                 </div>
-                <div class="radio-box">
-                    <input type="checkbox" name="table_force" value="1">
-                    <label title="勾选此项后无论表是否存在都会删除原表强制创建新表，不勾选只在表不存在时才创建新表，慎重选择，如果创建失败会自动回滚">强制建表</label>
+                <div class="radio-box" title="勾选此项后无论表是否存在都会删除原表强制创建新表，不勾选只在表不存在时才创建新表，慎重选择，如果创建失败会自动回滚">
+                    <input type="checkbox" name="create_table_force" value="1">
+                    <label>强制建表</label>
                 </div>
                 <button type="button" class="btn btn-warning op-sync" title="将表单元素里的字段自动填充到表字段里，会清空原表字段的数据，谨慎操作">
-                    同步字段(鼠标悬浮看说明)
+                    同步字段
                 </button>
             </div>
             <div class="col-xs-3"></div>
@@ -95,52 +183,75 @@
             </div>
             <div class="col-xs-3"></div>
         </div>
-        <div class="row cl table-el">
-            <label class="form-label col-xs-1"><span class="c-red">*</span>表字段：</label>
-            <div class="formControls col-xs-8">
-                <input type="text" class="input-text" placeholder="名称" name="table_name[]" datatype="/[a-z0-9_]+/"
-                       nullmsg="字段名称不可为空" errormsg="只能填写小写字母、数字、下划线" style="width: 100px">
-                <div class="select-box" style="width:120px">
-                    <select class="select" name="table_type[]">
-                        <option value="varchar">varchar</option>
-                        <option value="char">char</option>
-                        <option value="int">int</option>
-                        <option value="text">text</option>
-                        <option value="float">float</option>
-                        <option value="tinyint">tinyint</option>
-                        <option value="date">date</option>
-                        <option value="time">time</option>
-                        <option value="datetime">datetime</option>
-                        <option value="timestamp">timestamp</option>
-                        <option value="smallint">smallint</option>
-                        <option value="mediumint">mediumint</option>
-                        <option value="bigint">bigint</option>
-                        <option value="tinytext">tinytext</option>
-                        <option value="longtext">longtext</option>
+        <div class="row cl">
+            <label class="form-label col-xs-1"></label>
+            <div class="formControls col-xs-8 skin-minimal">
+                <div class="select-box" style="width: 150px">
+                    <select name="table_engine" class="select">
+                        <option value="InnoDB">InnoDB</option>
+                        <option value="MyISAM">MyISAM</option>
+                        <option value="MRG_MYISAM">MRG_MYISAM</option>
+                        <option value="MEMORY">MEMORY</option>
+                        <option value="ARCHIVE">ARCHIVE</option>
                     </select>
                 </div>
-                &nbsp;长度：<input type="text" class="input-text" placeholder="字段长度" name="table_size[]" value="255"
-                                style="width: 100px">
-                <input type="text" class="input-text" placeholder="默认值" name="table_default[]" style="width: 100px">
-                <div class="select-box" style="width:150px">
-                    <select class="select" name="table_null[]">
-                        <option value="1">不为空：是</option>
-                        <option value="0">不为空：否</option>
-                    </select>
-                </div>
-                <div class="select-box" style="width:150px">
-                    <select class="select" name="table_key[]">
-                        <option value="0">是否索引：否</option>
-                        <option value="1">是否索引：是</option>
-                    </select>
-                </div>
-                <input type="text" class="input-text" placeholder="注释" name="table_comment[]" style="width: 250px">
-                <!--<button type="button" class="btn btn-primary op-prev" data-type="table">上移</button>
-                <button type="button" class="btn btn-primary op-next" data-type="table">下移</button>-->
-                <button type="button" class="btn btn-success op-add" data-type="table">增加一栏</button>
+                <input type="text" class="input-text" style="width: 45%" name="table_name" title="不填写由控制器名自动生成"
+                       placeholder="不填写由控制器名自动生成">
             </div>
             <div class="col-xs-3"></div>
         </div>
+        <table class="table-table table table-border table-bordered table-hover table-bg mt-20 skin-minimal">
+            <thead>
+            <tr class="text-c">
+                <th width="110" title="删除后不可恢复，谨慎操作">操作<br>
+                    <a href="javascript:;" class="label label-success radius op-add" data-type="field" data-header="1">增加一栏</a>
+                </th>
+                <th width="130" title="只能小写字符和下划线，例如 user_id"><span class="c-red">*</span> 名称</th>
+                <th width="130" title="字段类型+大小，例如 varchar(255) , int(10) , text"><span class="c-red">*</span> 类型</th>
+                <th width="130" title="为NULL表示不设默认值，不区分大小写">默认值</th>
+                <th width="90" title="勾选后生成 NOT NULL">不是 null</th>
+                <th width="90" title="勾选后生成索引">索引</th>
+                <th width="130" title="设置字段备注">备注</th>
+                <th width="130" title="扩展属性，例如 unsigned , auto_increment">扩展属性</th>
+            </tr>
+            </thead>
+            <tbody id="tbody-field">
+            <tr>
+                <td title="删除后不可恢复，谨慎操作">
+                    <a href="javascript:;" class="label label-success radius mr-10 op-add" data-type="field">增加一栏</a>
+                    <a href="javascript:;" class="label label-danger radius op-delete">删除</a>
+                </td>
+                <td title="只能小写字符和下划线，例如 user_id">
+                    <input type="text" class="input-text field-name" placeholder="字段名称" name="field[0][name]">
+                </td>
+                <td title="字段类型+大小，例如 varchar(255) , int(10) , text">
+                    <input type="text" class="input-text" placeholder="例如varchar(255)" value="varchar(255)" name="field[0][type]">
+                </td>
+                <td title="为NULL表示不设默认值，不区分大小写">
+                    <input type="text" class="input-text" placeholder="为NULL表示不设默认值" name="field[0][default]"
+                           value="NULL">
+                </td>
+                <td title="勾选后生成 NOT NULL">
+                    <div class="radio-box" style="display:block;margin-top: -10px;margin-left: 45%">
+                        <input type="checkbox" name="field[0][not_null]" value="1">
+                    </div>
+                </td>
+                <td title="勾选后生成索引">
+                    <div class="radio-box" style="display:block;margin-top: -10px;margin-left: 45%">
+                        <input type="checkbox" name="field[0][key]" value="1">
+                    </div>
+                </td>
+                <td title="设置字段备注">
+                    <input type="text" class="input-text field-comment" placeholder="备注" name="field[0][comment]">
+                </td>
+                <td title="扩展属性，例如 unsigned , auto_increment">
+                    <input type="text" class="input-text" placeholder="例如unsigned" name="field[0][extra]">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        {/if}
+        <h2>其他选项</h2>
         <div class="row cl">
             <label class="form-label col-xs-1">首页菜单：</label>
             <div class="formControls col-xs-8 skin-minimal">
@@ -174,6 +285,10 @@
                     <input type="checkbox" name="model" value="1">
                     <label title="会自动创建相应的模型，并且自动添加字段create_time，update_time，并且开启时间戳记录">创建模型（model）</label>
                 </div>
+                <div class="radio-box" title="勾选模型了该配置项才会生效，勾选此项后会自动生成create_time,update_time字段，并且自动写入时间戳到数据库">
+                    <input type="checkbox" name="auto_timestamp" value="1">
+                    <label>自动时间戳记录</label>
+                </div>
             </div>
             <div class="col-xs-3"></div>
         </div>
@@ -206,101 +321,112 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script>
     $(function () {
-        $('.skin-minimal input').iCheck({
-            checkboxClass: 'icheckbox-blue',
-            radioClass: 'iradio-blue',
-            increaseArea: '20%'
-        });
+        table_fixed('.table-form');
+        table_fixed('.table-table');
+        $(".db-table").find("[value='{$Request.param.table}']").attr("selected",true);
 
-        //初始化表单验证
-        function form_init() {
-            $("#form").Validform({
-                tiptype: 2,
-                ajaxPost: true,
-                showAllError: true,
-                callback: function (ret) {
-                    ajax_progress(ret, function () {
-                        layer.alert('您接下来是要继续生成下一个控制器还是继续停留？', {
-                            btn: ['继续生成', '查看', '停留在此页'], //按钮
-                            yes: function (i) {
-                                location.reload();
-                                layer.close(i);
-                            },
-                            btn2: function (i) {
-                                window.open(ret.data.action);
-                                return false;
-                            }
-                        });
+        // 获取模板
+        var template = {}, index = {};
+        template['form'] = $("#tbody-form").html();
+        template['field'] = $("#tbody-field").html();
+        index['form'] = 0;
+        index['field'] = 0;
+
+        // 初始化表单验证
+        $("#form").Validform({
+            tiptype: 2,
+            ajaxPost: true,
+            showAllError: true,
+            callback: function (ret) {
+                ajax_progress(ret, function () {
+                    layer.alert('您接下来是要继续生成下一个控制器还是继续停留？', {
+                        btn: ['继续生成', '查看', '停留在此页'], //按钮
+                        yes: function (i) {
+                            location.reload();
+                            layer.close(i);
+                        },
+                        btn2: function (i) {
+                            window.open(ret.data.action);
+                            return false;
+                        }
                     });
-                }
+                });
+            }
+        });
+        function form_init() {
+            $('.skin-minimal input').iCheck('destroy');
+            $('.skin-minimal input').iCheck({
+                checkboxClass: 'icheckbox-blue',
+                radioClass: 'iradio-blue',
+                increaseArea: '20%'
             });
         }
 
+        // 一定要在获取模板后在初始化，否则会出现错误
         form_init();
-
-        var template = {};
-        //获取模板
-        template['form'] = $(".form-el .formControls").html();
-        template['table'] = $(".table-el .formControls").html();
-        //增加一栏
+        // 增加一栏
         $(document).on("click", ".op-add", function () {
             var type = $(this).attr("data-type");
-            add_column(type);
-            form_init();
-        }).on("click", ".op-delete", function () { //删除一栏
-            $(this).parents(".row").remove();
-        }).on("change", "[name='form_require[]']", function () { //必填项自动加*
-            var $this = $(this);
-            var form_validate = $this.parents(".formControls").find("[name='form_validate[]']");
-            var form_validate_val = form_validate.val();
-            if ($this.val() == 1) {
-                if (form_validate_val) {
-                    if (form_validate_val.substring(0, 1) != "*") {
-                        form_validate.val("*|" + form_validate_val);
-                    }
-                } else {
-                    form_validate.val("*");
-                }
+            var html = template[type].replace(/(\[\d+\])/g, '[' + (++index[type]) + ']');
+            // 表头菜单，追加到第一个
+            if ($(this)[0].hasAttribute('data-header')) {
+                $("#tbody-" + type).prepend(html);
             } else {
-                if (form_validate_val.length == 1) {
-                    form_validate.val("");
-                } else {
-                    form_validate.val(form_validate_val.substring(2));
-                }
+                $(this).closest('tr').after(html);
             }
-        }).on("click", ".op-sync", function () { //自动同步
-            $(".table-el:gt(0)").remove();
-            $("[name='form_name[]']").each(function (index, item) {
-                if (index != 0) {
-                    add_column('table');
-                }
-                $("[name='table_name[]']").eq(index).val(item.value);
-                $("[name='table_comment[]']").eq(index).val($("[name='form_title[]']").eq(index).val());
+            form_init();
+        }).on("click", ".op-delete", function () {
+            // 删除一栏
+            $(this).closest("tr").fadeOut(undefined, undefined, function () {
+                // 使用回调函数，强行移除该DOM
+                $(this).remove();
             });
             form_init();
+        }).on("change", ".form-require", function () {
+            // 必填项自动加*
+            var $this = $(this);
+            var formValidate = $this.closest("tr").find(".form-validate-datatype");
+            var formValidateVal = formValidate.val();
+            if ($this.prop('checked')) {
+                if (formValidateVal) {
+                    if (formValidateVal.substring(0, 1) != "*") {
+                        formValidate.val("*|" + formValidateVal);
+                    }
+                } else {
+                    formValidate.val("*");
+                }
+            } else {
+                if (formValidateVal.length == 1) {
+                    formValidate.val("");
+                } else {
+                    formValidate.val(formValidateVal.substring(2));
+                }
+            }
+        }).on("click", ".op-sync", function () {
+            // 自动同步
+            var objField = $("#tbody-field");
+            objField.find('tr').remove();
+            $("#tbody-form").find('tr').each(function () {
+                objField.append(template['field'].replace(/(\[\d+\])/g, '[' + (++index['field']) + ']'));
+                var objCurrent = objField.find('tr:last');
+                objCurrent.find('.field-comment').val($(this).find('.form-title').val());
+                objCurrent.find('.field-name').val($(this).find('.form-name').val());
+            });
+            form_init();
+        }).on('click', '.db-jump', function () {
+            location.href = '{:\\think\\Url::build("index")}?table=' + $('.db-table').val();
         });
 
-        function add_column(type) {
-            var html = '<div class="row cl ' + type + '-el">'
-                    + '<label class="form-label col-xs-1"></label>'
-                    + '<div class="formControls col-xs-8">' + template[type] + '<button type="button" class="btn btn-danger op-delete">删除</button></div>'
-                    + '<div class="col-xs-3"> </div>'
-                    + '</div>';
-            $("." + type + "-el:last").after(html);
-        }
-
-        /*$(document).on("click",".op-prev",function () { //上移
-
-         }).on("click",".op-next",function () { //下移
-         var el = "."+$(this).attr("data-type")+"-el";
-         var next_obj = $(this).parents(el).next(el);
-         if (next_obj.length > 0){ //不是最后一个时才能移动
-         var this_html = $(this).parents(".formControls").html();
-         var next_html = next_obj.find(".formControls").html();
-         $(this).parents(".formControls").html(next_html);
-         next_obj.find(".formControls").html(this_html);
-         }
-         })*/
+        {present name="table_info"}
+            var tableInfo = {$table_info};
+            var objForm = $("#tbody-form");
+            objForm.find('tr').remove();
+            for (var i = 0; i < tableInfo.fields.length; i++) {
+                objForm.append(template['form'].replace(/(\[\d+\])/g, '[' + (++index['form']) + ']'));
+                var objCurrent = objForm.find('tr:last');
+                objCurrent.find('.form-name').val(tableInfo.fields[i]);
+            }
+        {/present}
     })
 </script>
 {/block}

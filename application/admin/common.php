@@ -336,3 +336,85 @@ function array_merge_multi()
 
     return $array;
 }
+
+
+/**
+ * 将list_to_tree的树还原成列表
+ * @param array $tree
+ * @param string $child
+ * @param string $order
+ * @param int $level
+ * @param null $filter
+ * @param array $list
+ * @return array
+ */
+function tree_to_list($tree, $filter = null, $child = '_child', $order = 'id', $level = 0, &$list = [])
+{
+    if (is_array($tree)) {
+        if (!is_callable($filter)) {
+            $filter = function (&$refer, $level) {
+                $refer['level'] = $level;
+            };
+        }
+        foreach ($tree as $key => $value) {
+            $refer = $value;
+            unset($refer[$child]);
+            $filter($refer, $level);
+            $list[] = $refer;
+            if (isset($value[$child])) {
+                tree_to_list($value[$child], $filter, $child, $order, $level + 1, $list);
+            }
+        }
+    }
+
+    return $list;
+}
+
+/**
+ * 对查询结果集进行排序
+ * @access public
+ * @param array $list   查询结果
+ * @param string $field 排序的字段名
+ * @param array $sortBy 排序类型
+ *                      asc正向排序 desc逆向排序 nat自然排序
+ * @return array|bool
+ */
+function list_sort_by($list, $field, $sortBy = 'asc')
+{
+    if (is_array($list)) {
+        $refer = $resultSet = [];
+        foreach ($list as $i => $data)
+            $refer[$i] = &$data[$field];
+        switch ($sortBy) {
+            case 'asc': // 正向排序
+                asort($refer);
+                break;
+            case 'desc': // 逆向排序
+                arsort($refer);
+                break;
+            case 'nat': // 自然排序
+                natcasesort($refer);
+                break;
+        }
+        foreach ($refer as $key => $val)
+            $resultSet[] = &$list[$key];
+
+        return $resultSet;
+    }
+
+    return false;
+}
+
+/**
+ * 格式化字节大小
+ * @param  number $size      字节数
+ * @param  string $delimiter 数字和单位分隔符
+ * @return string            格式化后的带单位的大小
+ */
+function format_bytes($size, $delimiter = '')
+{
+    $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    for ($i = 0; $size >= 1024 && $i < 5; $i++) $size /= 1024;
+
+    return round($size, 2) . $delimiter . $units[$i];
+}

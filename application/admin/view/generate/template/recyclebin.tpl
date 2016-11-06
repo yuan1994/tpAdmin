@@ -4,10 +4,10 @@
     {include file='form' /}
     <div class="cl pd-5 bg-1 bk-gray">
         <span class="l">
-            {tp:menu menu='recycle,deleteforever,clear' /}
+            {tp:menu menu='recycle,deleteForever,clear' /}
         </span>
         <span class="r pt-5 pr-5">
-            共有数据 ：<strong>{$count}</strong> 条
+            共有数据 ：<strong>{$count ?? '0'}</strong> 条
         </span>
     </div>
     <table class="table table-border table-bordered table-hover table-bg mt-20">
@@ -29,6 +29,7 @@
         {/volist}
         </tbody>
     </table>
-    <div class="page-bootstrap">{$page}</div>
+    <div class="page-bootstrap">{$page ?? ''}</div>
 </div>
 {/block}
+[SCRIPT]

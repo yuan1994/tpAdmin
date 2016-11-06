@@ -8,6 +8,8 @@ use app\admin\Controller;
 class [NAME] extends Controller
 {
     use \app\admin\traits\controller\Controller;
+    // 方法黑名单
+    protected static $blacklist = [];
 
     [FILTER]
 }

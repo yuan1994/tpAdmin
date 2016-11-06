@@ -28,12 +28,22 @@ class AdminNode extends Controller
 
     protected function filter(&$map)
     {
-        if ($this->request->action() == 'index') {
+        if ($this->request->action() == 'index' || $this->request->action() == 'index2') {
             $map['pid'] = $this->request->param('pid', 0);
         }
 
         if ($this->request->param('title')) $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
         if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
+    }
+
+    protected function beforeIndex2()
+    {
+        $this->beforeIndex();
+    }
+
+    public function index2()
+    {
+        return $this->index();
     }
 
     protected function beforeIndex()

@@ -19,10 +19,10 @@ function layer_open(title, url, opt) {
     h = opt.h || "80vh";
     // 不支持vh,vw单位时采取js动态获取
     if (!attr_support('height', '10vh')) {
-        w = w.replace(/([\d\.]+)(vh|vw)/,function(source, num, unit){
+        w = w.replace(/([\d\.]+)(vh|vw)/, function (source, num, unit) {
             return $(window).width() * num / 100 + 'px';
         });
-        h = h.replace(/([\d\.]+)(vh|vw)/,function(source, num, unit){
+        h = h.replace(/([\d\.]+)(vh|vw)/, function (source, num, unit) {
             return $(window).height() * num / 100 + 'px';
         });
     }
@@ -393,18 +393,23 @@ function login(url) {
  * 表格无限宽横向溢出
  * @param selector
  * @param width 不赋值默认为th的width值和
+ * @param force 强制将表格宽度设置成实际的宽度
  */
-function table_fixed(selector, width) {
-    $obj = $(selector);
-    //未设置宽度自动获取width属性的宽
-    if (typeof width === "undefined") {
-        width = 0;
-        $obj.find("tr:first th").each(function () {
-            width += parseInt($(this).attr("width") || $(this).innerWidth());
-        })
-    }
-    $obj.css({"width": width + "px", "table-layout": "fixed"});
-    $obj.wrap('<div style="width:100%;overflow:auto"></div>');
+function table_fixed(selector, width, force) {
+    var attr = typeof force == 'undefined' ? 'min-width' : 'width';
+    $(selector).each(function () {
+        $this = $(this);
+        //未设置宽度自动获取width属性的宽
+        if (typeof width === "undefined") {
+            width = 0;
+            $this.find("tr:first th").each(function () {
+                width += parseInt($(this).attr("width") || $(this).innerWidth());
+            })
+        }
+        $this.css(attr, width + "px");
+        $this.css("table-layout", "fixed");
+        $this.wrap('<div style="width:100%;overflow:auto"></div>');
+    });
 }
 
 /**
@@ -426,10 +431,10 @@ function get_random(prefix) {
 function attr_support(attrName, attrValue) {
     try {
         var element = document.createElement('div');
-        if(attrName in element.style){
+        if (attrName in element.style) {
             element.style[attrName] = attrValue;
             return element.style[attrName] === attrValue;
-        }else{
+        } else {
             return false;
         }
     } catch (e) {
