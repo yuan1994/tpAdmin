@@ -2,10 +2,10 @@
 /**
  * tpAdmin [a web admin based ThinkPHP5]
  *
- * @author yuan1994 <tianpian0805@gmail.com>
- * @link http://tpadmin.yuan1994.com/
+ * @author    yuan1994 <tianpian0805@gmail.com>
+ * @link      http://tpadmin.yuan1994.com/
  * @copyright 2016 yuan1994 all rights reserved.
- * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
 //------------------------
@@ -14,7 +14,7 @@
 
 namespace app\admin\controller;
 
-\think\Loader::import('controller/Controller', \think\Config::get('traits_path') , EXT);
+\think\Loader::import('controller/Controller', \think\Config::get('traits_path'), EXT);
 
 use app\admin\Controller;
 use think\Db;
@@ -22,13 +22,15 @@ use think\Loader;
 
 class AdminNode extends Controller
 {
-    use \app\admin\traits\controller\Controller;
+    use \app\admin\traits\controller\Controller {
+        \app\admin\traits\controller\Controller::index as indexOld;
+    }
 
 //    protected static $blacklist = ['recyclebin', 'delete', 'deleteforever', 'clear', 'recycle'];
 
     protected function filter(&$map)
     {
-        if ($this->request->action() == 'index' || $this->request->action() == 'index2') {
+        if ($this->request->action() == 'index') {
             $map['pid'] = $this->request->param('pid', 0);
         }
 
@@ -36,25 +38,58 @@ class AdminNode extends Controller
         if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
     }
 
-    protected function beforeIndex2()
+    /**
+     * 首页
+     */
+    public function index()
     {
-        $this->beforeIndex();
+        $list = Db::name('AdminNode')->order('sort asc')->where('isdelete=0')->select();
+        //分组信息
+        $list_group = Loader::model('AdminGroup')->getList();
+        $group = reset_by_key($list_group, "id");
+        $node = [];
+        foreach ($list as $vo) {
+            $name = '<span class="c-warning">[ ' . ($vo['level'] == 1 ? '模块' : ($vo['type'] ? '控制器' : '方法')) . ' ]</span> '
+                . $vo['title'] . " (" . $vo['name'] . ") "
+                . (isset($group[$vo['group_id']]) ? '<span style="color:red"> [ ' . $group[$vo['group_id']]['name'] . ' ]</span>' : '')
+                . ' <a></a><span class="c-secondary">[ 层级：' . $vo['level'] . ' ]</span> '
+                . show_status($vo['status'], $vo['id'])
+                . ' <a class="label label-primary radius J_add" data-id="' . $vo['id'] . '" href="javascript:;" title="添加子节点">添加</a>';
+            $node[] = [
+                'id'   => $vo['id'],
+                'pId'  => $vo['pid'],
+                'sort' => $vo['sort'],
+                'name' => $name,
+            ];
+        }
+        $this->view->assign('node', json_encode($node));
+        $this->view->assign('count', count($list));
+
+        return $this->view->fetch();
     }
 
-    public function index2()
+    /**
+     * 回收站
+     */
+    public function recycleBin()
     {
-        return $this->index();
+        $list_group = Loader::model('AdminGroup')->getList();
+        $this->view->assign('group_list', reset_by_key($list_group, "id"));
+
+        $this::$isdelete = 1;
+
+        return $this->indexOld();
     }
 
-    protected function beforeIndex()
+    /**
+     * 保存排序
+     */
+    public function sort()
     {
-        $group_list = Loader::model('AdminGroup')->getList();
-        $this->view->assign('group_list', reset_by_key($group_list, "id"));
-    }
+        $data = $this->request->only(['id', 'pid', 'sort', 'level']);
+        Loader::model('AdminNode')->save($data, ['id' => $data['id']]);
 
-    protected function beforeRecycleBin()
-    {
-        $this->beforeIndex();
+        return ajax_return_adv('保存排序成功');
     }
 
     protected function beforeAdd()

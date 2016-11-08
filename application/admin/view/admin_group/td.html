@@ -1,6 +1,6 @@
 <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
 <td>{$vo.id}</td>
-<td>{$vo.name|high_light=\\think\\Request::instance()->param('name')}</td>
+<td>{$vo.name|high_light=$Request.param.name}</td>
 <td><i class="Hui-iconfont">{$vo.icon|htmlspecialchars_decode|default='&#xe616;'}</i></td>
 <td>{$vo.sort}</td>
 <td>{$vo.remark}</td>

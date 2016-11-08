@@ -3,9 +3,9 @@
 {block name="content"}
 <div class="page-container" id="full">
     <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
-        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
-        <input type="hidden" name="pid" value="{:isset($vo.pid)?$vo.pid:'0'}">
-        <input type="hidden" name="level" value="{:isset($vo.level)?$vo.level:'1'}">
+        <input type="hidden" name="id" value="{$vo.id ?? ''}">
+        <input type="hidden" name="pid" value="{$vo.pid ?? '0'}">
+        <input type="hidden" name="level" value="{$vo.level ?? '1'}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">分组：</label>
             <div class="formControls col-xs-6 col-sm-6">
@@ -13,7 +13,7 @@
                     <select name="group_id" class="select">
                         <option value="0">未分组</option>
                         {foreach name='group_list' item='group'}
-                        <option value="{$group.id}">{$group.name}</option>
+                            <option value="{$group.id}">{$group.name}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -22,12 +22,14 @@
         </div>
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">类型：</label>
-            <div class="formControls col-xs-6 col-sm-6">
-                <div class="select-box">
-                    <select name="type" class="select">
-                        <option value="1">控制器</option>
-                        <option value="0" selected>方法</option>
-                    </select>
+            <div class="formControls col-xs-6 col-sm-6 skin-minimal">
+                <div class="radio-box">
+                    <input type="radio" name="type" id="type-1" value="1">
+                    <label for="type-1">控制器</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" name="type" id="type-0" value="0" checked>
+                    <label for="type-0">方法</label>
                 </div>
             </div>
             <div class="col-xs-3 col-sm-3"></div>

@@ -12,6 +12,16 @@
 @bg-gray:#e0e0e0;
 @bg-gray-shallow:#f1f2f8;
 
+.c-secondary{
+  color: @color-secondary;
+}
+.c-warning{
+  color: @color-warning;
+}
+.c-link{
+  color: @color-link;
+}
+
 .sub-menu-title{
   padding-left: 20px !important;
   border-bottom: 1px solid #e0e0e0 !important;
@@ -173,5 +183,17 @@ tr .check-box > div{
   border: 1px solid @border-color;
   &.dragenter{
     border-color: @color-success;
+  }
+}
+
+.ztree li{
+  .label{
+    padding: 1px 4px;
+    line-height: 14px;
+    height: 14px;
+    color: white;
+    &:hover{
+      text-decoration: none;
+    }
   }
 }

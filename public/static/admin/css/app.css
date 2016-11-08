@@ -1,4 +1,13 @@
 @charset "utf-8";
+.c-secondary {
+  color: #3bb4f2;
+}
+.c-warning {
+  color: #f37b1d;
+}
+.c-link {
+  color: #0e90d2;
+}
 .sub-menu-title {
   padding-left: 20px !important;
   border-bottom: 1px solid #e0e0e0 !important;
@@ -156,4 +165,13 @@ tr .check-box > div {
 }
 #drag.dragenter {
   border-color: #5eb95e;
+}
+.ztree li .label {
+  padding: 1px 4px;
+  line-height: 14px;
+  height: 14px;
+  color: white;
+}
+.ztree li .label:hover {
+  text-decoration: none;
 }

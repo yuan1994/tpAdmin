@@ -287,8 +287,8 @@ jQuery.tpTab = function (tabBar, tabCon, class_name, tabEvent, i, callback, fini
  * @param id 对象id
  * @param url 删除地址，一般为 {:url('delete_forever')}
  */
-function del_forever(obj, id, url) {
-    _del(obj, id, url, '您确定要删除此项并且不能恢复？');
+function del_forever(obj, id, url, fn) {
+    _del(obj, id, url, '您确定要删除此项并且不能恢复？', fn);
 }
 
 /**
@@ -296,9 +296,10 @@ function del_forever(obj, id, url) {
  * @param obj this
  * @param id 对象id
  * @param url 删除地址，一般为 {:url('delete')}
+ * @param fn 回调函数
  */
-function del(obj, id, url) {
-    _del(obj, id, url, '您确定要把此条数据放入回收站？');
+function del(obj, id, url, fn) {
+    _del(obj, id, url, '您确定要把此条数据放入回收站？', fn);
 }
 
 /**
@@ -306,9 +307,10 @@ function del(obj, id, url) {
  * @param obj this
  * @param id 对象id
  * @param url 恢复地址，一般为 {:url('recycle')}
+ * @param fn 回调函数
  */
-function recycle(obj, id, url) {
-    _recycle(obj, id, url, '您确定要从回收站还原此条数据吗？');
+function recycle(obj, id, url, fn) {
+    _recycle(obj, id, url, '您确定要从回收站还原此条数据吗？', fn);
 }
 
 /**
@@ -442,7 +444,7 @@ function attr_support(attrName, attrValue) {
     }
 }
 
-function _del_recycle(obj, id, url, msg, returnMsg) {
+function _del_recycle(obj, id, url, msg, returnMsg, fn) {
     layer.confirm(msg, {
         btn: ['确定', '取消'],
         title: '提示',
@@ -455,18 +457,19 @@ function _del_recycle(obj, id, url, msg, returnMsg) {
             } else {
                 layer.alert(data.msg);
             }
+            fn && fn(data);
         }, 'json')
     }, function (index) {
         layer.close(index);
     });
 }
 
-function _del(obj, id, url, msg) {
-    _del_recycle(obj, id, url, msg, "已删除！")
+function _del(obj, id, url, msg, fn) {
+    _del_recycle(obj, id, url, msg, "已删除！", fn)
 }
 
-function _recycle(obj, id, url, msg) {
-    _del_recycle(obj, id, url, msg, "已还原！")
+function _recycle(obj, id, url, msg, fn) {
+    _del_recycle(obj, id, url, msg, "已还原！", fn)
 }
 
 function _del_recycle_all(url, checkbox_group, msg, return_msg) {

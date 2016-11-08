@@ -1,0 +1,72 @@
+{extend name="template/base" /}
+{block name="content"}
+<!--
+  ~ tpAdmin [a web admin based ThinkPHP5]
+  ~
+  ~ @author yuan1994 <tianpian0805@gmail.com>
+  ~ @link http://tpadmin.yuan1994.com/
+  ~ @copyright 2016 yuan1994 all rights reserved.
+  ~ @license http://www.apache.org/licenses/LICENSE-2.0
+  -->
+
+<div class="page-container">
+    {include file='form' /}
+    <div class="cl pd-5 bg-1 bk-gray">
+        <span class="l">
+            {tp:menu url='add:pid=$Request.param.pid' /}
+            <a href="{:\\think\\Url::build('index',['pid'=>0])}" class="btn btn-success radius ml-5"><i
+                    class="Hui-iconfont">&#xe625;</i> 返回根目录</a>
+            <a href="javascript:;" onclick="history.back()" class="btn btn-secondary radius ml-5"><i
+                    class="Hui-iconfont">&#xe66b;</i> 返回上一级</a>
+            {tp:menu menu='add' title='批量导入' url='load:pid=$Request.param.pid' /}
+        </span>
+        <span class="r pt-5 pr-5">
+            共有数据 ：<strong>{$count}</strong> 条
+        </span>
+    </div>
+    <table class="table table-border table-bordered table-hover table-bg mt-20">
+        <thead>
+        <tr class="text-c">
+            {include file="th" /}
+            <th width="70">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+        <tr class="text-c">
+            <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
+            <td>{$vo.id}</td>
+            <td><a class="c-blue" href="{:\\think\\Url::build('index', ['pid' => $vo.id])}">
+                    {:isset($group_list[$vo.group_id])?$group_list[$vo.group_id]['name']:'未分组'}
+                </a>
+            </td>
+            <td><a class="c-blue" href="{:\\think\\Url::build('index', ['pid' => $vo.id])}">
+                    {$vo.title|high_light=$Request.param.title}
+                </a>
+            </td>
+            <td><a class="c-blue" href="{:\\think\\Url::build('index', ['pid' => $vo.id])}">
+                    {$vo.name|high_light=$Request.param.name}
+                </a>
+            </td>
+            <td>{$vo.type?'控制器':'<span class="c-red">方法</span>'}</td>
+            <td>{$vo.sort}</td>
+
+            <td>{$vo.status|get_status}</td>
+            <td class="f-14">
+                {$vo.status|show_status=$vo.id}
+                {tp:menu menu='sedit,sdelete' /}
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    <div class="page-bootstrap">{$page}</div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    $(function () {
+        $("[name='group_id']").find("[value='{$Request.param.group_id}']").attr("selected", true);
+    })
+</script>
+{/block}

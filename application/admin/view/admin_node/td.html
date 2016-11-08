@@ -1,8 +1,14 @@
 <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
 <td>{$vo.id}</td>
-<td>{if condition="($vo['group_id'] eq 0) OR (!isset($group_list[$vo.group_id]['name']))"}未分组{else/}{$group_list[$vo.group_id]['name']}{/if}</td>
-<td>{$vo.title|high_light=\\think\\Request::instance()->param('title')}</td>
-<td>{$vo.name|high_light=\\think\\Request::instance()->param('name')}</td>
+<td>
+    {if condition="($vo['group_id'] eq 0) OR (!isset($group_list[$vo.group_id]['name']))"}
+        未分组
+    {else /}
+        {$group_list[$vo.group_id]['name']}
+    {/if}
+</td>
+<td>{$vo.title|high_light=$Request.param.title}</td>
+<td>{$vo.name|high_light=$Request.param.name}</td>
 <td>{$vo.type?'控制器':'<span class="c-red">方法</span>'}</td>
 <td>{$vo.sort}</td>
 <td>{$vo.status|get_status}</td>

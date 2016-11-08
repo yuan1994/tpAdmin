@@ -4,7 +4,7 @@
     {include file='form' /}
     <div class="cl pd-5 bg-1 bk-gray">
         <span class="l">
-            {tp:menu menu='recycle,deleteforever,clear' /}
+            {tp:menu menu='recycle' /}
         </span>
         <span class="r pt-5 pr-5">
             共有数据 ：<strong>{$count}</strong> 条
@@ -23,7 +23,6 @@
             {include file="td" /}
             <td class="f-14">
                 {tp:menu menu='srecycle' /}
-                {tp:menu menu='sdeleteforever' /}
             </td>
         </tr>
         {/volist}

@@ -4,7 +4,7 @@
     {include file='form' /}
     <div class="cl pd-5 bg-1 bk-gray">
         <span class="l">
-            {tp:menu /}
+            {tp:menu menu='add,forbid,resume' /}
         </span>
         <span class="r pt-5 pr-5">
             共有数据 ：<strong>{$count}</strong> 条
@@ -24,7 +24,6 @@
             <td class="f-14">
                 {$vo.status|show_status=$vo.id}
                 {tp:menu menu='sedit' /}
-                {tp:menu menu='sdelete' /}
             </td>
         </tr>
         {/volist}
