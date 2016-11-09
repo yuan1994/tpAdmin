@@ -29,7 +29,9 @@ class AdminRole extends Controller
 
     protected function filter(&$map)
     {
-        if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
+        if ($this->request->param('name')) {
+            $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
+        }
     }
 
     /**

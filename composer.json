@@ -1,18 +1,23 @@
 {
-    "name": "topthink/think",
-    "description": "the new thinkphp framework",
+    "name": "yuan1994/tpadmin",
+    "description": "a web admin based ThinkPHP5",
     "type": "project",
     "keywords": [
-        "framework",
+        "tpadmin",
         "thinkphp",
-        "ORM"
+        "admin",
+        "rbac",
+        "generate",
+        "generator"
     ],
-    "homepage": "http://thinkphp.cn/",
+    "homepage": "http://tpadmin.yuan1994.com/",
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "liu21st",
-            "email": "liu21st@gmail.com"
+            "name": "tianpian",
+            "email": "tianpian0805@gmail.com",
+            "homepage": "http://www.tianpian.net.cn",
+            "role": "Owner"
         }
     ],
     "require": {

@@ -10,13 +10,6 @@
 
 return [
     'module'             => 'admin',
-    'create_table'       => true,
-    'create_table_force' => true,
-    'table_name'         => '',
-    'table_engine'       => 'InnoDB',
-    'menu'               => ['add', 'forbid', 'resume', 'delete', 'recyclebin', 'recycle'],
-    'auto_timestamp'     => true,
-    'model'              => false,
-    'validate'           => false,
+    'menu'               => ['add'],
     'create_config'      => true,
 ];

@@ -91,7 +91,7 @@
                     layer.alert(ret.msg);
                 } else {
                     layer.msg("登录成功！");
-                    location.href = '{:\\think\\Request::instance()->get("callback") ?: \\think\\Url::build("Index/index")}';
+                    location.href = '{$Request.get.callback ?: \\think\\Url::build("Index/index")}';
                 }
             }
         });

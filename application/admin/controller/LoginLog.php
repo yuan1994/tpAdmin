@@ -33,8 +33,12 @@ class LoginLog extends Controller
         }
 
         // 关联筛选
-        if ($this->request->param('account')) $map['admin_user.account'] = $this->request->param('account');
-        if ($this->request->param('name')) $map['admin_user.realname'] = ["like", "%" . $this->request->param('name') . "%"];
+        if ($this->request->param('account')) {
+            $map['admin_user.account'] = $this->request->param('account');
+        }
+        if ($this->request->param('name')) {
+            $map['admin_user.realname'] = ["like", "%" . $this->request->param('name') . "%"];
+        }
 
         // 设置属性
         $map['_table'] = "login_log";

@@ -2,24 +2,29 @@
 /**
  * tpAdmin [a web admin based ThinkPHP5]
  *
- * @author yuan1994 <tianpian0805@gmail.com>
- * @link http://tpadmin.yuan1994.com/
+ * @author    yuan1994 <tianpian0805@gmail.com>
+ * @link      http://tpadmin.yuan1994.com/
  * @copyright 2016 yuan1994 all rights reserved.
- * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
 use \think\Request;
 
+$basename = Request::instance()->root();
+if (pathinfo($basename, PATHINFO_EXTENSION) == 'php') {
+    $basename = dirname($basename);
+}
+
 return [
     // 模板参数替换
     'view_replace_str' => [
-        '__ROOT__' => Request::instance()->root(),
-        '__STATIC__' => Request::instance()->root() . '/static/admin',
-        '__LIB__'    => Request::instance()->root() . '/static/admin/lib',
+        '__ROOT__'   => $basename,
+        '__STATIC__' => $basename . '/static/admin',
+        '__LIB__'    => $basename . '/static/admin/lib',
     ],
 
     // traits 目录
-    'traits_path' => APP_PATH . 'admin' . DS . 'traits' . DS,
+    'traits_path'      => APP_PATH . 'admin' . DS . 'traits' . DS,
 
     // 异常处理 handle 类 留空使用 \think\exception\Handle
     'exception_handle' => '\\TpException',

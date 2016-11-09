@@ -17,6 +17,7 @@ use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
 use think\Exception;
+use think\Loader;
 
 class Generate extends Command
 {
@@ -56,8 +57,23 @@ EOF
     {
 
         $output->info('代码开始生成中……');
-        $config = explode(".", $input->getOption('config'));
-        $configFile = ROOT_PATH . $config[0] . '.php';
+        $config = $input->getOption('config');
+        if (strpos($config, ':')) {
+            // 针对于指向模块的文件 module:controller[/file.php]
+            list($module, $controller) = explode(':', $config, 2);
+            $file = 'config.php';
+            // 对于module:controller/file.php类型处理
+            if (pathinfo($controller, PATHINFO_EXTENSION) == 'php') {
+                $file = basename($controller);
+                $controller = dirname($controller);
+            }
+            $controller = str_replace('.', DS, Loader::parseName(str_replace(['/', DS, ':'], '.', $controller)));
+            $configFile = APP_PATH . strtolower($module) . DS . 'view' . DS . $controller . DS . $file;
+        } else {
+            $config = explode(".", $config);
+            $configFile = ROOT_PATH . $config[0] . '.php';
+        }
+
         if (!file_exists($configFile)) {
             $output->error('配置文件不存在：' . $configFile);
 

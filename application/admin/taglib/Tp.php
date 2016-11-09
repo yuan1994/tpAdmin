@@ -126,7 +126,7 @@ class Tp extends Taglib
                 case 'sedit':
                     $title = isset($titleArr[$k]) && $titleArr[$k] ? $titleArr[$k] : '编辑';
                     list($url, $param) = $this->parseUrl($url, 'id=$vo["id"]');
-                    $parseStr .= ' <a title="' . $title . '" href="javascript:;" onclick="layer_open(\'' . $title . '\',\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>';
+                    $parseStr .= ' <a title="' . $title . '" href="javascript:;" onclick="layer_open(\'' . $title . '\',\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" style="text-decoration:none" class="ml-5"><i class="Hui-iconfont">&#xe6df;</i></a>';
                     break;
                 case 'sdelete':
                     $title = isset($titleArr[$k]) && $titleArr[$k] ? $titleArr[$k] : '删除';
@@ -136,13 +136,19 @@ class Tp extends Taglib
                 case 'srecycle':
                     $title = isset($titleArr[$k]) && $titleArr[$k] ? $titleArr[$k] : '还原';
                     list($url, $param) = $this->parseUrl($url);
-                    $parseStr .= ' <a href="javascript:;" onclick="recycle(this,\'{$vo.id}\',\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" class="label label-success radius">' . $title . '</a>';
+                    $parseStr .= ' <a href="javascript:;" onclick="recycle(this,\'{$vo.id}\',\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" class="label label-success radius ml-5">' . $title . '</a>';
                     break;
                 case 'sdeleteforever':
                     $title = isset($titleArr[$k]) && $titleArr[$k] ? $titleArr[$k] : '彻底删除';
                     list($url, $param) = $this->parseUrl($url);
-                    $parseStr .= ' <a href="javascript:;" onclick="del_forever(this,\'{$vo.id}\',\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" class="label label-danger radius">' . $title . '</a>';
+                    $parseStr .= ' <a href="javascript:;" onclick="del_forever(this,\'{$vo.id}\',\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" class="label label-danger radius ml-5">' . $title . '</a>';
                     break;
+                default:
+                    // 默认为小菜单
+                    $title = isset($titleArr[$k]) && $titleArr[$k] ? $titleArr[$k] : '菜单';
+                    list($url, $param) = $this->parseUrl($url);
+                    $class = isset($tag['class']) ? $tag['class'] : 'label-primary';
+                    $parseStr .= ' <a title="' . $title . '" href="javascript:;" onclick="layer_open(\'' . $title . '\',\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" class="label radius ml-5 ' . $class . '">' . $title . '</a>';
             }
             $parseStr .= "<?php endif; ?>";
         }
@@ -164,8 +170,8 @@ class Tp extends Taglib
         foreach ($params as $param) {
             if ($param) {
                 list($key, $value) = explode("=", $param);
-                    $this->parseVar($value);
-                    $ret .= "'{$key}' => {$value}, ";
+                $this->parseVar($value);
+                $ret .= "'{$key}' => {$value}, ";
             }
         }
 
@@ -183,7 +189,7 @@ class Tp extends Taglib
             case '$':
                 if (false !== $pos = strpos($value, '?')) {
                     $array = preg_split('/([!=]={1,2}|(?<!-)[><]={0,1})/', substr($value, 0, $pos), 2, PREG_SPLIT_DELIM_CAPTURE);
-                    $name  = $array[0];
+                    $name = $array[0];
                     $this->tpl->parseVar($name);
                     $this->tpl->parseVarFunction($name);
 

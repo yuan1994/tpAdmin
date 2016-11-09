@@ -527,7 +527,6 @@ class Generate
                             $searchSelected .= tab(2) . '$("[name=\'' . $form['name'] . '\']").find("[value=\'{$Request.param.' . $form['name'] . '}\']").attr("selected", true);' . "\n";
                             $search[] = tab(1) . '<div class="select-box" style="width:250px">';
                             $search[] = tab(2) . '<select name="' . $form['name'] . '" class="select">';
-                            $search[] = tab(3) . '<option value="">所有' . $form['title'] . '</option>';
                             $search = array_merge($search, $this->getOption($options, $form, true, 3));
                             $search[] = tab(2) . '</select>';
                             $search[] = tab(1) . '</div>';
@@ -596,7 +595,7 @@ class Generate
                                 $setChecked[] = tab(2) . 'var checks = \'' . $form['default'] . '\'.split(",");' . "\n"
                                     . tab(2) . 'if (checks.length > 0){' . "\n"
                                     . tab(3) . 'for (var i in checks){' . "\n"
-                                    . tab(4) . '$("[name=\'user_id[]\'][value=\'"+checks[i]+"\']").attr("checked", true);' . "\n"
+                                    . tab(4) . '$("[name=\'' . $form['name'] . '[]\'][value=\'"+checks[i]+"\']").attr("checked", true);' . "\n"
                                     . tab(3) . '}' . "\n"
                                     . tab(2) . '}';
                             }
@@ -609,7 +608,7 @@ class Generate
                                     $editField .= $this->getCheckbox($form, $name, $validateForm, $options[1], '', 0);
                                     break;
                                 case 'var':
-                                    $editField .= tab(4) . '{foreach name=":\\think\\Config::get(\'conf.' . $options[1] . '\')" item=\'v\' key=\'k\'}' . "\n"
+                                    $editField .= tab(4) . '{foreach name="$Think.config.conf.' . $options[1] . '" item=\'v\' key=\'k\'}' . "\n"
                                         . $this->getCheckbox($form, $name, $validateForm, '{$v}', '{$k}', '{$k}')
                                         . tab(4) . '{/foreach}' . "\n";
                                     break;
@@ -633,7 +632,7 @@ class Generate
                             // 默认生成的textarea加入了输入字符长度实时统计，H-ui.admin官方的textarealength方法有问题，请使用 tpadmin 框架修改后的源码，也可拷贝 H-ui.js 里相应的方法
                             // 如果不需要字符长度实时统计，请在生成代码中删除textarea上的onKeyUp事件和下面p标签那行
                             $editField .= tab(4) . '<textarea class="textarea" placeholder="" name="' . $form['name'] . '" '
-                                . 'onKeyUp="textarealength(this,100)"' . $validateForm . '>'
+                                . 'onKeyUp="textarealength(this, 100)"' . $validateForm . '>'
                                 . '{$vo.' . $form['name'] . ' ?? \'' . $form['default'] . '\'}'
                                 . '</textarea>' . "\n"
                                 . tab(4) . '<p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>' . "\n";
@@ -727,7 +726,7 @@ class Generate
                 if ($empty) {
                     $ret[] = tab($tab) . '<option value="">所有' . $form['title'] . '</option>';
                 }
-                $ret[] = tab($tab) . '{foreach name=":\\think\\Config::get(\'conf.' . $options[1] . '\')" item=\'v\' key=\'k\'}';
+                $ret[] = tab($tab) . '{foreach name="$Think.config.conf.' . $options[1] . '" item=\'v\' key=\'k\'}';
                 $ret[] = tab($tab + 1) . '<option value="{$k}">{$v}</option>';
                 $ret[] = tab($tab) . '{/foreach}';
 
@@ -761,7 +760,7 @@ class Generate
             $ret = [];
             $arrVal = explode('#', $option);
             foreach ($arrVal as $val) {
-                $keyVal = explode(':', $val);
+                $keyVal = explode(':', $val, 2);
                 if (count($keyVal) == 1) {
                     $ret[] = ['', $keyVal[0]];
                 } else {

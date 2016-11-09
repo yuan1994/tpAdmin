@@ -61,7 +61,7 @@ class Controller
         }
 
         // 前置方法
-        $beforeAction = "before" . ucfirst($this->request->action());
+        $beforeAction = "before" . $this->request->action();
         if (method_exists($this, $beforeAction)) {
             $this->$beforeAction();
         }
@@ -90,11 +90,12 @@ class Controller
      */
     protected function getModel($controller = '')
     {
+        $module = $this->request->module();
         if (!$controller) {
             $controller = $this->request->controller();
         }
-        if (class_exists("\\app\\admin\\model\\" . $this->parseClass($controller))) {
-            return Loader::model($this->parseClass($controller));
+        if (class_exists(Loader::parseClass($module, 'model', $controller))) {
+            return Loader::model($controller);
         } else {
             return Db::name($this->parseTable($controller));
         }
@@ -124,7 +125,7 @@ class Controller
      * @param string $pk        主键，默认为主键
      * @param string $input     接收参数，默认为主键
      */
-    protected function update($field, $value, $msg = "操作成功", $pk = "", $input = "")
+    protected function updateField($field, $value, $msg = "操作成功", $pk = "", $input = "")
     {
         $model = $this->getModel();
         if (!$pk) {

@@ -1,9 +1,9 @@
 <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
 <td>{$vo.id}</td>
-<td>{$vo.realname|high_light=\\think\\Request::instance()->param('realname')}</td>
-<td>{$vo.account|high_light=\\think\\Request::instance()->param('account')}</td>
-<td>{$vo.email|high_light=\\think\\Request::instance()->param('email')}</td>
-<td>{$vo.mobile|high_light=\\think\\Request::instance()->param('mobile')}</td>
+<td>{$vo.realname|high_light=$Request.param.realname}</td>
+<td>{$vo.account|high_light=$Request.param.account}</td>
+<td>{$vo.email|high_light=$Request.param.email}</td>
+<td>{$vo.mobile|high_light=$Request.param.mobile}</td>
 <td>{$vo.create_time|date='Y-m-d',###}</td>
 <td>{$vo.last_login_time|date='Y-m-d H:i:s',###}</td>
 <td>{$vo.login_count}</td>

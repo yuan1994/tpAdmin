@@ -1,7 +1,7 @@
 {extend name="template/base" /}
 {block name="content"}
 <div class="page-container">
-    <input type="hidden" id="callbackId" value="{:\\think\\Request::instance()->param('id')}">
+    <input type="hidden" id="callbackId" value="{$Request.param.id}">
     <div id="tab_upload" class="HuiTab">
         <div class="tabBar cl">
             <span>本地上传</span>

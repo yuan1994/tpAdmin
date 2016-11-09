@@ -2,7 +2,7 @@
 {block name="content"}
 <div class="page-container">
     <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
-        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <input type="hidden" name="id" value="{$vo.id ?? ''}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>模块：</label>
             <div class="formControls col-xs-6 col-sm-6">
@@ -17,7 +17,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>节点图：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="text" class="input-text" value="{:isset($vo.map)?$vo.map:''}" placeholder="" name="map" datatype="*">
+                <input type="text" class="input-text" value="{$vo.map ?? ''}" placeholder="" name="map" datatype="*">
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
@@ -38,7 +38,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>备注：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <textarea class="textarea" placeholder="" name="comment" onKeyUp="textarealength(this,100)" datatype="*">{:isset($vo.comment)?$vo.comment:''}</textarea>
+                <textarea class="textarea" placeholder="" name="comment" onKeyUp="textarealength(this,100)" datatype="*">{$vo.comment ?? ''}</textarea>
                 <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
             </div>
             <div class="col-xs-3 col-sm-3"></div>
@@ -57,8 +57,8 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script>
     $(function () {
-        $("[name='is_ajax'][value='{:isset($vo.is_ajax)?$vo.is_ajax:'0'}']").attr("checked",true);
-        $("[name='module']").find("[value='{:isset($vo.module)?$vo.module:''}']").attr("selected",true);
+        $("[name='is_ajax'][value='{$vo.is_ajax ?? '0'}']").attr("checked",true);
+        $("[name='module']").find("[value='{$vo.module ?? ''}']").attr("selected",true);
 
         $('.skin-minimal input').iCheck({
             checkboxClass: 'icheckbox-blue',

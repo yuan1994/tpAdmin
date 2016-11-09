@@ -28,7 +28,11 @@ class AdminNodeLoad extends Controller
 
     protected function filter(&$map)
     {
-        if ($this->request->param('title')) $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
-        if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
+        if ($this->request->param('title')) {
+            $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
+        }
+        if ($this->request->param('name')) {
+            $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
+        }
     }
 }

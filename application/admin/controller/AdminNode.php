@@ -34,8 +34,12 @@ class AdminNode extends Controller
             $map['pid'] = $this->request->param('pid', 0);
         }
 
-        if ($this->request->param('title')) $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
-        if ($this->request->param('name')) $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
+        if ($this->request->param('title')) {
+            $map['title'] = ["like", "%" . $this->request->param('title') . "%"];
+        }
+        if ($this->request->param('name')) {
+            $map['name'] = ["like", "%" . $this->request->param('name') . "%"];
+        }
     }
 
     /**

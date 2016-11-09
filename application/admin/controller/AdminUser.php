@@ -31,10 +31,18 @@ class AdminUser extends Controller
         //不查询管理员
         $map['id'] = ["gt", 1];
 
-        if ($this->request->param('realname')) $map['realname'] = ["like", "%" . $this->request->param('realname') . "%"];
-        if ($this->request->param('account')) $map['realname'] = ["like", "%" . $this->request->param('account') . "%"];
-        if ($this->request->param('email')) $map['realname'] = ["like", "%" . $this->request->param('email') . "%"];
-        if ($this->request->param('mobile')) $map['realname'] = ["like", "%" . $this->request->param('mobile') . "%"];
+        if ($this->request->param('realname')) {
+            $map['realname'] = ["like", "%" . $this->request->param('realname') . "%"];
+        }
+        if ($this->request->param('account')) {
+            $map['realname'] = ["like", "%" . $this->request->param('account') . "%"];
+        }
+        if ($this->request->param('email')) {
+            $map['realname'] = ["like", "%" . $this->request->param('email') . "%"];
+        }
+        if ($this->request->param('mobile')) {
+            $map['realname'] = ["like", "%" . $this->request->param('mobile') . "%"];
+        }
     }
 
     /**

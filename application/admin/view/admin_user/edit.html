@@ -3,7 +3,7 @@
 {block name="content"}
 <div class="page-container">
     <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
-        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <input type="hidden" name="id" value="{$vo.id ?? ''}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>帐号：</label>
             <div class="formControls col-xs-6 col-sm-6">
@@ -14,7 +14,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>姓名：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="text" class="input-text" value="{:isset($vo.realname)?$vo.realname:''}" placeholder="" name="realname" datatype="*" nullmsg="请填写姓名">
+                <input type="text" class="input-text" value="{$vo.realname ?? ''}" placeholder="" name="realname" datatype="*" nullmsg="请填写姓名">
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
@@ -30,14 +30,14 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">邮箱：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="text" class="input-text" value="{:isset($vo.email)?$vo.email:''}" placeholder="" name="email" datatype="e" ignore="ignore" errormsg="邮箱格式错误">
+                <input type="text" class="input-text" value="{$vo.email ?? ''}" placeholder="" name="email" datatype="e" ignore="ignore" errormsg="邮箱格式错误">
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">手机：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="text" class="input-text" value="{:isset($vo.mobile)?$vo.mobile:''}" placeholder="" name="mobile" datatype="m" ignore="ignore" errormsg="手机格式错误">
+                <input type="text" class="input-text" value="{$vo.mobile ?? ''}" placeholder="" name="mobile" datatype="m" ignore="ignore" errormsg="手机格式错误">
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
@@ -58,7 +58,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">备注：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <textarea class="textarea" placeholder="" name="remark" onKeyUp="textarealength(this,100)">{:isset($vo.remark)?$vo.remark:''}</textarea>
+                <textarea class="textarea" placeholder="" name="remark" onKeyUp="textarealength(this,100)">{$vo.remark ?? ''}</textarea>
                 <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
             </div>
             <div class="col-xs-3 col-sm-3"></div>
@@ -77,7 +77,7 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script>
     $(function () {
-        $("[name='status'][value='{:isset($vo.status)?$vo.status:'1'}']").attr("checked",true);
+        $("[name='status'][value='{$vo.status ?? '1'}']").attr("checked",true);
 
         $('.skin-minimal input').iCheck({
             checkboxClass: 'icheckbox-blue',

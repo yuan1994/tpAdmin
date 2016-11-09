@@ -3,18 +3,18 @@
 {block name="content"}
 <div class="page-container">
     <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
-        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <input type="hidden" name="id" value="{$vo.id ?? ''}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>分组名称：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="text" class="input-text" value="{:isset($vo.name)?$vo.name:''}" placeholder="" name="name" datatype="*" nullmsg="请填写分组名称">
+                <input type="text" class="input-text" value="{$vo.name ?? ''}" placeholder="" name="name" datatype="*" nullmsg="请填写分组名称">
             </div>
             <div class="col-xs-3 col-sm-3"> </div>
         </div>
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>排序：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="number" class="input-text" value="{:isset($vo.sort)?$vo.sort:'50'}" placeholder="" name="sort" datatype="*" nullmsg="请填写排序">
+                <input type="number" class="input-text" value="{$vo.sort ?? '50'}" placeholder="" name="sort" datatype="*" nullmsg="请填写排序">
             </div>
             <div class="col-xs-3 col-sm-3"> </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">备注：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <textarea class="textarea"  placeholder="备注" name="remark" onKeyUp="textarealength(this,100)">{:isset($vo.remark)?$vo.remark:''}</textarea>
+                <textarea class="textarea"  placeholder="备注" name="remark" onKeyUp="textarealength(this,100)">{$vo.remark ?? ''}</textarea>
                 <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
             </div>
             <div class="col-xs-3 col-sm-3"></div>
@@ -54,9 +54,9 @@
 <script>
     $(function () {
         /* 单选按钮组初始化选中状态，可以设定默认值 */
-        $("[name='status'][value='{:isset($vo.status)?$vo.status:'1'}']").attr("checked",true);
+        $("[name='status'][value='{$vo.status ?? '1'}']").attr("checked",true);
         /* 下拉框初始化选中状态，可以设定默认值 */
-        $("[name='select']").find("[value='{:isset($vo.select)?$vo.select:''}']").attr("selected",true);
+        $("[name='select']").find("[value='{$vo.select ?? ''}']").attr("selected",true);
 
         $('.skin-minimal input').iCheck({
             checkboxClass: 'icheckbox-blue',

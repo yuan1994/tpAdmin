@@ -66,6 +66,7 @@ trait Controller
     public function add()
     {
         $controller = $this->request->controller();
+        $module = $this->request->module();
 
         if ($this->request->isAjax()) {
             // 插入
@@ -74,7 +75,7 @@ trait Controller
             unset($data['id']);
 
             // 验证
-            if (class_exists("\\app\\admin\\validate\\{$this->parseClass($controller)}")) {
+            if (class_exists(Loader::parseClass($module, 'validate', $controller))) {
                 $validate = Loader::validate($controller);
                 if (!$validate->check($data)) {
                     return ajax_return_adv_error($validate->getError());
@@ -84,7 +85,7 @@ trait Controller
             // 写入数据
             Db::startTrans();
             try {
-                if (class_exists("\\app\\admin\\model\\{$this->parseClass($controller)}")) {
+                if (class_exists(Loader::parseClass($module, 'model', $controller))) {
                     //使用模型写入，可以在模型中定义更高级的操作
                     $model = Loader::model($controller);
                     $ret = $model->save($data);
@@ -105,7 +106,7 @@ trait Controller
             }
         } else {
             // 添加
-            return $this->view->fetch('edit');
+            return $this->view->fetch(isset($this->template) ? $this->template : 'edit');
         }
     }
 
@@ -116,6 +117,7 @@ trait Controller
     public function edit()
     {
         $controller = $this->request->controller();
+        $module = $this->request->module();
 
         if ($this->request->isAjax()) {
             // 更新
@@ -125,7 +127,7 @@ trait Controller
             }
 
             // 验证
-            if (class_exists("\\app\\admin\\validate\\{$this->parseClass($controller)}")) {
+            if (class_exists(Loader::parseClass($module, 'validate', $controller))) {
                 $validate = Loader::validate($controller);
                 if (!$validate->check($data)) {
                     return ajax_return_adv_error($validate->getError());
@@ -135,7 +137,7 @@ trait Controller
             // 更新数据
             Db::startTrans();
             try {
-                if (class_exists("\\app\\admin\\model\\{$this->parseClass($controller)}")) {
+                if (class_exists(Loader::parseClass($module, 'model', $controller))) {
                     // 使用模型更新，可以在模型中定义更高级的操作
                     $model = Loader::model($controller);
                     $ret = $model->isUpdate(true)->save($data, ['id' => $data['id']]);
@@ -176,7 +178,7 @@ trait Controller
      */
     public function delete()
     {
-        return $this->update("isdelete", 1, "移动到回收站成功");
+        return $this->updateField("isdelete", 1, "移动到回收站成功");
     }
 
     /**
@@ -184,7 +186,7 @@ trait Controller
      */
     public function recycle()
     {
-        return $this->update("isdelete", 0, "恢复成功");
+        return $this->updateField("isdelete", 0, "恢复成功");
     }
 
     /**
@@ -192,7 +194,7 @@ trait Controller
      */
     public function forbid()
     {
-        return $this->update("status", 0, "禁用成功");
+        return $this->updateField("status", 0, "禁用成功");
     }
 
 
@@ -201,7 +203,7 @@ trait Controller
      */
     public function resume()
     {
-        return $this->update("status", 1, "恢复成功");
+        return $this->updateField("status", 1, "恢复成功");
     }
 
 
