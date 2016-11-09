@@ -18,7 +18,7 @@ tpadmin 官方交流群：518162472
 
 ## 使用方法
 
-### composer安装
+### composer安装：
 composer create-project yuan1994/tpadmin tpadmin  --prefer-dist
 
 ### git克隆：

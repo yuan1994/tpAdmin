@@ -26,7 +26,7 @@ class TpException extends Handle
             http_response_code($statusCode);
         }
         //可以在此交由系统处理
-        if (Config::get('e') && Request::instance()->isAjax()) {
+        if (Request::instance()->isAjax()) {
             $error_code = $this->getCode($e) ?: 1;
             return ajax_return_adv_error($this->getMessage($e), $error_code);
         }

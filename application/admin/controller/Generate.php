@@ -70,7 +70,8 @@ class Generate extends Controller
     {
         $generate = new \Generate();
         $data = $this->request->post();
-        $generate->run($data, 'all');
+        unset($data['file']);
+        $generate->run($data, $this->request->post('file'));
 
         return ajax_return_adv('生成成功', '', false, '', '', ['action' => Url::build($data['controller'] . '/index')]);
     }

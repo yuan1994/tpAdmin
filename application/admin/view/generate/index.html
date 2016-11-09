@@ -34,6 +34,31 @@
             </div>
             <div class="col-xs-2"></div>
         </div>
+        <div class="row cl">
+            <label class="form-label col-xs-1">生成文件：</label>
+            <div class="formControls col-xs-8">
+                <div class="select-box" style="width: 260px">
+                    <select name="file" class="select">
+                        <option value="all">默认生成文件（all）</option>
+                        <option value="controller">控制器（controller）</option>
+                        <option value="model">模型（model）</option>
+                        <option value="validate">验证器（validate）</option>
+                        {if condition='!$Request.param.table'}
+                            <option value="table">数据表（table）</option>
+                        {/if}
+                        <option value="edit">编辑添加页（edit.html）</option>
+                        <option value="index">列表页（index.html）</option>
+                        <option value="recycleBin">回收站（recyclebin.html）</option>
+                        <option value="form">搜索框（form.html）</option>
+                        <option value="th">表格表头（th.html）</option>
+                        <option value="td">表格表体（td.html）</option>
+                        <option value="config">配置文件（config.php）</option>
+                        <option value="dir">目录（dir）</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-2"></div>
+        </div>
         <h2>控制器信息 ：</h2>
         <div class="row cl">
             <label class="form-label col-xs-1"><span class="c-red">*</span>模块：</label>

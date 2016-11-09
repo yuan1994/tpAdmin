@@ -39,10 +39,15 @@ The <info>%command.name%</info> command can generate all files include php and h
   <info>php %command.full_name%</info>
 
 You can use this method to set the default config file that you want . You can omit the file`s extension .
-The root path of the config file is ROOT_PATH , your project root path :
+The default root path of the config file is ROOT_PATH , your project root path :
 
   <info>php %command.full_name% --config generate</info> 
-  or <info>php %command.full_name% --config generate.php</info>
+  Or <info>php %command.full_name% --config generate.php</info>
+  
+If you want to assign the root path to the module path , you can input <info>module</info><error>:</error><info>controller</info> , and you can also assign the file :
+
+  <info>php %command.full_name% --config admin:controller_name</info> 
+  And <info>php %command.full_name% --config admin:second.dirname.ControllerName/tpconfig.php</info>
 
 You can assign the file you want to generate using the <info>--file</info> option .
 All the options are all|controller|model|validate|table|edit|index|recycleBin|form|th|td|config|dir , defaults to all :
