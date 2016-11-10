@@ -403,8 +403,8 @@ class Generate
             if (!in_array($field['name'], $auto_create_field)) {
                 // 字段属性
                 $fieldAttr[] = tab(1) . "`{$field['name']}` {$field['type']}"
-                    . (isset($field['not_null']) && $field['not_null'] ? ' NOT NULL' : '')
                     . ($field['extra'] ? ' ' . $field['extra'] : '')
+                    . (isset($field['not_null']) && $field['not_null'] ? ' NOT NULL' : '')
                     . (strtolower($field['default']) == 'null' ? '' : " DEFAULT '{$field['default']}'")
                     . ($field['comment'] === '' ? '' : " COMMENT '{$field['comment']}'");
             }
