@@ -1,10 +1,8 @@
-> 当前版本： v1.2
-
 ## tpadmin 是什么？
 tpadmin 是一个基于 ThinkPHP5.0 正式版和 Hui.admin v2.5 的管理后台，简化管理后台的开发流程，简化代码的编写，提高代码复用率，同时集成完整的权限管理和其他管理后台中常用的功能
 
 ## 官方文档
-[http://www.kancloud.cn/yuan1994/tpadmin](http://www.kancloud.cn/yuan1994/tpadmin)
+[http://doc.tpadmin.yuan1994.com](http://doc.tpadmin.yuan1994.com)
 
 ## 在线体验
 [http://tpadmin.yuan1994.com](http://tpadmin.yuan1994.com) 
@@ -62,10 +60,13 @@ https://github.com/yuan1994/tpadmin/archive/master.zip
 * 图片预览
 * 二维码生成
 
+### 终端模式
+* 支持终端生成代码
+* 支持终端查看数据库详情
 
 ## 鸣谢：
 本平台使用了如下框架或插件、源码
-* ThinkPHP 5.0正式版
+* ThinkPHP 5.0.3 正式版
 * Hui.admin v2.5 
 * layer
 * jQuery Validform

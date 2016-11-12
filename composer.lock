@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8fdaed3f6fbe09c2910a4a110505a589",
+    "hash": "df0384ec7bd2704b898f95fff08ee840",
     "content-hash": "bf65cb19202d868843a452056f97d6d2",
     "packages": [
         {
@@ -66,16 +66,16 @@
         },
         {
             "name": "qiniu/php-sdk",
-            "version": "v7.1.0",
+            "version": "v7.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/qiniu/php-sdk.git",
-                "reference": "4b53b16783a5d153b0aad117125966c148edb7b9"
+                "reference": "e9cdc254c95188c8d13e0f04fab9648d790c42f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/qiniu/php-sdk/4b53b16783a5d153b0aad117125966c148edb7b9.zip",
-                "reference": "4b53b16783a5d153b0aad117125966c148edb7b9",
+                "url": "https://packagist.phpcomposer.com/files/qiniu/php-sdk/e9cdc254c95188c8d13e0f04fab9648d790c42f9.zip",
+                "reference": "e9cdc254c95188c8d13e0f04fab9648d790c42f9",
                 "shasum": ""
             },
             "require": {
@@ -113,20 +113,20 @@
                 "sdk",
                 "storage"
             ],
-            "time": "2016-10-25 12:58:33"
+            "time": "2016-11-02 03:10:06"
         },
         {
             "name": "topthink/framework",
-            "version": "v5.0.2",
+            "version": "v5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/top-think/framework.git",
-                "reference": "0674c774981517e48911eafc0f1102a8fe56a022"
+                "reference": "fd30f090e40dc25a758d99029fa07f669f575580"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/top-think/framework/0674c774981517e48911eafc0f1102a8fe56a022.zip",
-                "reference": "0674c774981517e48911eafc0f1102a8fe56a022",
+                "url": "https://packagist.phpcomposer.com/files/top-think/framework/fd30f090e40dc25a758d99029fa07f669f575580.zip",
+                "reference": "fd30f090e40dc25a758d99029fa07f669f575580",
                 "shasum": ""
             },
             "require": {
@@ -165,7 +165,7 @@
                 "orm",
                 "thinkphp"
             ],
-            "time": "2016-10-24 06:15:09"
+            "time": "2016-11-11 09:22:23"
         },
         {
             "name": "topthink/think-captcha",

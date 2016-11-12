@@ -141,17 +141,17 @@
     },
     {
         "name": "topthink/framework",
-        "version": "v5.0.2",
-        "version_normalized": "5.0.2.0",
+        "version": "v5.0.3",
+        "version_normalized": "5.0.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/top-think/framework.git",
-            "reference": "0674c774981517e48911eafc0f1102a8fe56a022"
+            "reference": "fd30f090e40dc25a758d99029fa07f669f575580"
         },
         "dist": {
             "type": "zip",
-            "url": "https://packagist.phpcomposer.com/files/top-think/framework/0674c774981517e48911eafc0f1102a8fe56a022.zip",
-            "reference": "0674c774981517e48911eafc0f1102a8fe56a022",
+            "url": "https://packagist.phpcomposer.com/files/top-think/framework/fd30f090e40dc25a758d99029fa07f669f575580.zip",
+            "reference": "fd30f090e40dc25a758d99029fa07f669f575580",
             "shasum": ""
         },
         "require": {
@@ -167,7 +167,7 @@
             "sebastian/phpcpd": "2.*",
             "squizlabs/php_codesniffer": "2.*"
         },
-        "time": "2016-10-24 06:15:09",
+        "time": "2016-11-11 09:22:23",
         "type": "think-framework",
         "installation-source": "dist",
         "autoload": {
@@ -195,17 +195,17 @@
     },
     {
         "name": "qiniu/php-sdk",
-        "version": "v7.1.0",
-        "version_normalized": "7.1.0.0",
+        "version": "v7.1.1",
+        "version_normalized": "7.1.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/qiniu/php-sdk.git",
-            "reference": "4b53b16783a5d153b0aad117125966c148edb7b9"
+            "reference": "e9cdc254c95188c8d13e0f04fab9648d790c42f9"
         },
         "dist": {
             "type": "zip",
-            "url": "https://packagist.phpcomposer.com/files/qiniu/php-sdk/4b53b16783a5d153b0aad117125966c148edb7b9.zip",
-            "reference": "4b53b16783a5d153b0aad117125966c148edb7b9",
+            "url": "https://packagist.phpcomposer.com/files/qiniu/php-sdk/e9cdc254c95188c8d13e0f04fab9648d790c42f9.zip",
+            "reference": "e9cdc254c95188c8d13e0f04fab9648d790c42f9",
             "shasum": ""
         },
         "require": {
@@ -215,7 +215,7 @@
             "phpunit/phpunit": "~4.0",
             "squizlabs/php_codesniffer": "~2.3"
         },
-        "time": "2016-10-25 12:58:33",
+        "time": "2016-11-02 03:10:06",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
