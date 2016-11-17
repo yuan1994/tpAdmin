@@ -135,8 +135,11 @@ class Generate
      * 检查当前模块目录是否可写
      * @return bool
      */
-    public static function checkWritable($path = APP_PATH . 'admin' . DS)
+    public static function checkWritable($path = null)
     {
+        if (null === $path) {
+            $path = APP_PATH . 'admin' . DS;
+        }
         try {
             $testFile = $path . "bulid.test";
             if (!file_put_contents($testFile, "test")) {
