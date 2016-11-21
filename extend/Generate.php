@@ -645,7 +645,7 @@ class Generate
                                 . 'placeholder="' . $form['title'] . '" name="' . $form['name'] . '" '
                                 . 'value="' . '{$vo.' . $form['name'] . ' ?? \'' . $form['default'] . '\'}' . '" '
                                 . '{literal} onfocus="WdatePicker({dateFmt:\'yyyy-MM-dd\'})" {/literal} '
-                                . '>' . "\n";
+                                . $validateForm . '>' . "\n";
                             $scriptEdit['date'] = "\n" . '<script type="text/javascript" src="__LIB__/My97DatePicker/WdatePicker.js"></script>';
                             break;
                         case "text":
@@ -655,7 +655,7 @@ class Generate
                             $editField .= tab(4) . '<input type="' . $form['type'] . '" class="input-text" '
                                 . 'placeholder="' . $form['title'] . '" name="' . $form['name'] . '" '
                                 . 'value="' . '{$vo.' . $form['name'] . ' ?? \'' . $form['default'] . '\'}' . '" '
-                                . '>' . "\n";
+                                . $validateForm . '>' . "\n";
                             break;
                     }
                     $editField .= tab(3) . '</div>' . "\n"

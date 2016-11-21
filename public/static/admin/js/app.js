@@ -60,7 +60,9 @@ function layer_open(title, url, opt) {
  * 全屏打开窗口，参数见layer_open
  */
 function full_page(title, url, opt) {
-    return layer_open(title, url, $.extend({w: "100%", h: "100%"}, opt))
+    var index = layer_open(title, url, opt);
+    layer.full(index);
+    return index;
 };
 
 /**
