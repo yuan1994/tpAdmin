@@ -10,13 +10,12 @@
         </div>
         <div class="tabCon">
             <div>
-                <div id="drag" class="mt-30">
-                    <label for="file-input">
-                        <i class="Hui-iconfont Hui-iconfont-add3" style="font-size: 100px" id="upload-btn"></i>
+                <div id="drag" class="mt-30" title="将文件拖拽到此处上传">
+                    <label for="fileupload" title="点击上传">
+                        <img src="__STATIC__/images/upload99.png" style="height: 100px;width: 100px;margin: 20px" alt="">
                     </label>
                 </div>
-                <input type="file" accept="*/*" name="file[]" id="file-input" multiple class="input-file"
-                       style="display: none">
+                <input id="fileupload" type="file" name="file" data-url="{:\\think\\Url::build('upload')}">
             </div>
         </div>
         <div class="tabCon">
@@ -40,7 +39,10 @@
 {/block}
 {block name="script"}
 <script src="__LIB__/laypage/1.3/laypage.js"></script>
-<script src="__LIB__/tpUpload/tpUpload.js"></script>
+<!--<script src="__LIB__/tpUpload/tpUpload.js"></script>-->
+<script src="__LIB__/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="__LIB__/jQuery-File-Upload/js/jquery.iframe-transport.js"></script>
+<script src="__LIB__/jQuery-File-Upload/js/jquery.fileupload.js"></script>
 <script src="__LIB__/lightbox2/js/lightbox.min.js"></script>
 <script>
 
@@ -75,8 +77,32 @@
         }, function (i) {
 
         });
+        //
+        $('#fileupload').fileupload({
+            dataType: 'json',
+            dropZone: $('#drag'),
+            start: function () {
+                layer_msg = layer.msg('正在上传中…', {time: 100000000});
+            },
+            progressall: function (e, data) {
+                $('.layui-layer-msg .layui-layer-content').html('已上传' + (data.loaded / data.total * 100).toFixed(2) + '%');
+            },
+            done: function (e, data) {
+                layer.close(layer_msg);
+                callback(callbackId,data.result.data.name);
+            }
+        });
+        $('#drag').bind('drop dragover', function (e) {
+            e.preventDefault();
+        }).on('dragenter', function (e) {
+            $(this).addClass('dragenter');
+        }).on('drop', function (e) {
+            $(this).removeClass('dragenter');
+        }).on('dragleave', function (e) {
+            $(this).removeClass('dragenter');
+        });;
         // 文件上传
-        $("#file-input").tpUpload({
+        /*$("#file-input").tpUpload({
             url: '{:\\think\\Url::build("upload")}',
             data: {a: 'a'},
             drag: '#drag',
@@ -95,7 +121,7 @@
             end: function () {
                 layer.close(layer_msg);
             }
-        });
+        });*/
 
         // 远程图片抓取
         $("#net-image").on('click', '#crawl-btn', function () {

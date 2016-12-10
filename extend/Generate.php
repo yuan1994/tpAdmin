@@ -13,6 +13,7 @@ use think\Log;
 use think\Config;
 use think\Db;
 use think\Loader;
+use think\Request;
 
 class Generate
 {
@@ -59,7 +60,11 @@ class Generate
     public function run($data, $option = 'all')
     {
         // 检查方法是否存在
-        $action = 'build' . ucfirst($option);
+        if (isset($data['delete_file']) && $data['delete_file']) {
+            $action = 'del' . ucfirst($option);
+        } else {
+            $action = 'build' . ucfirst($option);
+        }
         if (!method_exists($this, $action)) {
             throw new Exception('选项不存在：' . $option, 404);
         }
@@ -94,6 +99,15 @@ class Generate
             $this->namespaceSuffix = "";
         }
 
+        // 删除刚刚生成的文件
+        if (isset($data['delete_file']) && $data['delete_file']) {
+            $pathView = APP_PATH . $this->module . DS . "view" . DS . $this->dir . $this->nameLower . DS;
+            $fileName = APP_PATH . "%MODULE%" . DS . "%NAME%" . DS . $this->dir . $this->name . ".php";
+            $this->$action($pathView, $fileName);
+
+            return true;
+        }
+
         // 数据表表名
         $tableName = str_replace(DS, '_', $this->dir) . $this->nameLower;
 
@@ -123,8 +137,8 @@ class Generate
         if ($action != 'buildDir') {
             // 文件路径
             $pathView = APP_PATH . $this->module . DS . "view" . DS . $this->dir . $this->nameLower . DS;
-            $pathTemplate = APP_PATH . $this->module . DS . "view" . DS . "generate" . DS . "template" . DS;
-            $fileName = APP_PATH . $this->module . DS . "%NAME%" . DS . $this->dir . $this->name . ".php";
+            $pathTemplate = APP_PATH . 'admin' . DS . "view" . DS . "generate" . DS . "template" . DS;
+            $fileName = APP_PATH . "%MODULE%" . DS . "%NAME%" . DS . $this->dir . $this->name . ".php";
             $code = $this->parseCode();
             // 执行方法
             $this->$action($pathView, $pathTemplate, $fileName, $tableName, $code, $data);
@@ -135,11 +149,8 @@ class Generate
      * 检查当前模块目录是否可写
      * @return bool
      */
-    public static function checkWritable($path = null)
+    public static function checkWritable($path = APP_PATH . 'admin' . DS)
     {
-        if (null === $path) {
-            $path = APP_PATH . 'admin' . DS;
-        }
         try {
             $testFile = $path . "bulid.test";
             if (!file_put_contents($testFile, "test")) {
@@ -185,6 +196,266 @@ class Generate
     }
 
     /**
+     * 删除所有文件
+     *
+     * @param        $pathView
+     * @param string $phpFile
+     */
+    private function delAll($pathView, $phpFile = '')
+    {
+        try {
+            $this->delTable($pathView, $phpFile);
+            $this->delView($pathView, $phpFile);
+            $this->delController($pathView, $phpFile);
+            $this->delModel($pathView, $phpFile);
+            $this->delValidate($pathView, $phpFile);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 删除首页文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delIndex($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView . 'index.html');
+    }
+
+    /**
+     * 删除form文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delForm($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView . 'form.html');
+    }
+
+    /**
+     * 删除th文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delTh($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView . 'th.html');
+    }
+
+    /**
+     * 删除td文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delTd($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView . 'td.html');
+    }
+
+    /**
+     * 删除编辑文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delEdit($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView . 'edit.html');
+    }
+
+    /**
+     * 删除回收站文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delRecycleBin($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView . 'recyclebin.html');
+    }
+
+    /**
+     * 删除配置文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delConfig($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView . 'config.php');
+    }
+
+    /**
+     * 删除视图文件夹
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delView($pathView, $phpFile = '')
+    {
+        return $this->deleteFile($pathView);
+    }
+
+    /**
+     * 删除控制器文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delController($pathView, $phpFile = '')
+    {
+        $file = str_replace(
+            ['%MODULE%', '%NAME%'],
+            [$this->module, 'controller'],
+            $phpFile
+        );
+
+        return $this->deleteFile($file);
+    }
+
+    /**
+     * 删除模型文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delModel($pathView, $phpFile = '')
+    {
+        // 获取模型的路径，根据配置文件读取
+        $module = $this->readConfig($this->module, 'app', 'model_path', Config::get('app.model_path'));
+        $file = str_replace(
+            ['%MODULE%', '%NAME%'],
+            [$module, 'model'],
+            $phpFile
+        );
+
+        return $this->deleteFile($file);
+    }
+
+    /**
+     * 删除验证器文件
+     *
+     * @param $pathView
+     * @param $phpFile
+     *
+     * @return bool
+     */
+    private function delValidate($pathView, $phpFile = '')
+    {
+        // 获取验证器的路径，根据配置文件读取
+        $module = $this->readConfig($this->module, 'app', 'validate_path', Config::get('app.validate_path'));
+        $file = str_replace(
+            ['%MODULE%', '%NAME%'],
+            [$module, 'validate'],
+            $phpFile
+        );
+
+        return $this->deleteFile($file);
+    }
+
+    /**
+     * 删除表
+     *
+     * @param        $pathView
+     * @param string $phpFile
+     *
+     * @return bool
+     */
+    private function delTable($pathView, $phpFile = '')
+    {
+        // 数据表表名
+        $tableName = str_replace(DS, '_', $this->dir) . $this->nameLower;
+        // 一定别忘记表名前缀
+        $tableName = isset($this->data['table_name']) && $this->data['table_name'] ?
+            $this->data['table_name'] :
+            Config::get("database.prefix") . $tableName;
+        // 判断表是否存在
+        $ret = Db::query("SHOW TABLES LIKE '{$tableName}'");
+        // 表存在
+        if ($ret && isset($ret[0])) {
+            // 不是强制建表但表存在时直接return
+            if (!isset($this->data['create_table_force']) || !$this->data['create_table_force']) {
+                return true;
+            }
+
+            // 删除表
+            Db::execute("DROP TABLE IF EXISTS `{$tableName}`");
+        }
+
+        return true;
+    }
+
+    /**
+     * 删除文件或目录
+     *
+     * @param $path
+     */
+    private function deleteFile($path)
+    {
+        if (is_dir($path)) {
+            return $this->deleteDir($path);
+        } else {
+            return unlink($path);
+        }
+    }
+
+    /**
+     * 删除目录及下面所有的文件
+     *
+     * @param $dir
+     *
+     * @return bool
+     */
+    private function deleteDir($dir)
+    {
+        //先删除目录下的文件：
+        $dh = opendir($dir);
+        while ($file = readdir($dh)) {
+            if ($file != "." && $file != "..") {
+                $fullpath = $dir . "/" . $file;
+                if (!is_dir($fullpath)) {
+                    unlink($fullpath);
+                } else {
+                    $this->deleteDir($fullpath);
+                }
+            }
+        }
+        closedir($dh);
+        //删除当前文件夹：
+        if (rmdir($dir)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * 创建目录
      */
     private function buildDir($dir_list)
@@ -206,9 +477,16 @@ class Generate
         $template = file_get_contents($pathTemplate . "edit.tpl");
         $file = $path . "edit.html";
 
+        //TODO 自定义模板路径
+        if ($this->module == Request::instance()->module()) {
+            $module = '';
+        } else {
+            $module = Request::instance()->module() . '@';
+        }
+
         return file_put_contents($file, str_replace(
-            ["[ROWS]", "[SET_VALUE]", "[SCRIPT]"],
-            [$code['edit'], implode("\n", array_merge($code['set_checked'], $code['set_selected'])), implode("", $code['script_edit'])],
+            ["[MODULE]", "[ROWS]", "[SET_VALUE]", "[SCRIPT]"],
+            [$module, $code['edit'], implode("\n", array_merge($code['set_checked'], $code['set_selected'])), implode("", $code['script_edit'])],
             $template));
     }
 
@@ -253,7 +531,14 @@ class Generate
         // 首页菜单选择了回收站才创建回收站
         $file = $path . "recyclebin.html";
 
-        $content = '{extend name="template/recyclebin" /}';
+        //TODO 自定义模板路径
+        if ($this->module == Request::instance()->module()) {
+            $module = '';
+        } else {
+            $module = Request::instance()->module() . '@';
+        }
+
+        $content = '{extend name="' . $module . 'template/recyclebin" /}';
         if ($code['search_selected']) {
             $content .= "\n" . '{block name="script"}' . implode("", $code['script_search']) . "\n"
                 . '<script>' . "\n"
@@ -310,9 +595,16 @@ class Generate
         $template = file_get_contents($pathTemplate . "index.tpl");
         $file = $path . "index.html";
 
+        //TODO 自定义模板路径
+        if ($this->module == Request::instance()->module()) {
+            $module = '';
+        } else {
+            $module = Request::instance()->module() . '@';
+        }
+
         return file_put_contents($file, str_replace(
-                ["[FORM]", "[MENU]", "[TH]", "[TD]", "[TD_MENU]", "[SCRIPT]"],
-                [$form, $menu, $th, $td, $tdMenu, $script],
+                ["[MODULE]", "[FORM]", "[MENU]", "[TH]", "[TD]", "[TD_MENU]", "[SCRIPT]"],
+                [$module, $form, $menu, $th, $td, $tdMenu, $script],
                 $template
             )
         );
@@ -324,11 +616,15 @@ class Generate
     private function buildController($path, $pathTemplate, $fileName, $tableName, $code, $data)
     {
         $template = file_get_contents($pathTemplate . "Controller.tpl");
-        $file = str_replace('%NAME%', 'controller', $fileName);
+        $file = str_replace(
+            ['%MODULE%', '%NAME%'],
+            [$this->module, 'controller'],
+            $fileName
+        );
 
         return file_put_contents($file, str_replace(
-                ["[TITLE]", "[NAME]", "[FILTER]", "[NAMESPACE]"],
-                [$this->data['title'], $this->name, $code['filter'], $this->namespaceSuffix],
+                ["[MODULE]", "[TITLE]", "[NAME]", "[FILTER]", "[NAMESPACE]"],
+                [$this->module, $this->data['title'], $this->name, $code['filter'], $this->namespaceSuffix],
                 $template
             )
         );
@@ -341,7 +637,13 @@ class Generate
     {
         // 直接生成空模板
         $template = file_get_contents($pathTemplate . "Model.tpl");
-        $file = str_replace('%NAME%', 'model', $fileName);
+        // 获取模型的路径，根据配置文件读取
+        $module = $this->readConfig($this->module, 'app', 'model_path', Config::get('app.model_path'));
+        $file = str_replace(
+            ['%MODULE%', '%NAME%'],
+            [$module, 'model'],
+            $fileName
+        );
         $autoTimestamp = '';
         if (isset($this->data['auto_timestamp']) && $this->data['auto_timestamp']) {
             $autoTimestamp = '// 开启自动写入时间戳字段' . "\n"
@@ -349,8 +651,8 @@ class Generate
         }
 
         return file_put_contents($file, str_replace(
-                ["[TITLE]", "[NAME]", "[NAMESPACE]", "[TABLE]", "[AUTO_TIMESTAMP]"],
-                [$this->data['title'], $this->name, $this->namespaceSuffix, $tableName, $autoTimestamp],
+                ["[MODULE]", "[TITLE]", "[NAME]", "[NAMESPACE]", "[TABLE]", "[AUTO_TIMESTAMP]"],
+                [$module, $this->data['title'], $this->name, $this->namespaceSuffix, $tableName, $autoTimestamp],
                 $template
             )
         );
@@ -362,11 +664,17 @@ class Generate
     private function buildValidate($path, $pathTemplate, $fileName, $tableName, $code, $data)
     {
         $template = file_get_contents($pathTemplate . "Validate.tpl");
-        $file = str_replace('%NAME%', 'validate', $fileName);
+        // 获取验证器的路径，根据配置文件读取
+        $module = $this->readConfig($this->module, 'app', 'validate_path', Config::get('app.validate_path'));
+        $file = str_replace(
+            ['%MODULE%', '%NAME%'],
+            [$module, 'validate'],
+            $fileName
+        );
 
         return file_put_contents($file, str_replace(
-                ["[TITLE]", "[NAME]", "[NAMESPACE]", "[RULE]"],
-                [$this->data['title'], $this->name, $this->namespaceSuffix, $code['validate']],
+                ["[MODULE]", "[TITLE]", "[NAME]", "[NAMESPACE]", "[RULE]"],
+                [$module, $this->data['title'], $this->name, $this->namespaceSuffix, $code['validate']],
                 $template
             )
         );
@@ -495,6 +803,8 @@ class Generate
      */
     private function parseCode()
     {
+        // 是否开启排序
+        $sortable = false;
         // 生成 form.html 文件的代码
         $search = ['<form class="mb-20" method="get" action="{:\\\\think\\\\Url::build($Request.action)}">'];
         // 生成 th.html 文件的代码
@@ -518,6 +828,11 @@ class Generate
         $scriptEdit = [];
         if (isset($this->data['form']) && $this->data['form']) {
             foreach ($this->data['form'] as $form) {
+                // 状态选择的自动设置为单选框
+                if ($form['name'] == 'status') {
+                    $form['type'] = 'radio';
+                    $form['option'] = '1:启用#0:禁用';
+                }
                 $options = $this->parseOption($form['option']);
                 // 表单搜索
                 if (isset($form['search']) && $form['search']) {
@@ -546,7 +861,16 @@ class Generate
                             break;
                         default:
                             // td
-                            $td[] = '<td>{$vo.' . $form['name'] . '|high_light=$Request.param.' . $form['name'] . "}</td>";
+                            if ($form['name'] == 'sort') {
+                                // 排序字段特殊处理
+                                $sortable = true;
+                                $td[] = '<td style="padding: 0">' . "\n"
+                                    . tab(1) . '<input type="number" name="sort[{$vo.id}]" value="{$vo.sort}" style="width: 60px;"' . "\n"
+                                    . tab(2) . 'class="input-text text-c order-input" data-id="{$vo.id}">'
+                                    . '</td>';
+                            } else {
+                                $td[] = '<td>{$vo.' . $form['name'] . '|high_light=$Request.param.' . $form['name'] . "}</td>";
+                            }
                             $filter .= tab(2) . 'if ($this->request->param("' . $form['name'] . '")) {' . "\n"
                                 . tab(3) . '$map[\'' . $form['name'] . '\'] = ["like", "%" . $this->request->param("' . $form['name'] . '") . "%"];' . "\n"
                                 . tab(2) . '}' . "\n";
@@ -558,7 +882,16 @@ class Generate
                     }
                 } else {
                     // td
-                    $td[] = '<td>{$vo.' . $form['name'] . ($form['name'] == "status" ? '|get_status' : '') . '}</td>';
+                    if ($form['name'] == 'sort') {
+                        // 排序字段特殊处理
+                        $sortable = true;
+                        $td[] = '<td style="padding: 0">' . "\n"
+                            . tab(1) . '<input type="number" name="sort[{$vo.id}]" value="{$vo.sort}" style="width: 60px;"' . "\n"
+                            . tab(2) . 'class="input-text text-c order-input" data-id="{$vo.id}">'
+                            . '</td>';
+                    } else {
+                        $td[] = '<td>{$vo.' . $form['name'] . ($form['name'] == "status" ? '|get_status' : '') . '}</td>';
+                    }
                 }
                 // th
                 if (isset($form['sort']) && $form['sort']) {
@@ -664,10 +997,15 @@ class Generate
                 }
             }
         }
-        if ($search) {
+        if (count($search) > 1) {
+            // 有设置搜索则显示
             $search[] = tab(1) . '<button type="submit" class="btn btn-success"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>';
+            $search[] = '</form>';
+        } else {
+            // 不设置将form.html置空
+            $search = [];
         }
-        $search[] = '</form>';
+
 
         if ($filter) {
             $filter = 'protected function filter(&$map)' . "\n"
@@ -686,6 +1024,14 @@ class Generate
         }
         if ($validate) {
             $validate = 'protected $rule = [' . "\n" . $validate . '    ];';
+        }
+        // 如果没有sort字段，强制删除保存排序菜单
+        if (!$sortable) {
+            foreach ($this->data['menu'] as $k => $menu) {
+                if ($menu == 'saveorder') {
+                    unset($this->data['menu'][$k]);
+                }
+            }
         }
 
         return [
@@ -709,10 +1055,10 @@ class Generate
     private function getCheckbox($form, $name, $validateForm, $title, $value = '', $key = 0, $tab = 4)
     {
         return tab($tab) . '<div class="radio-box">' . "\n"
-        . tab($tab + 1) . '<input type="' . $form['type'] . '" name="' . $name . '" '
-        . 'id="' . $form['name'] . '-' . $key . '" value="' . $value . '"' . $validateForm . '>' . "\n"
-        . tab($tab + 1) . '<label for="' . $form['name'] . '-' . $key . '">' . $title . '</label>' . "\n"
-        . tab($tab) . '</div>' . "\n";
+            . tab($tab + 1) . '<input type="' . $form['type'] . '" name="' . $name . '" '
+            . 'id="' . $form['name'] . '-' . $key . '" value="' . $value . '"' . $validateForm . '>' . "\n"
+            . tab($tab + 1) . '<label for="' . $form['name'] . '-' . $key . '">' . $title . '</label>' . "\n"
+            . tab($tab) . '</div>' . "\n";
     }
 
     /**
@@ -735,6 +1081,17 @@ class Generate
 
                 return $ret;
                 break;
+            case 'think_var':
+                $ret = [];
+                if ($empty) {
+                    $ret[] = tab($tab) . '<option value="">所有' . $form['title'] . '</option>';
+                }
+                $ret[] = tab($tab) . '{foreach name="$' . $options[1] . '" item=\'v\'}';
+                $ret[] = tab($tab + 1) . '<option value="{$v.id}">{$v.name}</option>';
+                $ret[] = tab($tab) . '{/foreach}';
+
+                return $ret;
+                break;
             case 'array':
                 $ret = [];
                 foreach ($options[1] as $option) {
@@ -752,8 +1109,11 @@ class Generate
     private function parseOption($option, $string = false)
     {
         if (!$option) return ['string', $option];
-        // {vo.item} 这种格式传入的变量
-        if (preg_match('/^\{(.*?)\}$/', $option, $match)) {
+        if (preg_match('/^\{\$(.*?)\}$/', $option, $match)) {
+            // {$vo.item} 这种格式传入的变量
+            return ['think_var', $match[1]];
+        } elseif (preg_match('/^\{(.*?)\}$/', $option, $match)) {
+            // {vo.item} 这种格式传入的变量
             return ['var', $match[1]];
         } else {
             if ($string) {
@@ -772,6 +1132,39 @@ class Generate
             }
 
             return ['array', $ret];
+        }
+    }
+
+    /**
+     * 读取配置
+     *
+     * @param        $module
+     * @param        $scope
+     * @param null   $name
+     * @param string $default
+     *
+     * @return array|mixed|string
+     */
+    private function readConfig($module, $scope, $name = null, $default = '')
+    {
+        // 可能的配置文件路径
+        $fileConfig = APP_PATH . $module . '/config.php';
+        $fileExtra = APP_PATH . $module . 'extra/' . $scope . '.php';
+        $config = [];
+        // 加载配置
+        if (file_exists($fileExtra)) {
+            $config = include $fileExtra;
+        } elseif (file_exists($fileConfig)) {
+            $allConfig = include $fileConfig;
+            if (isset($allConfig[$scope])) {
+                $config = $allConfig[$scope];
+            }
+        }
+        // 返回值
+        if ($name) {
+            return isset($config[$name]) ? $config[$name] : $default;
+        } else {
+            return $config;
         }
     }
 }

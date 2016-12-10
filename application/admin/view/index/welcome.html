@@ -37,7 +37,7 @@
         <p><a target="_blank" class="c-blue" href="https://github.com/yuan1994/tpadmin/archive/master.zip">https://github.com/yuan1994/tpadmin/archive/master.zip</a></p>
 
         <blockquote class="info">
-            <p>框架的依赖需要通过 composer 下载，请在框架根目录执行 composer update ，已确保依赖的类库能下载下来</p>
+            <p>框架的依赖需要通过 composer 下载，请在框架根目录执行 composer install ，已确保依赖的类库能下载下来</p>
         </blockquote>
 
         <h2>部署</h2>
@@ -52,7 +52,17 @@
 
         <h2>注意</h2>
 
-        <p>为了确保代码自动生成可用，请在Linux/MacOS系统上使用项目时保证application文件夹有可写权限，本地开发可用将文件夹的权限改为777，线上部署请注意修改成安全的权限</p>
+        <p>为了确保代码自动生成可用，请在Linux/MacOS系统上使用项目时保证application文件夹有可写权限，本地开发可用将文件夹的权限改为777，线上部署请注意修改成安全的权限，为了更好的使用代码自动生成，请最好在Linux/MacOS系统上把Apache或php-fpm的用户修改为当前用户然后重启，可以避免权限问题</p>
+
+        <h2>推荐</h2>
+
+        <p>强烈推荐使用 tp-mailer 扩展类发送邮件，基于强大的 swiftmailer 开发，安装、使用非常简单，代码非常优美简便，详情请见 <a class="c-blue" href="https://github.com/yuan1994/tp-mailer" target="_blank">https://github.com/yuan1994/tp-mailer</a></p>
+
+        <p>一款支持所有PHP框架的优美的邮件发送类，ThinkPHP系列框架开箱即用，其他框架初始化配置即可使用</p>
+
+        <p>基于 SwiftMailer 二次开发, 为 ThinkPHP系列框架量身定制, 使 ThinkPHP 支持邮件模板、纯文本、附件邮件发送以及更多邮件功能, 邮件发送简单到只需一行代码</p>
+
+        <p>同时了方便其他框架或者非框架使用, Tp Mailer也非常容易拓展融合到其他框架中, 欢迎大家 Fork 和 Star, 提交代码让Tp Mailer支持更多框架</p>
     </div>
 
     <p class="c-red">以下为静态展示内容</p>

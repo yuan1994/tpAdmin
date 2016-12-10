@@ -19,7 +19,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">操作时间</label>
             <div class="formControls col-xs-6 col-sm-6">
-                {$vo.otime|date='Y-m-d H:i:s',###}
+                {$vo.create_at|date='Y-m-d H:i:s',###}
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
@@ -61,14 +61,14 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">节点图</label>
             <div class="formControls col-xs-6 col-sm-6">
-                {$vo.map} ({$vo.module})
+                {$vo.controller}/{$vo.action} ({$vo.module})
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-3 col-sm-3">是否AJAX</label>
+            <label class="form-label col-xs-3 col-sm-3">请求方式</label>
             <div class="formControls col-xs-6 col-sm-6">
-                {$vo.is_ajax?'是':'否'}
+                {$vo.method}
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>

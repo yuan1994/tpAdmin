@@ -198,19 +198,19 @@
                 }
             });
             // 上传完成从 iframe 取回数据
-            iframe.load(function () {
-                // 取回数据用text
-                var data = $(this).contents().find('body').text();
-                $(this).contents().find('body').html('');
-                try {
-                    var jsonData = JSON.parse(xhr.responseText);
-                } catch(e){
-                    throw '请返回json格式的数据';
-                }
-                typeof settings.success == "function" && settings.success(jsonData);
-                typeof settings.end == "function" && settings.end();
-                $self.val('');
-                $self.find("[type='file']").val('');
+            iframe.on('load', function () {
+                    // 取回数据用text
+                    var data = $(this).contents().find('body').text();
+                    $(this).contents().find('body').html('');
+                    try {
+                        var jsonData = JSON.parse(data);
+                    } catch(e){
+                        throw '请返回json格式的数据';
+                    }
+                    typeof settings.success == "function" && settings.success(jsonData);
+                    typeof settings.end == "function" && settings.end();
+                    $self.val('');
+                    $self.find("[type='file']").val('');
             });
         }
     };

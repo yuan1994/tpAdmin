@@ -1,4 +1,4 @@
-{extend name="template/base" /}
+{extend name="[MODULE]template/base" /}
 {block name="content"}
 <div class="page-container">
     {include file='form' /}

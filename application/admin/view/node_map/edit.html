@@ -15,22 +15,32 @@
             <div class="col-xs-3 col-sm-3"></div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>节点图：</label>
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>控制器：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="text" class="input-text" value="{$vo.map ?? ''}" placeholder="" name="map" datatype="*">
+                <input type="text" class="input-text" value="{$vo.controller ?? ''}" placeholder="" name="controller"
+                       datatype="*">
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
         <div class="row cl">
-            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>是否AJAX：</label>
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>方法：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" value="{$vo.action ?? ''}" placeholder="" name="action"
+                       datatype="*">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>请求方式：</label>
             <div class="formControls col-xs-6 col-sm-6 skin-minimal">
-                <div class="radio-box">
-                    <input type="radio" name="is_ajax" id="is_ajax-0" value="0" datatype="*">
-                    <label for="is_ajax-0">否</label>
-                </div>
-                <div class="radio-box">
-                    <input type="radio" name="is_ajax" id="is_ajax-1" value="1">
-                    <label for="is_ajax-0">是</label>
+                <div class="select-box">
+                    <select name="method" class="select" datatype="*">
+                        <option value="ALL">不限（ALL）</option>
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PUT">PUT</option>
+                    </select>
                 </div>
             </div>
             <div class="col-xs-3 col-sm-3"></div>
@@ -38,7 +48,8 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>备注：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <textarea class="textarea" placeholder="" name="comment" onKeyUp="textarealength(this,100)" datatype="*">{$vo.comment ?? ''}</textarea>
+                <textarea class="textarea" placeholder="" name="comment" onKeyUp="textarealength(this,100)"
+                          datatype="*">{$vo.comment ?? ''}</textarea>
                 <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
             </div>
             <div class="col-xs-3 col-sm-3"></div>
@@ -57,8 +68,8 @@
 <script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
 <script>
     $(function () {
-        $("[name='is_ajax'][value='{$vo.is_ajax ?? '0'}']").attr("checked",true);
-        $("[name='module']").find("[value='{$vo.module ?? ''}']").attr("selected",true);
+        $("[name='module']").find("[value='{$vo.module ?? ''}']").attr("selected", true);
+        $("[name='method']").find("[value='{$vo.method ?? ''}']").attr("selected", true);
 
         $('.skin-minimal input').iCheck({
             checkboxClass: 'icheckbox-blue',
@@ -67,10 +78,10 @@
         });
 
         $("#form").Validform({
-            tiptype:2,
-            ajaxPost:true,
-            showAllError:true,
-            callback:function(ret){
+            tiptype: 2,
+            ajaxPost: true,
+            showAllError: true,
+            callback: function (ret) {
                 ajax_progress(ret);
             }
         });

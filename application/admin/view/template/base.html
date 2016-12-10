@@ -7,6 +7,7 @@
     <meta name="viewport"
           content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <title>{block name="title"}{$Think.config.site.title}{/block}</title>
     <link rel="Bookmark" href="__ROOT__/favicon.ico" >
     <link rel="Shortcut Icon" href="__ROOT__/favicon.ico" />
     <!--[if lt IE 9]>
@@ -26,14 +27,14 @@
     <!--[if IE 6]>
     <script type="text/javascript" src="__LIB__/DD_belatedPNG_0.0.8a-min.js"></script>
     <script>DD_belatedPNG.fix('*');</script>
+    {include file='admin@template/javascript_vars' /}
     <![endif]-->
-    <title>{block name="title"}{$Think.config.site.title}{/block}</title>
 </head>
 <body>
 {block name="nav"}
 <nav class="breadcrumb">
     <div id="nav-title"></div>
-    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:;" onclick="location.replace(location.href);" title="刷新"><i class="Hui-iconfont"></i></a>
+    <a class="btn btn-success radius r btn-refresh" style="line-height:1.6em;margin-top:3px" href="javascript:;" title="刷新"><i class="Hui-iconfont"></i></a>
 </nav>
 {/block}
 {block name="content"}{/block}

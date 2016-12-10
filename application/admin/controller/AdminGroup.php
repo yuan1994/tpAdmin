@@ -22,7 +22,7 @@ class AdminGroup extends Controller
 {
     use \app\admin\traits\controller\Controller;
 
-    protected static $blacklist = ['deleteforever', 'clear'];
+    protected static $blacklist = [];
 
     protected function filter(&$map)
     {

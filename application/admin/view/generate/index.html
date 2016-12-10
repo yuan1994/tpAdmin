@@ -29,7 +29,7 @@
                     </select>
                 </div>
                 <button type="button" class="btn btn-success db-jump ml-10" title="点击此项选择从数据库生成字段">
-                    走，大神带你飞
+                    确认选择
                 </button>
             </div>
             <div class="col-xs-2"></div>
@@ -300,6 +300,10 @@
                     <input type="checkbox" name="menu[]" id="radio-4" value="recycleBin" checked>
                     <label for="radio-4">回收站</label>
                 </div>
+                <div class="radio-box" title="勾选保存排序后对于有sort字段的表自动给添加快速排序功能">
+                    <input type="checkbox" name="menu[]" id="radio-5" value="saveOrder" checked>
+                    <label for="radio-5">保存排序</label>
+                </div>
             </div>
             <div class="col-xs-3"></div>
         </div>
@@ -323,6 +327,17 @@
                 <div class="radio-box">
                     <input type="checkbox" name="validate" value="1">
                     <label title="只自动添加必填规则，其他规则太复杂，会留空，请到验证器手动完善">创建验证器（validate）（默认自动生成前端一致的验证规则）</label>
+                </div>
+            </div>
+            <div class="col-xs-3"></div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-1">删除代码：</label>
+            <div class="formControls col-xs-8 skin-minimal">
+                <div class="radio-box">
+                    <input type="checkbox" name="delete_file" value="1">
+                    <label title="删除刚刚自动生成的文件、数据表，如果涉及文件夹为了安全不会递归删除，如果有表，若为选择强制建表不会删除原来的表，如果要删除刚刚自动生成的数据表请勾选强制删除后再点删除代码">删除不带回收站功能，请谨慎操作</label>
                 </div>
             </div>
             <div class="col-xs-3"></div>

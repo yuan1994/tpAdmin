@@ -2,7 +2,7 @@
 {block name="content"}
 <div class="page-container">
     <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
-        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <input type="hidden" name="id" value="{$vo.id ?? ''}">
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>分组名称：</label>
             <div class="formControls col-xs-6 col-sm-6">
@@ -14,7 +14,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">图标：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <input type="text" class="input-text" value="{:isset($vo.icon)?htmlspecialchars($vo.icon):''}"
+                <input type="text" class="input-text" value="{:isset($vo.icon) ? htmlspecialchars($vo.icon) : ''}"
                        placeholder="不填先默认为列表图标" name="icon">
             </div>
             <div class="col-xs-3 col-sm-3"></div>
@@ -52,7 +52,7 @@
         <div class="row cl">
             <label class="form-label col-xs-3 col-sm-3">备注：</label>
             <div class="formControls col-xs-6 col-sm-6">
-                <textarea class="textarea" placeholder="备注" name="remark" onKeyUp="textarealength(this,100)">{$vo.remark ?? ''}</textarea>
+                <textarea class="textarea" placeholder="备注" name="remark" onKeyUp="textarealength(this, 100)">{$vo.remark ?? ''}</textarea>
                 <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
             </div>
             <div class="col-xs-3 col-sm-3"></div>

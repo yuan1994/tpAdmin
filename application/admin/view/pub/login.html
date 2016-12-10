@@ -87,8 +87,10 @@
                     if (ret.msg == '验证码错误!'){
                         $("#captcha").click();
                         $("[name='captcha']").val('');
+                        layer.msg(ret.msg);
+                    } else {
+                        layer.alert(ret.msg);
                     }
-                    layer.alert(ret.msg);
                 } else {
                     layer.msg("登录成功！");
                     location.href = '{$Request.get.callback ?: \\think\\Url::build("Index/index")}';

@@ -16,6 +16,7 @@ use think\Db;
 use think\Config;
 use think\Session;
 use think\Request;
+use think\Cache;
 
 class Rbac
 {
@@ -154,7 +155,13 @@ class Rbac
 
                 if (2 == Config::get('rbac.user_auth_type')) {
                     //加强验证和即时验证模式 更加安全 后台权限修改可以即时生效
-                    $accessList = self::getAccessList(Session::get(Config::get('rbac.user_auth_key')));
+                    $userId = Session::get(Config::get('rbac.user_auth_key'));
+                    // 将权限缓存5分钟
+                    $cacheKey = 'admin_user_auth_' . $userId;
+                    if (!$accessList = Cache::get($cacheKey)) {
+                        $accessList = self::getAccessList($userId);
+                        Cache::set($cacheKey, $accessList, 300);
+                    }
                 } else {
                     //登录验证模式，比较登录后保存的权限访问列表
                     $accessList = Session::get('_access_list');
@@ -235,15 +242,7 @@ class Rbac
             "AND access.role_id=role.id " .
             "AND role.status=1 " .
             "AND access.node_id=node.id " .
-            "AND node.status=1 " .
-            "AND (" .
-            "role.pid = 0 " .
-            "OR (role.pid <> 0 " .
-            "AND node.id IN (" .
-            "SELECT node_id FROM {$table['access']} WHERE role_id = role.pid" .
-            ")" .
-            ")" .
-            ")";
+            "AND node.status=1 ";
         $apps = Db::query($sql);
         //转化为树
         $tree = list_to_tree($apps);

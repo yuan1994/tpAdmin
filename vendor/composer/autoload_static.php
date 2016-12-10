@@ -7,6 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInit42f1a2b06c32df0543aaa7dd0a10f07a
 {
     public static $files = array (
+        '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '1cfd2761b63b0a29ed23657ea394cb2d' => __DIR__ . '/..' . '/topthink/think-captcha/src/helper.php',
         '841780ea2e1d6545ea3a253239d59c05' => __DIR__ . '/..' . '/qiniu/php-sdk/src/Qiniu/functions.php',
     );
@@ -17,6 +18,10 @@ class ComposerStaticInit42f1a2b06c32df0543aaa7dd0a10f07a
             'think\\composer\\' => 15,
             'think\\captcha\\' => 14,
             'think\\' => 6,
+        ),
+        'm' => 
+        array (
+            'mailer\\' => 7,
         ),
         'Q' => 
         array (
@@ -36,6 +41,10 @@ class ComposerStaticInit42f1a2b06c32df0543aaa7dd0a10f07a
         'think\\' => 
         array (
             0 => __DIR__ . '/../..' . '/thinkphp/library/think',
+        ),
+        'mailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yuan1994/tp-mailer/src/mailer',
         ),
         'Qiniu\\' => 
         array (

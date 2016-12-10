@@ -34,6 +34,8 @@ class ReadClass
         $staticProperties = $reflection->getStaticProperties();
         // 黑名单方法
         $blacklist = isset($staticProperties['blacklist']) ? $staticProperties['blacklist'] : [];
+        // 白名单方法
+        $allowList = isset($staticProperties['allowList']) ? $staticProperties['allowList'] : [];
         $ret = [];
         //遍历public方法
         foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {

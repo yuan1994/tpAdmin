@@ -1,5 +1,5 @@
 <?php
-namespace app\admin\model[NAMESPACE];
+namespace app\[MODULE]\model[NAMESPACE];
 
 use think\Model;
 

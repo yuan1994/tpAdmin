@@ -5,6 +5,7 @@
     <div class="cl pd-5 bg-1 bk-gray">
         <span class="l">
             {tp:menu /}
+            {tp:menu menu='saveOrder' /}
         </span>
         <span class="r pt-5 pr-5">
             共有数据 ：<strong>{$count}</strong> 条
@@ -31,4 +32,9 @@
     </table>
     <div class="page-bootstrap">{$page}</div>
 </div>
+{/block}
+{block name='script'}}
+<script>
+
+</script>
 {/block}

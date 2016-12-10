@@ -1,8 +1,8 @@
-{extend name="template/base" /}
+{extend name="[MODULE]template/base" /}
 {block name="content"}
 <div class="page-container">
     <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
-        <input type="hidden" name="id" value="{:isset($vo.id)?$vo.id:''}">
+        <input type="hidden" name="id" value="{$vo.id ?? ''}">
 [ROWS]
         <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">

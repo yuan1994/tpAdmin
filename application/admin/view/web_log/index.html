@@ -2,7 +2,8 @@
 {block name="content"}
 <div class="page-container">
     <form class="mb-20" method="get" action="{:\\think\\Url::build($Request.action)}">
-        <input type="text" class="input-text" style="width:250px" placeholder="节点图" name="map" value="{$Request.param.map}">
+        <input type="text" class="input-text" style="width:250px" placeholder="控制器" name="controller" value="{$Request.param.controller}">
+        <input type="text" class="input-text" style="width:250px" placeholder="方法" name="action" value="{$Request.param.action}">
         <input type="text" class="input-text" style="width:250px" placeholder="描述" name="comment" value="{$Request.param.comment}">
         <button type="submit" class="btn btn-success"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
     </form>
@@ -15,7 +16,8 @@
         <thead>
         <tr class="text-c">
             <th width="80">用户</th>
-            <th width="60">是否AJAX</th>
+            <th width="60">请求方式</th>
+            <th width="80">模块</th>
             <th width="200">节点图</th>
             <th width="">描述</th>
             <th width="150">时间</th>
@@ -26,10 +28,11 @@
         {volist name="list" id="vo"}
         <tr class="text-c">
             <td>{$vo.realname}</td>
-            <td>{$vo.is_ajax?'<span class="c-red">是</span>':'否'}</td>
-            <td>{$vo.map|high_light=$Request.param.map}</td>
+            <td>{$vo.method}</td>
+            <td>{$vo.module}</td>
+            <td>{$vo.controller}/{$vo.action}</td>
             <td>{$vo.desc|high_light=$Request.param.comment}</td>
-            <td>{$vo.otime|date='Y-m-d H:i:s',###}</td>
+            <td>{$vo.create_at|date='Y-m-d H:i:s',###}</td>
             <td>
                 {tp:access action="detail"}
                     <a href="javascript:;" class="label label-success radius" onclick="layer_open('详情','{:\\think\\Url::build(\'detail\', [\'id\'=>$vo[\'id\']])}')">详情</a>

@@ -2,10 +2,10 @@
 /**
  * tpAdmin [a web admin based ThinkPHP5]
  *
- * @author yuan1994 <tianpian0805@gmail.com>
- * @link http://tpadmin.yuan1994.com/
+ * @author    yuan1994 <tianpian0805@gmail.com>
+ * @link      http://tpadmin.yuan1994.com/
  * @copyright 2016 yuan1994 all rights reserved.
- * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
 namespace app\admin\controller;
@@ -28,29 +28,25 @@ class Upload extends Controller
      */
     public function upload()
     {
-        $files = $this->request->file('file');
-        $insert = [];
-        foreach ($files as $file) {
-            $path = ROOT_PATH . 'public/tmp/uploads/';
-            $info = $file->move($path);
-            if ($info) {
-                $data[] = $this->request->root() . '/tmp/uploads/' . $info->getSaveName();
-                $insert[] = [
-                    'cate'     => 3,
-                    'name'     => $data[] = $this->request->root() . '/tmp/uploads/' . $info->getSaveName(),
-                    'original' => $info->getInfo('name'),
-                    'domain'   => '',
-                    'type'     => $info->getInfo('type'),
-                    'size'     => $info->getInfo('size'),
-                    'mtime'    => time(),
-                ];
-            } else {
-                $error[] = $file->getError();
-            }
+        $file = $this->request->file('file');
+        $path = ROOT_PATH . 'public/tmp/uploads/';
+        $info = $file->move($path);
+        if (!$info) {
+            return ajax_return_error($file->getError());
         }
-        Db::name('File')->insertAll($insert);
+        $data = $this->request->root() . '/tmp/uploads/' . $info->getSaveName();
+        $insert = [
+            'cate'     => 3,
+            'name'     => $data,
+            'original' => $info->getInfo('name'),
+            'domain'   => '',
+            'type'     => $info->getInfo('type'),
+            'size'     => $info->getInfo('size'),
+            'mtime'    => time(),
+        ];
+        Db::name('File')->insert($insert);
 
-        return ajax_return($data);
+        return ajax_return(['name' => $data]);
     }
 
     /**

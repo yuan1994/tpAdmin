@@ -47,6 +47,79 @@ class AdminNode extends Controller
      */
     public function index()
     {
+        if ($this->request->isAjax()) {
+            try {
+                $moduleId = $this->request->param('module_id');
+                $groupId = $this->request->param('group_id');
+
+                if ($this->request->param('type') == 'group') {
+                    // 查询分组
+
+                    // 查询二级节点下分组信息
+                    $node = Db::name('AdminNode')
+                        ->where("isdelete=0 AND level=2 AND pid='{$moduleId}'")
+                        ->field('group_id')
+                        ->select();
+                    // 分组下菜单个数
+                    $groupId = [];
+                    foreach ($node as $vo) {
+                        if (isset($groupId[$vo['group_id']])) {
+                            $groupId[$vo['group_id']] += 1;
+                        } else {
+                            $groupId[$vo['group_id']] = 1;
+                        }
+                    }
+
+                    // 分组信息
+                    $groupList = Db::name('AdminGroup')
+                        ->alias('admin_group')
+                        ->order('sort asc')
+                        ->field('id,name,icon,sort,status')
+                        ->where(['isdelete' => 0, 'id' => ['in', array_keys($groupId)]])
+                        ->select();
+
+                    return ajax_return(['count' => $groupId, 'list' => $groupList]);
+                } else {
+                    // 查询节点
+                    $list = Db::field('*')
+                        ->name('admin_node')
+                        ->union(function($query){
+                            $query->name('admin_node')->where('isdelete=0 AND level>2');
+                        })
+                        ->where("isdelete=0 AND level=2 AND pid='{$moduleId}' AND group_id='{$groupId}'")
+                        ->select();
+                    // 重新组装节点
+                    $list2 = [];
+                    foreach ($list as $vo) {
+                        $list2[] = [ 'name' => '<span class="c-warning">[ ' . ($vo['level'] == 1 ? '模块' : ($vo['type'] ? '控制器' : '方法')) . ' ]</span> '
+                            . $vo['title'] . " (" . $vo['name'] . ") "
+                            . ' <a></a><span class="c-secondary">[ 层级：' . $vo['level'] . ' ]</span> '
+                            . show_status($vo['status'], $vo['id'])
+                            . ' <a class="label label-primary radius J_add" data-id="' . $vo['id'] . '" href="javascript:;" title="添加子节点">添加</a>' ,'id' => $vo['id'], 'pid' => $vo['pid']];
+                    }
+                    $node = list_to_tree($list2, 'id', 'pid', 'children', $moduleId);
+
+                    return ajax_return(['list' => $node]);
+                }
+            } catch (\Exception $e) {
+                return ajax_return_error($e->getMessage());
+            }
+        } else {
+            // 模块
+            $modules = Db::name('AdminNode')->order('sort asc')->where('pid=0 AND isdelete=0')->select();
+            $this->view->assign('modules', $modules);
+            $this->view->assign('node', '');
+
+            return $this->view->fetch();
+        }
+    }
+
+
+    /**
+     * 首页
+     */
+    /*public function index()
+    {
         $list = Db::name('AdminNode')->order('sort asc')->where('isdelete=0')->select();
         //分组信息
         $list_group = Loader::model('AdminGroup')->getList();
@@ -70,7 +143,7 @@ class AdminNode extends Controller
         $this->view->assign('count', count($list));
 
         return $this->view->fetch();
-    }
+    }*/
 
     /**
      * 回收站

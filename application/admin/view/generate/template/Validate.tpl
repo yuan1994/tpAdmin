@@ -1,5 +1,5 @@
 <?php
-namespace app\admin\validate[NAMESPACE];
+namespace app\[MODULE]\validate[NAMESPACE];
 
 use think\Validate;
 

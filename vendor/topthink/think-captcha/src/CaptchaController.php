@@ -18,6 +18,10 @@ class CaptchaController
     public function index($id = "")
     {
         $captcha = new Captcha((array)Config::get('captcha'));
+
+        // 修复某些环境验证码不显示的bug
+        ob_clean();
+
         return $captcha->entry($id);
     }
 }

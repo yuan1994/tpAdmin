@@ -10,29 +10,47 @@
 
 namespace app\admin;
 
-use think\Url;
+use think\Model;
 use think\View;
 use think\Request;
 use think\Session;
 use think\Db;
-use think\Response;
 use think\Config;
 use think\Loader;
-use think\response\Redirect;
 use think\Exception;
 use think\exception\HttpException;
-use think\exception\HttpResponseException;
+use app\admin\logic\Pub as PubLogic;
 
 class Controller
 {
-    // 视图类实例
+    /**
+     * @var View 视图类实例
+     */
     protected $view;
-    // Request实例
+    /**
+     * @var Request Request实例
+     */
     protected $request;
-    // 黑名单方法，禁止访问某些方法
+    /**
+     * @var array 黑名单方法，禁止访问某些方法
+     */
     protected static $blacklist = [];
-    // 是否删除标志，0-正常|1-删除|false-不包含该字段
+    /**
+     * @var array 白名单方法，如果设置会覆盖黑名单方法，只允许白名单方法能正常访问
+     */
+    protected static $allowList = [];
+    /**
+     * @var int 是否删除标志，0-正常|1-删除|false-不包含该字段
+     */
     protected static $isdelete = 0;
+    /**
+     * @var string 假删除字段
+     */
+    protected $fieldIsDelete = 'isdelete';
+    /**
+     * @var string 状态禁用、恢复字段
+     */
+    protected $fieldStatus = 'status';
 
     public function __construct()
     {
@@ -43,9 +61,11 @@ class Controller
             $this->request = Request::instance();
         }
 
-        // 黑名单方法
-        if ($this::$blacklist && in_array($this->request->action(), $this::$blacklist)) {
-            throw new HttpException(404, 'method not exists:' . (new \ReflectionClass($this))->getName() . '->' . $this->request->action());
+        // 白名单/黑名单方法
+        if ($this::$allowList && !in_array($this->request->action(), $this::$allowList)) {
+            throw new HttpException(404, 'method not exists:' . $this->request->controller() . '->' . $this->request->action());
+        } elseif ($this::$blacklist && in_array($this->request->action(), $this::$blacklist)) {
+            throw new HttpException(404, 'method not exists:' . $this->request->controller() . '->' . $this->request->action());
         }
 
         // 用户ID
@@ -70,11 +90,12 @@ class Controller
     /**
      * 自动搜索查询字段,给模型字段过滤
      */
-    protected function search($model)
+    protected function search($model, $param = [])
     {
         $map = [];
         $table_info = $model->getTableInfo();
-        foreach ($this->request->param() as $key => $val) {
+        $param = array_merge($this->request->param(), $param);
+        foreach ($param as $key => $val) {
             if ($val !== "" && in_array($key, $table_info['fields'])) {
                 $map[$key] = $val;
             }
@@ -85,25 +106,34 @@ class Controller
 
     /**
      * 获取模型
+     *
      * @param string $controller
-     * @return mixed
+     * @param bool   $type 是否返回模型的类型
+     *
+     * @return \think\db\Query|\think\Model|array
      */
-    protected function getModel($controller = '')
+    protected function getModel($controller = '', $type = false)
     {
-        $module = $this->request->module();
+        $module = Config::get('app.model_path');
         if (!$controller) {
             $controller = $this->request->controller();
         }
-        if (class_exists(Loader::parseClass($module, 'model', $controller))) {
-            return Loader::model($controller);
+        if (class_exists($modelName = Loader::parseClass($module, 'model', $controller))) {
+            $model = new $modelName();
+            $modelType = 'model';
         } else {
-            return Db::name($this->parseTable($controller));
+            $model = Db::name($this->parseTable($controller));
+            $modelType = 'db';
         }
+
+        return $type ? ['type' => $modelType, 'model' => $model] : $model;
     }
 
     /**
      * 获取实际的控制器名称(应用于多层控制器的场景)
+     *
      * @param $controller
+     *
      * @return mixed
      */
     protected function getRealController($controller = '')
@@ -119,11 +149,12 @@ class Controller
 
     /**
      * 默认更新字段方法
-     * @param string $field     更新的字段
+     *
+     * @param string     $field 更新的字段
      * @param string|int $value 更新的值
-     * @param string $msg       操作成功提示信息
-     * @param string $pk        主键，默认为主键
-     * @param string $input     接收参数，默认为主键
+     * @param string     $msg   操作成功提示信息
+     * @param string     $pk    主键，默认为主键
+     * @param string     $input 接收参数，默认为主键
      */
     protected function updateField($field, $value, $msg = "操作成功", $pk = "", $input = "")
     {
@@ -136,7 +167,7 @@ class Controller
         }
         $ids = $this->request->param($input);
         $where[$pk] = ["in", $ids];
-        if ($model->where($where)->update([$field => $value]) === false) {
+        if (false === $model->where($where)->update([$field => $value])) {
             return ajax_return_adv_error($model->getError());
         }
 
@@ -145,7 +176,9 @@ class Controller
 
     /**
      * 格式化表名，将 /. 转为 _ ，支持多级控制器
+     *
      * @param string $name
+     *
      * @return mixed
      */
     protected function parseTable($name = '')
@@ -159,7 +192,10 @@ class Controller
 
     /**
      * 格式化类名，将 /. 转为 \\
+     * 已废弃，请使用Loader::parseClass()
+     *
      * @param string $name
+     *
      * @return mixed
      */
     protected function parseClass($name = '')
@@ -176,24 +212,7 @@ class Controller
      */
     protected function notLogin()
     {
-        // 跳转到认证网关
-        if ($this->request->isAjax()) {
-            $response = ajax_return_adv_error("登录超时，请先登陆", 400, "", "", false, "", Url::build("Pub/loginFrame"));
-            throw new HttpResponseException($response);
-        } else {
-            if (strtolower($this->request->controller()) == 'index' && strtolower($this->request->action()) == 'index') {
-                throw new HttpResponseException(new Redirect('Pub/login'));
-            } else {
-                // 判断是弹出登录框还是直接跳转到登录页
-                $ret = '<script>' .
-                    'if(window.parent.frames.length == 0) ' .
-                    'window.location = "' . Url::build('Pub/login') . '?callback=' . urlencode($this->request->url(true)) . '";' .
-                    ' else ' .
-                    'parent.login("' . Url::build('Pub/loginFrame') . '");' .
-                    '</script>';
-                throw new HttpResponseException(new Response($ret));
-            }
-        }
+        PubLogic::notLogin();
     }
 
     /**
@@ -207,14 +226,15 @@ class Controller
             !in_array($this->request->module(), explode(',', Config::get('rbac.not_auth_module')))
         ) {
             if (!\Rbac::AccessCheck()) {
-                throw new Exception("没有权限");
+                throw new HttpException(403, "没有权限");
             }
         }
     }
 
     /**
      * 过滤禁止操作某些主键
-     * @param $filterData
+     *
+     * @param        $filterData
      * @param string $error
      * @param string $method
      * @param string $key
@@ -223,7 +243,7 @@ class Controller
     {
         $data = $this->request->param();
         if (!isset($data[$key])) {
-            throw new Exception('缺少必要参数');
+            throw new HttpException(404, '缺少必要参数');
         }
         $ids = is_array($data[$key]) ? $data[$key] : explode(",", $data[$key]);
         foreach ($ids as $id) {
@@ -264,24 +284,33 @@ class Controller
      * $map['_field']       可强制设置字段
      * $map['_order_by']    可强制设置排序字段(field asc|desc[,filed2 asc|desc...]或者false)
      * $map['_paginate']    是否开启分页，传入false可以关闭分页
+     * $map['_model']       可强制指定模型
      *
-     * @param object $model     数据对象
-     * @param array $map        过滤条件
-     * @param string $field     查询的字段
-     * @param string $sortBy    排序
-     * @param boolean $asc      是否正序
-     * @param boolean $return   是否返回数据，返回数据时返回paginate对象，不返回时直接模板赋值
-     * @param boolean $paginate 是否开启分页
+     * @param Model|Db $model    数据对象
+     * @param array    $map      过滤条件
+     * @param string   $field    查询的字段
+     * @param string   $sortBy   排序
+     * @param boolean  $asc      是否正序
+     * @param boolean  $return   是否返回数据，返回数据时返回paginate对象，不返回时直接模板赋值
+     * @param boolean  $paginate 是否开启分页
      */
-    protected function datalist($model, $map, $field = '*', $sortBy = '', $asc = false, $return = false, $paginate = true)
+    protected function datalist($model, $map, $field = null, $sortBy = '', $asc = false, $return = false, $paginate = true)
     {
+        // 私有字段，指定特殊条件，查询时要删除
+        $protectField = ['_table', '_relation', '_field', '_order_by', '_paginate', '_model'];
+
+        // 通过过滤器指定模型
+        if (isset($map['_model'])) {
+            $model = $map['_model'];
+        }
+
         // 排序字段 默认为主键名
         $order = $this->request->param('_order') ?: (empty($sortBy) ? $model->getPk() : $sortBy);
 
         // 接受 sort参数 0 表示倒序 非0都 表示正序
-        $sort = null !== $this->request->param('_sort') ?
-            ($this->request->param('_sort') == 'asc' ? 'asc' : 'desc') :
-            ($asc ? 'asc' : 'desc');
+        $sort = null !== $this->request->param('_sort')
+            ? ($this->request->param('_sort') == 'asc' ? 'asc' : 'desc')
+            : ($asc ? 'asc' : 'desc');
 
         // 设置关联预载入
         if (isset($map['_relation'])) {
@@ -307,6 +336,13 @@ class Controller
                 }
             }
             $field = implode(",", $_field);
+            // 给查询条件强制加上表名前缀
+            foreach ($map as $k => $v) {
+                if (!in_array($k, $protectField) && strpos($k, ".") === false) {
+                    $map[$map['_table'] . '.' . $k] = $v;
+                    unset($map[$k]);
+                }
+            }
         }
 
         // 设置排序字段 防止表无主键报错
@@ -319,7 +355,9 @@ class Controller
         $paginate = isset($map['_paginate']) ? boolval($map['_paginate']) : $paginate;
 
         // 删除设置属性的字段
-        unset($map['_table'], $map['_relation'], $map['_field'], $map['_order_by'], $map['_paginate']);
+        foreach ($protectField as $v) {
+            unset($map[$v]);
+        }
 
         if ($paginate) {
             // 分页查询
@@ -327,7 +365,11 @@ class Controller
             // 每页数据数量
             $listRows = $this->request->param('numPerPage') ?: Config::get("paginate.list_rows");
 
-            $list = $model->field($field)->where($map)->order($order_by)->paginate($listRows, false, ['query' => $this->request->get()]);
+            $list = $model
+                ->field($field)
+                ->where($map)
+                ->order($order_by)
+                ->paginate($listRows, false, ['query' => $this->request->get()]);
 
             if ($return) {
                 // 返回值
@@ -341,7 +383,11 @@ class Controller
             }
         } else {
             // 不开启分页查询
-            $list = $model->field($field)->where($map)->order($order_by)->select();
+            $list = $model
+                ->field($field)
+                ->where($map)
+                ->order($order_by)
+                ->select();
 
             if ($return) {
                 // 返回值

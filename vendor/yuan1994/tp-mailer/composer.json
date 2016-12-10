@@ -1,0 +1,32 @@
+{
+    "name": "yuan1994/tp-mailer",
+    "description": "A powerful and beautiful php mailer for All of ThinkPHP and Other PHP Frameworks based SwiftMailer",
+    "keywords": [
+        "tp-mailer",
+        "mailer",
+        "phpmailer",
+        "swiftmailer",
+        "tp5-mailer",
+        "mail",
+        "thinkphp",
+        "tp"
+    ],
+    "type": "library",
+    "license": "Apache 2.0",
+    "authors": [
+        {
+            "name": "yuan1994",
+            "email": "tianpian0805@gmail.com",
+            "homepage": "https://github.com/yuan1994/tp-mailer/",
+            "role": "Owner"
+        }
+    ],
+    "homepage": "https://github.com/yuan1994/tp-mailer/",
+    "require": {
+        "php": ">=5.4.0",
+        "swiftmailer/swiftmailer": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {"mailer\\": "src/mailer"}
+    }
+}

@@ -73,6 +73,9 @@ class Generate extends Controller
         unset($data['file']);
         $generate->run($data, $this->request->post('file'));
 
-        return ajax_return_adv('生成成功', '', false, '', '', ['action' => Url::build($data['controller'] . '/index')]);
+        if (isset($data['delete_file']) && $data['delete_file']) {
+            return ajax_return_adv('删除成功', '', false, '', '', ['action' => '']);
+        }
+        return ajax_return_adv('生成成功', '', false, '', '', ['action' => Url::build($data['module'] . '/' . $data['controller'] . '/index')]);
     }
 }

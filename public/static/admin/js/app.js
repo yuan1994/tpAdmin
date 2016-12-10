@@ -5,6 +5,108 @@
 $(function () {
     //多级菜单
     $.Huifold(".menu_dropdown .sub-menu-title", ".menu_dropdown .sub-menu-list", "fast", 3, "click");
+
+    getskincookie();
+    //layer.config({extend: 'extend/layer.ext.js'});
+    Huiasidedisplay();
+    var resizeID;
+    $(window).resize(function () {
+        clearTimeout(resizeID);
+        resizeID = setTimeout(function () {
+            Huiasidedisplay();
+        }, 500);
+    });
+
+    $(".nav-toggle").click(function () {
+        $(".Hui-aside").slideToggle();
+    });
+    $(".Hui-aside").on("click", ".menu_dropdown dd li a", function () {
+        if ($(window).width() < 768) {
+            $(".Hui-aside").slideToggle();
+        }
+    });
+    /*左侧菜单*/
+    $.Huifold(".menu_dropdown dl dt", ".menu_dropdown dl dd", "fast", 3, "click");
+
+    /*选项卡导航*/
+
+    $(".Hui-aside").on("click", ".menu_dropdown [_href]", function () {
+        $(".Hui-aside .menu_dropdown [_href]").removeClass('focus');
+        $(this).addClass('focus');
+        Hui_admin_tab(this);
+    });
+
+    /* 生成面包屑导航 */
+    $(".Hui-aside .menu_dropdown [_href]").each(function () {
+        var nav = $(this).html();
+        var tmp_node = $(this);
+        while (tmp_node.closest('.sub-menu-list').length) {
+            nav = tmp_node.closest('.sub-menu-list').prev('.sub-menu-title').attr('data-title') + ' <span class="c-gray en">&gt;</span> ' + nav;
+            tmp_node = tmp_node.closest('.sub-menu-list').prev('.sub-menu-title');
+        }
+
+        nav = tmp_node.closest('dd').prev('dt').html().replace(/(<[^>]*>.*?<\/[^>]*>)/ig, '') + ' <span class="c-gray en">&gt;</span> ' + nav;
+
+        $(this).attr('data-nav', nav);
+    });
+
+    $(document).on("click", "#min_title_list li", function () {
+        var bStopIndex = $(this).index();
+        var iframe_box = $("#iframe_box");
+        $("#min_title_list li").removeClass("active").eq(bStopIndex).addClass("active");
+        iframe_box.find(".show_iframe").hide().eq(bStopIndex).show();
+    });
+    $(document).on("click", "#min_title_list li i", function () {
+        var aCloseIndex = $(this).parents("li").index();
+        $(this).parent().remove();
+        $('#iframe_box').find('.show_iframe').eq(aCloseIndex).remove();
+        num == 0 ? num = 0 : num--;
+        tabNavallwidth();
+    });
+    $(document).on("dblclick", "#min_title_list li", function () {
+        var aCloseIndex = $(this).index();
+        var iframe_box = $("#iframe_box");
+        if (aCloseIndex > 0) {
+            $(this).remove();
+            $('#iframe_box').find('.show_iframe').eq(aCloseIndex).remove();
+            num == 0 ? num = 0 : num--;
+            $("#min_title_list li").removeClass("active").eq(aCloseIndex - 1).addClass("active");
+            iframe_box.find(".show_iframe").hide().eq(aCloseIndex - 1).show();
+            tabNavallwidth();
+        } else {
+            return false;
+        }
+    });
+    tabNavallwidth();
+
+    $('#js-tabNav-next').click(function () {
+        num == oUl.find('li').length - 1 ? num = oUl.find('li').length - 1 : num++;
+        toNavPos();
+    });
+    $('#js-tabNav-prev').click(function () {
+        num == 0 ? num = 0 : num--;
+        toNavPos();
+    });
+
+    function toNavPos() {
+        oUl.stop().animate({'left': -num * 100}, 100);
+    }
+
+    /*换肤*/
+    $("#Hui-skin .dropDown-menu a").click(function () {
+        var v = $(this).attr("data-val");
+        setCookie("Huiskin", v);
+        var hrefStr = $("#skin").attr("href");
+        var hrefRes = hrefStr.substring(0, hrefStr.lastIndexOf('skin/')) + 'skin/' + v + '/skin.css';
+
+        $(window.frames.document).contents().find("#skin").attr("href", hrefRes);
+        //$("#skin").attr("href",hrefResd);
+    });
+
+    // 绑定刷新事件
+    $(document).on('click', '.btn-refresh', function () {
+        location.replace(location.href);
+    })
 });
 
 /**
@@ -60,9 +162,7 @@ function layer_open(title, url, opt) {
  * 全屏打开窗口，参数见layer_open
  */
 function full_page(title, url, opt) {
-    var index = layer_open(title, url, opt);
-    layer.full(index);
-    return index;
+    return layer_open(title, url, $.extend({w: "100%", h: "100%"}, opt))
 };
 
 /**
@@ -203,7 +303,7 @@ function change_status(ret, obj, type) {
     //配置数据，TYPE:['下一状态文字描述','当前状态class颜色','下一状态class颜色','下一状态方法名','状态标签选择器','下一状态标签icon','下一状态标签title']
     var data = {
         'resume': ['禁用', 'success', 'warning', 'forbid', '.status', '&#xe615;', '正常'],
-        'forbid': ['恢复', 'warning', 'success', 'resume', '.status', '&#xe631;', '禁用'],
+        'forbid': ['恢复', 'warning', 'success', 'resume', '.status', '&#xe631;', '禁用']
     };
     var $this = $(obj);
     $this.html(data[type][0])
@@ -282,6 +382,43 @@ jQuery.tpTab = function (tabBar, tabCon, class_name, tabEvent, i, callback, fini
         typeof callback === "function" && callback(index, $tabCon, $tabBar);
     });
 };
+
+/**
+ * 保存排序
+ *
+ * @param url 保存排序的提交地址
+ * @param select 选择器
+ */
+function saveOrder(url, select) {
+    var data = {};
+    $(select || ".order-input").each(function (index, item) {
+        data[$(item).attr('data-id')] = $(item).val();
+    });
+    if (data.length == 0) {
+        layer.msg('没有可排序的对象');
+        return;
+    }
+    ajax_req(url || THINK_CONTROLLER + '/saveOrder', {'sort': data});
+}
+
+/**
+ * 浏览器打印，oper为大于的数并且有相应注释就打印该区域，否则打印整个网页
+ * @param oper
+ */
+function printerPreview(oper) {
+    if (typeof oper != "undefined") {
+        bdhtml = window.document.body.innerHTML;// 获取当前页的html代码
+        sprnstr = "<!--startprint" + oper + "-->";// 设置打印开始区域
+        eprnstr = "<!--endprint" + oper + "-->";// 设置打印结束区域
+        prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + sprnstr.length); // 从开始代码向后取html
+        prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr));// 从结束代码向前取html
+        window.document.body.innerHTML = prnhtml;
+        window.print();
+        window.document.body.innerHTML = bdhtml;
+    } else {
+        window.print();
+    }
+}
 
 /**
  * 永久删除操作项

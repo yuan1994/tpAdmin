@@ -31,6 +31,7 @@ class Generate extends Command
             ->setDefinition([
                 new Option('config', 'c', Option::VALUE_OPTIONAL, "The config file path of generate.php", 'generate.php'),
                 new Option('file', 'f', Option::VALUE_OPTIONAL, "Which file you want to generate : all|controller|model|validate|table|edit|index|recycleBin|form|th|td|config|dir", 'all'),
+                new Option('delete', 'd', Option::VALUE_OPTIONAL, "If you set this`s value to 1 or true, the files and directory will be removed just generated, please be careful and the operation won`t be restored", '0'),
             ])
             ->setDescription('Automatic generating code')
             ->setHelp(<<<EOF
@@ -86,9 +87,14 @@ EOF
         }
         try {
             $data = include $configFile;
+            $data['delete_file'] = $input->getOption('delete');
             $generate = new \Generate();
             $generate->run($data, $input->getOption('file'));
-            $output->info('代码生成成功！');
+            if ($data['delete_file']) {
+                $output->warning('代码删除成功！');
+            } else {
+                $output->info('代码生成成功！');
+            }
         } catch (Exception $e) {
             $errMsg = $e->getMessage();
             if ($e->getCode() == 403) {

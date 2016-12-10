@@ -1,9 +1,9 @@
 <?php
-namespace app\admin\controller[NAMESPACE];
+namespace app\[MODULE]\controller[NAMESPACE];
 
 \think\Loader::import('controller/Controller', \think\Config::get('traits_path') , EXT);
 
-use app\admin\Controller;
+use app\[MODULE]\Controller;
 
 class [NAME] extends Controller
 {

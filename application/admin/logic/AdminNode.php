@@ -2,10 +2,10 @@
 /**
  * tpAdmin [a web admin based ThinkPHP5]
  *
- * @author yuan1994 <tianpian0805@gmail.com>
- * @link http://tpadmin.yuan1994.com/
+ * @author    yuan1994 <tianpian0805@gmail.com>
+ * @link      http://tpadmin.yuan1994.com/
  * @copyright 2016 yuan1994 all rights reserved.
- * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
 namespace app\admin\logic;
@@ -25,20 +25,19 @@ class AdminNode
             $nodes = Db::name("AdminNode")->where("status=1 AND group_id > 0")->field("id,pid,name,group_id,title,type")->select();
         } else {
             $prefix = Config::get("database.prefix");
-            $sql = "SELECT node.id,node.name,node.pid,node.group_id,node.title,node.type from " .
-                "{$prefix}admin_role AS role," .
-                "{$prefix}admin_role_user AS user," .
-                "{$prefix}admin_access AS access ," .
-                "{$prefix}admin_node AS node " .
-                "WHERE user.user_id='" . UID . "' AND " .
-                "user.role_id=role.id AND " .
-                "access.role_id=role.id AND " .
-                "role.status=1 AND " .
-                "access.node_id=node.id AND " .
-                "node.status=1 AND " .
-                "node.group_id > 0 AND " .
-                "(role.pid = 0 OR (role.pid <> 0 AND node.id IN (SELECT node_id FROM {$prefix}admin_access WHERE role_id = role.pid))) " .
-                "ORDER BY node.sort ASC";
+            $sql = "SELECT node.id,node.name,node.pid,node.group_id,node.title,node.type from "
+                . "{$prefix}admin_role AS role,"
+                . "{$prefix}admin_role_user AS user,"
+                . "{$prefix}admin_access AS access ,"
+                . "{$prefix}admin_node AS node "
+                . "WHERE user.user_id='" . UID . "' "
+                . "AND user.role_id=role.id "
+                . "AND access.role_id=role.id "
+                . "AND role.status=1 "
+                . "AND access.node_id=node.id "
+                . "AND node.status=1 "
+                . "AND node.group_id > 0 "
+                . "ORDER BY node.sort ASC";
             $nodes = Db::query($sql);
         }
 
@@ -47,9 +46,11 @@ class AdminNode
 
     /**
      * 插入批量导入的节点
+     *
      * @param array $node_template 节点模板
-     * @param array $node_detect 代码中探测到的节点
-     * @param array $data 其他数据
+     * @param array $node_detect   代码中探测到的节点
+     * @param array $data          其他数据
+     *
      * @return array 错误信息
      */
     public function insertLoad($node_template, $node_detect, $data)
@@ -87,6 +88,7 @@ class AdminNode
         if ($insert_all) {
             Db::name("AdminNode")->insertAll($insert_all);
         }
+
         return $error;
     }
 }

@@ -19,14 +19,9 @@
 <link rel="stylesheet" href="__LIB__/lightbox2/css/lightbox.min.css">
 {/block}
 {block name="script"}
-<script type="text/javascript" src="__LIB__/showdown/1.4.2/showdown.min.js"></script>
 <script src="__LIB__/lightbox2/js/lightbox.min.js"></script>
 <script>
-    $(function () {
-        var converter = new showdown.Converter(),
-                text      = $("#markdown_tpl").html();
-        $("#markdown").html(converter.makeHtml(text));
-    })
+
 </script>
 {literal}
 <script type="text/plain" id="markdown_tpl">

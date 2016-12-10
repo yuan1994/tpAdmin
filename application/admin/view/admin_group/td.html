@@ -2,6 +2,9 @@
 <td>{$vo.id}</td>
 <td>{$vo.name|high_light=$Request.param.name}</td>
 <td><i class="Hui-iconfont">{$vo.icon|htmlspecialchars_decode|default='&#xe616;'}</i></td>
-<td>{$vo.sort}</td>
+<td style="padding: 0">
+    <input type="number" name="sort[{$vo.id}]" value="{$vo.sort}" style="width: 60px;"
+           class="input-text text-c order-input" data-id="{$vo.id}">
+</td>
 <td>{$vo.remark}</td>
 <td>{$vo.status|get_status}</td>

@@ -14,10 +14,11 @@
 
 namespace app\admin\controller;
 
-use app\admin\Controller;
+use think\Controller;
 use think\Db;
 use think\Exception;
 use think\Request;
+use mailer\tp5\Mailer;
 
 class Demo extends Controller
 {
@@ -90,10 +91,14 @@ class Demo extends Controller
             if ($result !== true) {
                 return ajax_return_adv_error($result);
             }
-            $html = "<p>这是一封来自tpadmin的测试邮件，请勿回复</p><p><br></p><p>该邮件由访问发送，本站不承担任何责任，如有骚扰请屏蔽此邮件地址</p>";
-            $result = \Mail::instance()->mail($receive, $html, "测试邮件");
-            if ($result !== true) {
-                return ajax_return_adv_error(\Mail::instance()->getError());
+            $mailer = Mailer::instance();
+            $result = $mailer->to($receive)
+                ->subject('来自tpadmin的测试邮件')
+                ->view('mail_template')
+                ->send();
+
+            if ($result == 0) {
+                return ajax_return_adv_error($mailer->getError());
             } else {
                 return ajax_return_adv("邮件发送成功，请注意查收", '');
             }

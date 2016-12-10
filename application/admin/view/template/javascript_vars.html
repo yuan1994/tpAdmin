@@ -1,0 +1,6 @@
+<!--定义JavaScript常量-->
+<script>
+    window.THINK_ROOT = '{:\\think\\Request::instance()->root()}';
+    window.THINK_MODULE = '{:\\think\\Url::build("/" . \\think\\Request::instance()->module(), "", false)}';
+    window.THINK_CONTROLLER = '{:\\think\\Url::build("___", "", false)}'.replace('/___', '');
+</script>

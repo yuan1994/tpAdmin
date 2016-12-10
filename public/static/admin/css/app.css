@@ -175,3 +175,51 @@ tr .check-box > div {
 .ztree li .label:hover {
   text-decoration: none;
 }
+nav.breadcrumb {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 40px;
+  z-index: 9;
+}
+nav.breadcrumb + .page-container {
+  padding-top: 60px;
+}
+.tp-page-aside {
+  left: 20px;
+  top: 30px;
+  bottom: 0;
+  width: 280px;
+}
+.tp-panel li {
+  line-height: 28px;
+}
+.tp-panel li:hover,
+.tp-panel li.focus {
+  color: #148cf1;
+  background-color: rgba(238, 238, 238, 0.98);
+}
+.tp-panel li a {
+  color: inherit;
+  line-height: 28px;
+  border-bottom: none;
+  font-weight: normal;
+}
+.tp-panel-module {
+  margin-top: 30px;
+}
+.tp-panel-module .panel-body {
+  height: 160px;
+  overflow: auto;
+}
+.tp-panel-group {
+  margin-top: 30px;
+}
+.tp-panel-group .panel-body {
+  overflow: auto;
+}
+.tp-page-main {
+  padding-top: 40px;
+  margin-left: 300px;
+}

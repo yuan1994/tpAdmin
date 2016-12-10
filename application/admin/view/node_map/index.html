@@ -1,7 +1,11 @@
 {extend name="template/base" /}
 {block name="content"}
 <div class="page-container">
-    {include file='form' /}
+    <form class="mb-20" method="get" action="{:\\think\\Url::build($Request.action)}">
+        <input type="text" class="input-text" style="width:250px" placeholder="节点图" name="map" value="{$Request.param.map}">
+        <input type="text" class="input-text" style="width:250px" placeholder="备注" name="comment" value="{$Request.param.comment}">
+        <button type="submit" class="btn btn-success"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+    </form>
     <div class="cl pd-5 bg-1 bk-gray">
         <span class="l">
             {tp:menu menu='add' /}
@@ -19,14 +23,24 @@
     <table class="table table-border table-bordered table-hover table-bg mt-20">
         <thead>
         <tr class="text-c">
-            {include file="th" /}
+            <th width="25"><input type="checkbox"></th>
+            <th width="80">{:sort_by('模块','module')}</th>
+            <th width="200">{:sort_by('控制器','controller')}</th>
+            <th width="100">{:sort_by('方法','action')}</th>
+            <th width="80">{:sort_by('请求方式','method')}</th>
+            <th width="">备注</th>
             <th width="70">操作</th>
         </tr>
         </thead>
         <tbody>
         {volist name="list" id="vo"}
         <tr class="text-c">
-            {include file="td" /}
+            <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
+            <td>{$vo.module}</td>
+            <td>{$vo.controller|high_light=$Request.param.map}</td>
+            <td>{$vo.action|high_light=$Request.param.map}</td>
+            <td>{$vo.method}</td>
+            <td>{$vo.comment|high_light=$Request.param.comment}</td>
             <td class="f-14">
                 {tp:menu menu='sedit,sdeleteforever' /}
             </td>

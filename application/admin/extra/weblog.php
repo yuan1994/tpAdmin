@@ -9,8 +9,28 @@
  */
 
 return [
-    'max_rows'              => 2000000, // 单表最大纪录值
-    'not_record_controller' => ['Index'], // 不记录的控制器
-    'not_record_map'        => [], // 不记录的节点图
-    'web_log_table'         => 'web_log', // 操作日志存储表
+    /**
+     *  单表最大纪录值，大于该值会自动分表
+     */
+    'max_rows'              => 200000,
+    /**
+     * 不开启日志记录的控制器，设置后该控制器下所有方法都将不记录日志
+     */
+    'not_record_controller' => [],
+    /**
+     * 不记录日单的方法，例如 AdminGroup/add，one.Two/add
+     */
+    'not_record_map'        => [],
+    /**
+     * 操作日志存储表，不含表名前缀
+     */
+    'web_log_table'         => 'web_log',
+    /**
+     * data字段存储最大数据长度，0不受限制，避免因文章等数据导致字段超长，数据存储被截断而报错
+     */
+    'max_data_length'       => 200,
+    /**
+     * 表名前缀，如果为null则为框架配置文件所设表前缀
+     */
+    'table_prefix'          => null,
 ];

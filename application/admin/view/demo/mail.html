@@ -6,6 +6,9 @@
             <label class="form-label col-xs-3 col-sm-3"></label>
             <div class="formControls col-xs-6 col-sm-6 c-red">
                 请先配置自己的邮件配置 (admin/extra/mail.php)
+                <p>邮件驱动已改用 tp-mailer ，一款非常优美、功能非常强大、非常易用的扩展，能用于任何框架，详情请见
+                <a class="c-blue" href="https://github.com/yuan1994/tp-mailer" target="_blank">https://github.com/yuan1994/tp-mailer</a>
+                </p>
             </div>
             <div class="col-xs-3 col-sm-3"></div>
         </div>
@@ -51,9 +54,9 @@
 {literal}
 <script type="text/plain" id="markdown_tpl">
 ---
-方法
+扩展类库：
 ```
-\Mail::instance()->mail($receive, $content, $subject = 'No Subject');
+tp-mailer: 详情请见文档：https://github.com/yuan1994/tp-mailer
 ```
 html 代码：
 ```
@@ -97,12 +100,16 @@ $result = $this->validate(
 if ($result !== true) {
     return ajax_return_adv_error($result);
 }
-$html = "<p>这是一封来自tpadmin的测试邮件，请勿回复</p><p><br></p><p>该邮件由访问发送，本站不承担任何责任，如有骚扰请屏蔽此邮件地址</p>";
-$result = \Mail::instance()->mail($receive, $html, "测试邮件");
-if ($result !== true) {
-    return ajax_return_adv_error(\Mail::instance()->getError());
+$mailer = Mailer::instance();
+$result = $mailer->to($receive)
+    ->subject('来自tpadmin的测试邮件')
+    ->view('mail_template')
+    ->send();
+
+if ($result == 0) {
+    return ajax_return_adv_error($mailer->getError());
 } else {
-    return ajax_return_adv("邮件发送成功，请注意查收");
+    return ajax_return_adv("邮件发送成功，请注意查收", '');
 }
 ```
 </script>

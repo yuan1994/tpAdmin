@@ -122,6 +122,11 @@ class Tp extends Taglib
                     list($url, $param) = $this->parseUrl($url);
                     $parseStr .= '<a href="javascript:;" onclick="clear_recyclebin(\'<?php echo \think\Url::build(\'' . $url . '\', [' . $param . ']); ?>\')" class="btn btn-danger radius mr-5"><i class="Hui-iconfont">&#xe6e2;</i> ' . $title . '</a>';
                     break;
+                case 'ssaveorder':
+                case 'saveorder':
+                    $title = isset($titleArr[$k]) && $titleArr[$k] ? $titleArr[$k] : '保存排序';
+                    $parseStr .= '<a href="javascript:;" onclick="saveOrder()" class="btn btn-primary radius mr-5"><i class="Hui-iconfont">&#xe632;</i> ' . $title . '</a>';
+                    break;
                 case 'edit':
                 case 'sedit':
                     $title = isset($titleArr[$k]) && $titleArr[$k] ? $titleArr[$k] : '编辑';

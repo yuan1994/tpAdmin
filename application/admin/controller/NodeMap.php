@@ -17,8 +17,8 @@ namespace app\admin\controller;
 \think\Loader::import('controller/Controller', \think\Config::get('traits_path') , EXT);
 
 use app\admin\Controller;
-use think\Db;
 use think\Loader;
+use app\admin\logic\NodeMap as LogicNodeMap;
 
 class NodeMap extends Controller
 {
@@ -43,7 +43,8 @@ class NodeMap extends Controller
      */
     public function load()
     {
-        Loader::model('NodeMap', 'logic')->load('admin', ['Ueditor', 'Generate', 'Error']);
+        $logicNodeMap = new LogicNodeMap();
+        $logicNodeMap->load('admin', LogicNodeMap::METHOD_ALL, ['Ueditor', 'Generate', 'Error']);
 
         return ajax_return_adv('导入成功', 'current');
     }

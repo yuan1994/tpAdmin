@@ -1,0 +1,33 @@
+{
+  "name": "simplecontextmenu",
+  "version": "1.3.2",
+  "title": "Simple Context Menu",
+  "description": "Very simple to use, good looking right click context menu.",
+  "author": {
+    "name": "Joe Walnes",
+    "email": "joe@walnes.com",
+    "url": "http://joewalnes.com/"
+  },
+  "keywords": [
+    "ui",
+    "menu",
+    "contextmenu",
+    "context-menu",
+    "rightclick",
+    "right-click"
+  ],
+  "dependencies": {
+    "jquery": ">=1.3"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/joewalnes/jquery-simple-context-menu/master/LICENSE.txt"
+    }
+  ],
+  "homepage": "https://github.com/joewalnes/jquery-simple-context-menu",
+  "docs": "https://github.com/joewalnes/jquery-simple-context-menu",
+  "demo": "http://joewalnes.github.com/jquery-simple-context-menu/example.html",
+  "download": "https://github.com/joewalnes/jquery-simple-context-menu/archive/master.zip",
+  "bugs": "https://github.com/joewalnes/jquery-simple-context-menu/issues"
+}
