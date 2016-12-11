@@ -40,14 +40,14 @@ var setting = {
     }
 };
 
+// 默认选中模块
+var currentModuleId = getHash('mid', 1);
+initGroup(currentModuleId);
+
 $(function () {
     // 设置高度
     var groupHeight = $('.tp-page-aside').height() - $('.tp-panel-module').outerHeight() - 150;
     $('.tp-panel-group .panel-body').height(groupHeight);
-
-    // 默认选中模块
-    var currentModuleId = getHash('mid', 1);
-    initGroup(currentModuleId);
 });
 
 /**
