@@ -47,7 +47,7 @@ class NodeMap
             $insertMap = [];
             $controller = str_replace('\\', '.', str_replace('app\\' . $module . '\\controller\\', '', $class['class']));
             foreach ($class['method'] as $method) {
-                if (!isset($maps[$controller]) && !isset($maps[$controller][$method['name']])) {
+                if (!isset($maps[$controller]) || !isset($maps[$controller][$method['name']])) {
                     $insertMap[] = [
                         'module'     => $module,
                         'controller' => $controller,
