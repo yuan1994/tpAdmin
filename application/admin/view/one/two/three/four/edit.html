@@ -1,0 +1,161 @@
+{extend name="template/base" /}
+{block name="content"}
+<div class="page-container">
+    <form class="form form-horizontal" id="form" method="post" action="{:\\think\\Request::instance()->baseUrl()}">
+        <input type="hidden" name="id" value="{$vo.id ?? ''}">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>字段一：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" placeholder="字段一" name="field1" value="{$vo.field1 ?? ''}"  datatype="*" nullmsg="请填写字段一">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">选填：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" placeholder="选填" name="option" value="{$vo.option ?? ''}" >
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">下拉框：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <div class="select-box">
+                    <select name="select" class="select">
+                        <option value="1">选项一</option>
+                        <option value="2">选项二</option>
+                        <option value="3">选项三</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">单选：</label>
+            <div class="formControls col-xs-6 col-sm-6 skin-minimal">
+                {foreach name="$Think.config.conf.sex" item='v' key='k'}
+                <div class="radio-box">
+                    <input type="radio" name="radio" id="radio-{$k}" value="{$k}">
+                    <label for="radio-{$k}">{$v}</label>
+                </div>
+                {/foreach}
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">复选框：</label>
+            <div class="formControls col-xs-6 col-sm-6 skin-minimal">
+                <div class="radio-box">
+                    <input type="checkbox" name="checkbox[]" id="checkbox-1" value="1">
+                    <label for="checkbox-1">选项一</label>
+                </div>
+                <div class="radio-box">
+                    <input type="checkbox" name="checkbox[]" id="checkbox-2" value="2">
+                    <label for="checkbox-2">选项二</label>
+                </div>
+                <div class="radio-box">
+                    <input type="checkbox" name="checkbox[]" id="checkbox-3" value="3">
+                    <label for="checkbox-3">选项三</label>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">密码：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="password" class="input-text" placeholder="密码" name="password" value="{$vo.password ?? ''}" >
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3">文本域：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <textarea class="textarea" placeholder="" name="textarea" onKeyUp="textarealength(this, 100)">{$vo.textarea ?? ''}</textarea>
+                <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>日期：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text Wdate" placeholder="日期" name="date" value="{$vo.date ?? ''}" {literal} onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" {/literal}  datatype="*" nullmsg="请选择日期">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>手机号：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" placeholder="手机号" name="mobile" value="{$vo.mobile ?? ''}"  datatype="/^1[34578]\d{9}$/" nullmsg="请填写手机号" errormsg="手机号格式错误">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>邮箱：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="text" class="input-text" placeholder="邮箱" name="email" value="{$vo.email ?? ''}"  datatype="e" nullmsg="请填写邮箱" errormsg="邮箱格式错误">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>排序：</label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <input type="number" class="input-text" placeholder="排序" name="sort" value="{$vo.sort ?? '50'}"  datatype="*" nullmsg="请填写排序">
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>状态：</label>
+            <div class="formControls col-xs-6 col-sm-6 skin-minimal">
+                <div class="radio-box">
+                    <input type="radio" name="status" id="status-1" value="1" datatype="*" nullmsg="请选择状态">
+                    <label for="status-1">启用</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" name="status" id="status-0" value="0" datatype="*" nullmsg="请选择状态">
+                    <label for="status-0">禁用</label>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3"></div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary radius">&nbsp;&nbsp;提交&nbsp;&nbsp;</button>
+                <button type="button" class="btn btn-default radius ml-20" onClick="layer_close();">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__LIB__/Validform/5.3.2/Validform.min.js"></script>
+<script type="text/javascript" src="__LIB__/My97DatePicker/WdatePicker.js"></script>
+<script>
+    $(function () {
+        $("[name='radio'][value='{$vo.radio ?? '1'}']").attr("checked", true);
+        var checks = ''.split(",");
+        if (checks.length > 0){
+            for (var i in checks){
+                $("[name='checkbox[]'][value='"+checks[i]+"']").attr("checked", true);
+            }
+        }
+        $("[name='status'][value='{$vo.status ?? '1'}']").attr("checked", true);
+        $("[name='select']").find("[value='{$vo.select ?? ''}']").attr("selected", true);
+
+        $('.skin-minimal input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        $("#form").Validform({
+            tiptype: 2,
+            ajaxPost: true,
+            showAllError: true,
+            callback: function (ret){
+                ajax_progress(ret);
+            }
+        });
+    })
+</script>
+{/block}

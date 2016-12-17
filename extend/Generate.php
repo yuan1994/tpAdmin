@@ -78,6 +78,21 @@ class Generate
         if (!self::checkWritable($pathCheck)) {
             throw new Exception("目录没有权限不可写，请执行一下命令修改权限：<br>chmod -R 755 " . realpath($pathCheck), 403);
         }
+        if (isset($data['model']) && $data['model']) {
+            $module = $this->readConfig($this->module, 'app', 'model_path', Config::get('app.model_path'));
+            $pathCheck = APP_PATH . $module . DS;
+            if (!self::checkWritable($pathCheck)) {
+                throw new Exception("目录没有权限不可写，请执行一下命令修改权限：<br>chmod -R 755 " . realpath($pathCheck), 403);
+            }
+        }
+        if (isset($data['validate']) && $data['validate']) {
+            $module = $this->readConfig($this->module, 'app', 'validate_path', Config::get('app.validate_path'));
+            $pathCheck = APP_PATH . $module . DS;
+            if (!self::checkWritable($pathCheck)) {
+                throw new Exception("目录没有权限不可写，请执行一下命令修改权限：<br>chmod -R 755 " . realpath($pathCheck), 403);
+            }
+        }
+
         // 将菜单全部转为小写
         if (isset($data['menu']) && $data['menu']) {
             foreach ($data['menu'] as &$menu) {
@@ -122,15 +137,17 @@ class Generate
         }
 
         // 创建目录
-        $dir_list = ["view" . DS . $this->dir . $this->nameLower];
+        $dir_list = [$this->module . DS . "view" . DS . $this->dir . $this->nameLower];
         if (isset($data['model']) && $data['model']) {
-            $dir_list[] = "model" . DS . $this->dir;
+            $module = $this->readConfig($this->module, 'app', 'model_path', Config::get('app.model_path'));
+            $dir_list[] = $module . DS . "model";
         }
         if (isset($data['validate']) && $data['validate']) {
-            $dir_list[] = "validate" . DS . $this->dir;
+            $module = $this->readConfig($this->module, 'app', 'validate_path', Config::get('app.validate_path'));
+            $dir_list[] = $module . DS . "validate" . DS . $this->dir;
         }
         if ($this->dir) {
-            $dir_list[] = "controller" . DS . $this->dir;
+            $dir_list[] = $this->module . DS . "controller" . DS . $this->dir;
         }
         $this->buildDir($dir_list);
 
@@ -350,11 +367,8 @@ class Generate
     {
         // 获取模型的路径，根据配置文件读取
         $module = $this->readConfig($this->module, 'app', 'model_path', Config::get('app.model_path'));
-        $file = str_replace(
-            ['%MODULE%', '%NAME%'],
-            [$module, 'model'],
-            $phpFile
-        );
+        $name = $this->parseCamelCase($this->dir) . $this->name;
+        $file = APP_PATH . $module . DS . "model" . DS . $name . ".php";
 
         return $this->deleteFile($file);
     }
@@ -462,7 +476,7 @@ class Generate
     private function buildDir($dir_list)
     {
         foreach ($dir_list as $dir) {
-            $path = APP_PATH . $this->module . DS . $dir;
+            $path = APP_PATH . $dir;
             if (!is_dir($path)) {
                 // 创建目录
                 mkdir($path, 0755, true);
@@ -640,11 +654,9 @@ class Generate
         $template = file_get_contents($pathTemplate . "Model.tpl");
         // 获取模型的路径，根据配置文件读取
         $module = $this->readConfig($this->module, 'app', 'model_path', Config::get('app.model_path'));
-        $file = str_replace(
-            ['%MODULE%', '%NAME%'],
-            [$module, 'model'],
-            $fileName
-        );
+        $name = $this->parseCamelCase($this->dir) . $this->name;
+        $file = APP_PATH . $module . DS . "model" . DS . $name . ".php";
+
         $autoTimestamp = '';
         if (isset($this->data['auto_timestamp']) && $this->data['auto_timestamp']) {
             $autoTimestamp = '// 开启自动写入时间戳字段' . "\n"
@@ -653,7 +665,7 @@ class Generate
 
         return file_put_contents($file, str_replace(
                 ["[MODULE]", "[TITLE]", "[NAME]", "[NAMESPACE]", "[TABLE]", "[AUTO_TIMESTAMP]"],
-                [$module, $this->data['title'], $this->name, $this->namespaceSuffix, $tableName, $autoTimestamp],
+                [$module, $this->data['title'], $name, '', $tableName, $autoTimestamp],
                 $template
             )
         );
@@ -1167,5 +1179,19 @@ class Generate
         } else {
             return $config;
         }
+    }
+
+    /**
+     * 将one/two/three转为OneTwoThree
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
+    private function parseCamelCase($name)
+    {
+        return preg_replace_callback('/((^|\\' . quotemeta(DS) . ')([a-z]))/', function ($matches) {
+            return strtoupper($matches[3]);
+        }, trim($name, DS));
     }
 }

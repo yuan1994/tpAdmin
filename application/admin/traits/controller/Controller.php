@@ -76,7 +76,10 @@ trait Controller
             }
 
             // 写入数据
-            if (class_exists($modelClass = Loader::parseClass(Config::get('app.model_path'), 'model', $controller))) {
+            if (
+                class_exists($modelClass = Loader::parseClass(Config::get('app.model_path'), 'model', $this->parseCamelCase($controller)))
+                || class_exists($modelClass = Loader::parseClass(Config::get('app.model_path'), 'model', $controller))
+            ) {
                 //使用模型写入，可以在模型中定义更高级的操作
                 $model = new $modelClass();
                 $ret = $model->isUpdate(false)->save($data);
@@ -127,7 +130,10 @@ trait Controller
             }
 
             // 更新数据
-            if (class_exists($modelClass = Loader::parseClass(Config::get('app.model_path'), 'model', $controller))) {
+            if (
+                class_exists($modelClass = Loader::parseClass(Config::get('app.model_path'), 'model', $this->parseCamelCase($controller)))
+                || class_exists($modelClass = Loader::parseClass(Config::get('app.model_path'), 'model', $controller))
+            ) {
                 // 使用模型更新，可以在模型中定义更高级的操作
                 $model = new $modelClass();
                 $ret = $model->isUpdate(true)->save($data, ['id' => $data['id']]);

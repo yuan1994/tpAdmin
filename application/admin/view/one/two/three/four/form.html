@@ -1,0 +1,11 @@
+<form class="mb-20" method="get" action="{:\\think\\Url::build($Request.action)}">
+    <input type="text" class="input-text" style="width:250px" placeholder="字段一" name="field1" value="{$Request.param.field1}" >
+    <div class="select-box" style="width:250px">
+        <select name="select" class="select">
+            <option value="1">选项一</option>
+            <option value="2">选项二</option>
+            <option value="3">选项三</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+</form>

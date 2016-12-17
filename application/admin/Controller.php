@@ -118,8 +118,11 @@ class Controller
         if (!$controller) {
             $controller = $this->request->controller();
         }
-        if (class_exists($modelName = Loader::parseClass($module, 'model', $controller))) {
-            $model = new $modelName();
+        if (
+            class_exists($modelClass = Loader::parseClass($module, 'model', $this->parseCamelCase($controller)))
+            || class_exists($modelClass = Loader::parseClass($module, 'model', $controller))
+        ) {
+            $model = new $modelClass();
             $modelType = 'model';
         } else {
             $model = Db::name($this->parseTable($controller));
@@ -400,5 +403,19 @@ class Controller
                 $this->view->assign('numPerPage', 0);
             }
         }
+    }
+
+    /**
+     * 将abc.def.Gh转为AbcDefGh
+     *
+     * @param $string
+     *
+     * @return mixed
+     */
+    protected function parseCamelCase($string)
+    {
+        return preg_replace_callback('/(\.|^)([a-zA-Z])/', function ($match) {
+            return ucfirst($match[2]);
+        }, $string);
     }
 }

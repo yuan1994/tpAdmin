@@ -1,0 +1,15 @@
+<td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
+<td>{$vo.field1|high_light=$Request.param.field1}</td>
+<td>{$vo.option}</td>
+<td>{$vo.select}</td>
+<td>{$vo.radio}</td>
+<td>{$vo.checkbox}</td>
+<td>{$vo.password}</td>
+<td>{$vo.textarea}</td>
+<td>{$vo.date}</td>
+<td>{$vo.mobile}</td>
+<td>{$vo.email}</td>
+<td style="padding: 0">
+    <input type="number" name="sort[{$vo.id}]" value="{$vo.sort}" style="width: 60px;"
+        class="input-text text-c order-input" data-id="{$vo.id}"></td>
+<td>{$vo.status|get_status}</td>

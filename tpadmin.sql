@@ -4,13 +4,13 @@ Navicat MySQL Data Transfer
 Source Server         : localhost
 Source Server Version : 50716
 Source Host           : localhost:3306
-Source Database       : tpadmin
+Source Database       : tpadmin_source
 
 Target Server Type    : MYSQL
 Target Server Version : 50716
 File Encoding         : 65001
 
-Date: 2016-12-10 20:18:41
+Date: 2016-12-17 12:15:26
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -80,7 +80,7 @@ CREATE TABLE `tp_admin_node` (
   KEY `isdelete` (`isdelete`),
   KEY `sort` (`sort`),
   KEY `group_id` (`group_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM AUTO_INCREMENT=63 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of tp_admin_node
@@ -108,7 +108,7 @@ INSERT INTO `tp_admin_node` VALUES ('20', '1', '2', 'Demo/qrcode', '二维码生
 INSERT INTO `tp_admin_node` VALUES ('21', '1', '1', 'NodeMap', '节点图', '', '2', '1', '5', '1', '0');
 INSERT INTO `tp_admin_node` VALUES ('22', '1', '1', 'WebLog', '操作日志', '', '2', '1', '6', '1', '0');
 INSERT INTO `tp_admin_node` VALUES ('23', '1', '1', 'LoginLog', '登录日志', '', '2', '1', '7', '1', '0');
-INSERT INTO `tp_admin_node` VALUES ('59', '1', '2', 'one.two.three.Forth/index', '多级节点', '', '2', '0', '50', '1', '0');
+INSERT INTO `tp_admin_node` VALUES ('59', '1', '2', 'one.two.three.Four/index', '多级节点', '', '2', '0', '50', '1', '0');
 INSERT INTO `tp_admin_node` VALUES ('24', '23', '0', 'index', '首页', '', '3', '0', '50', '1', '0');
 INSERT INTO `tp_admin_node` VALUES ('25', '22', '0', 'index', '列表', '', '3', '0', '50', '1', '0');
 INSERT INTO `tp_admin_node` VALUES ('26', '22', '0', 'detail', '详情', '', '3', '0', '50', '1', '0');
@@ -141,9 +141,10 @@ INSERT INTO `tp_admin_node` VALUES ('52', '2', '0', 'add', '添加', '', '3', '0
 INSERT INTO `tp_admin_node` VALUES ('53', '2', '0', 'edit', '编辑', '', '3', '0', '50', '1', '0');
 INSERT INTO `tp_admin_node` VALUES ('54', '2', '0', 'forbid', '默认禁用操作', '', '3', '0', '51', '1', '0');
 INSERT INTO `tp_admin_node` VALUES ('55', '2', '0', 'resume', '默认恢复操作', '', '3', '0', '50', '1', '0');
-INSERT INTO `tp_admin_node` VALUES ('56', '1', '2', 'one', '多级菜单演示', '', '2', '1', '13', '1', '0');
-INSERT INTO `tp_admin_node` VALUES ('57', '1', '2', 'two', '三级菜单', '', '1', '1', '0', '1', '0');
-INSERT INTO `tp_admin_node` VALUES ('58', '1', '2', 'three', '四级菜单', '', '2', '0', '4', '1', '0');
+INSERT INTO `tp_admin_node` VALUES ('56', '1', '2', 'one', '一级菜单', '', '2', '1', '13', '1', '0');
+INSERT INTO `tp_admin_node` VALUES ('60', '56', '2', 'two', '二级', '', '3', '1', '50', '1', '0');
+INSERT INTO `tp_admin_node` VALUES ('61', '60', '2', 'three', '三级菜单', '', '4', '1', '50', '1', '0');
+INSERT INTO `tp_admin_node` VALUES ('62', '61', '2', 'Four', '四级菜单', '', '5', '1', '50', '1', '0');
 
 -- ----------------------------
 -- Table structure for tp_admin_node_load
@@ -268,7 +269,7 @@ CREATE TABLE `tp_login_log` (
   `login_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `uid` (`uid`)
-) ENGINE=InnoDB AUTO_INCREMENT=717 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of tp_login_log
@@ -292,6 +293,36 @@ CREATE TABLE `tp_node_map` (
 -- ----------------------------
 -- Records of tp_node_map
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for tp_one_two_three_four
+-- ----------------------------
+DROP TABLE IF EXISTS `tp_one_two_three_four`;
+CREATE TABLE `tp_one_two_three_four` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '四级控制器主键',
+  `field1` varchar(255) DEFAULT NULL COMMENT '字段一',
+  `option` varchar(255) DEFAULT NULL COMMENT '选填',
+  `select` varchar(255) DEFAULT NULL COMMENT '下拉框',
+  `radio` varchar(255) DEFAULT NULL COMMENT '单选',
+  `checkbox` varchar(255) DEFAULT NULL COMMENT '复选框',
+  `password` varchar(255) DEFAULT NULL COMMENT '密码',
+  `textarea` varchar(255) DEFAULT NULL COMMENT '文本域',
+  `date` varchar(255) DEFAULT NULL COMMENT '日期',
+  `mobile` varchar(255) DEFAULT NULL COMMENT '手机号',
+  `email` varchar(255) DEFAULT NULL COMMENT '邮箱',
+  `sort` smallint(5) DEFAULT '50' COMMENT '排序',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '状态，1-正常 | 0-禁用',
+  `isdelete` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '删除状态，1-删除 | 0-正常',
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `sort` (`sort`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='四级控制器';
+
+-- ----------------------------
+-- Records of tp_one_two_three_four
+-- ----------------------------
+INSERT INTO `tp_one_two_three_four` VALUES ('1', 'yuan1994', 'tpadmin', '2', '1', null, '2222', 'https://github.com/yuan1994/tpadmin', '2016-12-07', '13012345678', 'tianpian0805@gmail.com', '50', '1', '0', '1481947278', '1481947353');
 
 -- ----------------------------
 -- Table structure for tp_web_log_001
