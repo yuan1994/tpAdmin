@@ -101,11 +101,31 @@ class WebLog
     }
 
     /**
+     * module_init同名函数，ThinkPHP5.0.4默默的将行为规范为psr-4标准
+     *
+     * @param $param
+     */
+    public function moduleInit(&$param)
+    {
+        $this->init();
+    }
+
+    /**
      * 应用执行完
      *
      * @param $param
      */
     public function app_end(&$param)
+    {
+        $this->record();
+    }
+
+    /**
+     * app_end同名函数，ThinkPHP5.0.4默默的将行为规范为psr-4标准
+     *
+     * @param $param
+     */
+    public function appEnd(&$param)
     {
         $this->record();
     }

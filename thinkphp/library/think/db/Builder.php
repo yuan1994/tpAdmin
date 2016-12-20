@@ -37,22 +37,33 @@ abstract class Builder
     /**
      * 架构函数
      * @access public
-     * @param Connection $connection 数据库连接对象实例
+     * @param Connection    $connection 数据库连接对象实例
+     * @param Query         $query      数据库查询对象实例
      */
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, Query $query)
     {
         $this->connection = $connection;
+        $this->query      = $query;
     }
 
     /**
-     * 设置当前的Query对象实例
-     * @access protected
-     * @param Query $query 当前查询对象实例
+     * 获取当前的连接对象实例
+     * @access public
      * @return void
      */
-    public function setQuery(Query $query)
+    public function getConnection()
     {
-        $this->query = $query;
+        return $this->connection;
+    }
+
+    /**
+     * 获取当前的Query对象实例
+     * @access public
+     * @return void
+     */
+    public function getQuery()
+    {
+        return $this->query;
     }
 
     /**
@@ -90,7 +101,7 @@ abstract class Builder
         $result = [];
         foreach ($data as $key => $val) {
             $item = $this->parseKey($key, $options);
-            if (!in_array($key, $fields, true)) {
+            if (false === strpos($key, '.') && !in_array($key, $fields, true)) {
                 if ($options['strict']) {
                     throw new Exception('fields not exists:[' . $key . ']');
                 }
@@ -100,9 +111,10 @@ abstract class Builder
                 $result[$item] = 'NULL';
             } elseif (is_scalar($val)) {
                 // 过滤非标量数据
-                if ($this->query->isBind(substr($val, 1))) {
+                if (0 === strpos($val, ':') && $this->query->isBind(substr($val, 1))) {
                     $result[$item] = $val;
                 } else {
+                    $key = str_replace('.', '_', $key);
                     $this->query->bind($key, $val, isset($bind[$key]) ? $bind[$key] : PDO::PARAM_STR);
                     $result[$item] = ':' . $key;
                 }
@@ -182,6 +194,9 @@ abstract class Builder
         $item = [];
         foreach ((array) $tables as $key => $table) {
             if (!is_numeric($key)) {
+                if (strpos($key, '@think')) {
+                    $key = strstr($key, '@think', true);
+                }
                 $key    = $this->parseSqlTable($key);
                 $item[] = $this->parseKey($key) . ' ' . $this->parseKey($table);
             } else {
@@ -306,7 +321,7 @@ abstract class Builder
         if (is_scalar($value) && array_key_exists($field, $binds) && !in_array($exp, ['EXP', 'NOT NULL', 'NULL', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN']) && strpos($exp, 'TIME') === false) {
             if (strpos($value, ':') !== 0 || !$this->query->isBind(substr($value, 1))) {
                 if ($this->query->isBind($bindName)) {
-                    $bindName .= '_' . uniqid();
+                    $bindName .= '_' . str_replace('.', '_', uniqid('', true));
                 }
                 $this->query->bind($bindName, $value, $bindType);
                 $value = ':' . $bindName;
@@ -333,8 +348,13 @@ abstract class Builder
                     $bind  = [];
                     $array = [];
                     foreach ($value as $k => $v) {
-                        $bind[$bindName . '_in_' . $k] = [$v, $bindType];
-                        $array[]                       = ':' . $bindName . '_in_' . $k;
+                        if ($this->query->isBind($bindName . '_in_' . $k)) {
+                            $bindKey = $bindName . '_in_' . uniqid() . '_' . $k;
+                        } else {
+                            $bindKey = $bindName . '_in_' . $k;
+                        }
+                        $bind[$bindKey] = [$v, $bindType];
+                        $array[]        = ':' . $bindKey;
                     }
                     $this->query->bind($bind);
                     $zone = implode(',', $array);
@@ -347,12 +367,19 @@ abstract class Builder
             // BETWEEN 查询
             $data = is_array($value) ? $value : explode(',', $value);
             if (array_key_exists($field, $binds)) {
+                if ($this->query->isBind($bindName . '_between_1')) {
+                    $bindKey1 = $bindName . '_between_1' . uniqid();
+                    $bindKey2 = $bindName . '_between_2' . uniqid();
+                } else {
+                    $bindKey1 = $bindName . '_between_1';
+                    $bindKey2 = $bindName . '_between_2';
+                }
                 $bind = [
-                    $bindName . '_between_1' => [$data[0], $bindType],
-                    $bindName . '_between_2' => [$data[1], $bindType],
+                    $bindKey1 => [$data[0], $bindType],
+                    $bindKey2 => [$data[1], $bindType],
                 ];
                 $this->query->bind($bind);
-                $between = ':' . $bindName . '_between_1' . ' AND :' . $bindName . '_between_2';
+                $between = ':' . $bindKey1 . ' AND :' . $bindKey2;
             } else {
                 $between = $this->parseValue($data[0], $field) . ' AND ' . $this->parseValue($data[1], $field);
             }
@@ -397,12 +424,23 @@ abstract class Builder
     protected function parseDateTime($value, $key, $options = [], $bindName = null, $bindType = null)
     {
         // 获取时间字段类型
-        $type = $this->query->getFieldsType($options);
+        if (strpos($key, '.')) {
+            list($table, $key) = explode('.', $key);
+            if (isset($options['alias']) && $pos = array_search($table, $options['alias'])) {
+                $table = $pos;
+            }
+        } else {
+            $table = $options['table'];
+        }
+        $type = $this->query->getTableInfo($table, 'type');
         if (isset($type[$key])) {
             $info = $type[$key];
         }
         if (isset($info)) {
-            $value = strtotime($value) ?: $value;
+            if (is_string($value)) {
+                $value = strtotime($value) ?: $value;
+            }
+
             if (preg_match('/(datetime|timestamp)/is', $info)) {
                 // 日期及时间戳类型
                 $value = date('Y-m-d H:i:s', $value);

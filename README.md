@@ -66,7 +66,7 @@ https://github.com/yuan1994/tpadmin/archive/master.zip
 
 ## 鸣谢：
 本平台使用了如下框架或插件、源码
-* ThinkPHP 5.0.3 正式版
+* ThinkPHP 5.0.4 正式版
 * Hui.admin v2.5 
 * layer
 * jQuery Validform

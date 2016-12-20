@@ -34,6 +34,8 @@ class Validate
 
     // 验证提示信息
     protected $message = [];
+    // 验证字段描述
+    protected $field = [];
 
     // 验证规则默认提示信息
     protected static $typeMsg = [
@@ -70,8 +72,8 @@ class Validate
         'expire'      => '不在有效期内 :rule',
         'allowIp'     => '不允许的IP访问',
         'denyIp'      => '禁止的IP访问',
-        'confirm'     => ':attribute和字段 :rule 不一致',
-        'different'   => ':attribute和字段 :rule 不能相同',
+        'confirm'     => ':attribute和确认字段:2不一致',
+        'different'   => ':attribute和比较字段:2不能相同',
         'egt'         => ':attribute必须大于等于 :rule',
         'gt'          => ':attribute必须大于 :rule',
         'elt'         => ':attribute必须小于等于 :rule',
@@ -107,11 +109,13 @@ class Validate
      * @access public
      * @param array $rules 验证规则
      * @param array $message 验证提示信息
+     * @param array $field 验证字段描述信息
      */
-    public function __construct(array $rules = [], $message = [])
+    public function __construct(array $rules = [], $message = [], $field = [])
     {
         $this->rule    = array_merge($this->rule, $rules);
         $this->message = array_merge($this->message, $message);
+        $this->field   = array_merge($this->field, $field);
     }
 
     /**
@@ -119,12 +123,13 @@ class Validate
      * @access public
      * @param array     $rules 验证规则
      * @param array     $message 验证提示信息
+     * @param array     $field 验证字段描述信息
      * @return Validate
      */
-    public static function make($rules = [], $message = [])
+    public static function make($rules = [], $message = [], $field = [])
     {
         if (is_null(self::$instance)) {
-            self::$instance = new self($rules, $message);
+            self::$instance = new self($rules, $message, $field);
         }
         return self::$instance;
     }
@@ -217,6 +222,17 @@ class Validate
     }
 
     /**
+     * 判断是否存在某个验证场景
+     * @access public
+     * @param string $name 场景名
+     * @return bool
+     */
+    public function hasScene($name)
+    {
+        return isset($this->scene[$name]);
+    }
+
+    /**
      * 设置批量验证
      * @access public
      * @param bool $batch  是否批量验证
@@ -280,7 +296,7 @@ class Validate
                 // 字段|描述 用于指定属性名称
                 list($key, $title) = explode('|', $key);
             } else {
-                $title = $key;
+                $title = isset($this->field[$key]) ? $this->field[$key] : $key;
             }
 
             // 场景检测
@@ -301,7 +317,12 @@ class Validate
             $value = $this->getDataValue($data, $key);
 
             // 字段验证
-            $result = $this->checkItem($key, $value, $rule, $data, $title, $msg);
+            if ($rule instanceof \Closure) {
+                // 匿名函数验证 支持传入当前字段和所有字段两个数据
+                $result = call_user_func_array($rule, [$value, $data]);
+            } else {
+                $result = $this->checkItem($key, $value, $rule, $data, $title, $msg);
+            }
 
             if (true !== $result) {
                 // 没有返回true 则表示验证失败
@@ -334,82 +355,89 @@ class Validate
      */
     protected function checkItem($field, $value, $rules, $data, $title = '', $msg = [])
     {
-        if ($rules instanceof \Closure) {
-            // 匿名函数验证 支持传入当前字段和所有字段两个数据
-            $result = call_user_func_array($rules, [$value, $data]);
-        } else {
-            // 支持多规则验证 require|in:a,b,c|... 或者 ['require','in'=>'a,b,c',...]
-            if (is_string($rules)) {
-                $rules = explode('|', $rules);
-            }
-            $i = 0;
-            foreach ($rules as $key => $rule) {
-                if ($rule instanceof \Closure) {
-                    $result = call_user_func_array($rule, [$value, $data]);
-                } else {
-                    // 判断验证类型
-                    if (is_numeric($key)) {
-                        if (strpos($rule, ':')) {
-                            list($type, $rule) = explode(':', $rule, 2);
-                            if (isset($this->alias[$type])) {
-                                // 判断别名
-                                $type = $this->alias[$type];
-                            }
-                            $info = $type;
-                        } elseif (method_exists($this, $rule)) {
-                            $type = $rule;
-                            $info = $rule;
-                            $rule = '';
-                        } else {
-                            $type = 'is';
-                            $info = $rule;
-                        }
-                    } else {
-                        $info = $type = $key;
-                    }
-
-                    // 如果不是require 有数据才会行验证
-                    if (0 === strpos($info, 'require') || (!is_null($value) && '' !== $value)) {
-                        // 验证类型
-                        $callback = isset(self::$type[$type]) ? self::$type[$type] : [$this, $type];
-                        // 验证数据
-                        $result = call_user_func_array($callback, [$value, $rule, $data, $field]);
-                    } else {
-                        $result = true;
-                    }
-                }
-
-                if (false === $result) {
-                    // 验证失败 返回错误信息
-                    if (isset($msg[$i])) {
-                        $message = $msg[$i];
-                        if (is_string($message) && strpos($message, '{%') === 0) {
-                            $message = Lang::get(substr($message, 2, -1));
-                        }
-                    } else {
-                        $message = $this->getRuleMsg($field, $title, $info, $rule);
-                    }
-                    return $message;
-                } elseif (true !== $result) {
-                    // 返回自定义错误信息
-                    return $result;
-                }
-                $i++;
-            }
+        // 支持多规则验证 require|in:a,b,c|... 或者 ['require','in'=>'a,b,c',...]
+        if (is_string($rules)) {
+            $rules = explode('|', $rules);
         }
-        return true !== $result ? $result : true;
+        $i = 0;
+        foreach ($rules as $key => $rule) {
+            if ($rule instanceof \Closure) {
+                $result = call_user_func_array($rule, [$value, $data]);
+                $info   = is_numeric($key) ? '' : $key;
+            } else {
+                // 判断验证类型
+                if (is_numeric($key)) {
+                    if (strpos($rule, ':')) {
+                        list($type, $rule) = explode(':', $rule, 2);
+                        if (isset($this->alias[$type])) {
+                            // 判断别名
+                            $type = $this->alias[$type];
+                        }
+                        $info = $type;
+                    } elseif (method_exists($this, $rule)) {
+                        $type = $rule;
+                        $info = $rule;
+                        $rule = '';
+                    } else {
+                        $type = 'is';
+                        $info = $rule;
+                    }
+                } else {
+                    $info = $type = $key;
+                }
+
+                // 如果不是require 有数据才会行验证
+                if (0 === strpos($info, 'require') || (!is_null($value) && '' !== $value)) {
+                    // 验证类型
+                    $callback = isset(self::$type[$type]) ? self::$type[$type] : [$this, $type];
+                    // 验证数据
+                    $result = call_user_func_array($callback, [$value, $rule, $data, $field, $title]);
+                } else {
+                    $result = true;
+                }
+            }
+
+            if (false === $result) {
+                // 验证失败 返回错误信息
+                if (isset($msg[$i])) {
+                    $message = $msg[$i];
+                    if (is_string($message) && strpos($message, '{%') === 0) {
+                        $message = Lang::get(substr($message, 2, -1));
+                    }
+                } else {
+                    $message = $this->getRuleMsg($field, $title, $info, $rule);
+                }
+                return $message;
+            } elseif (true !== $result) {
+                // 返回自定义错误信息
+                if (is_string($result) && false !== strpos($result, ':')) {
+                    $result = str_replace([':attribute', ':rule'], [$title, (string) $rule], $result);
+                }
+                return $result;
+            }
+            $i++;
+        }
+        return $result;
     }
 
     /**
      * 验证是否和某个字段的值一致
      * @access protected
-     * @param mixed     $value  字段值
+     * @param mixed     $value 字段值
      * @param mixed     $rule  验证规则
      * @param array     $data  数据
+     * @param string    $field 字段名
      * @return bool
      */
-    protected function confirm($value, $rule, $data)
+    protected function confirm($value, $rule, $data, $field = '')
     {
+        if ('' == $rule) {
+            if (strpos($field, '_confirm')) {
+                $rule = strstr($field, '_confirm', true);
+            } else {
+                $rule = $field . '_confirm';
+            }
+        }
         return $this->getDataValue($data, $rule) == $value;
     }
 
@@ -1174,6 +1202,8 @@ class Validate
     {
         if (isset($this->message[$attribute . '.' . $type])) {
             $msg = $this->message[$attribute . '.' . $type];
+        } elseif (isset($this->message[$attribute][$type])) {
+            $msg = $this->message[$attribute][$type];
         } elseif (isset($this->message[$attribute])) {
             $msg = $this->message[$attribute];
         } elseif (isset(self::$typeMsg[$type])) {
@@ -1182,11 +1212,11 @@ class Validate
             $msg = $title . '规则错误';
         }
 
-        if (is_string($msg) && strpos($msg, '{%')) {
+        if (is_string($msg) && 0 === strpos($msg, '{%')) {
             $msg = Lang::get(substr($msg, 2, -1));
         }
 
-        if (is_string($msg) && false !== strpos($msg, ':')) {
+        if (is_string($msg) && is_string($rule) && false !== strpos($msg, ':')) {
             // 变量替换
             if (strpos($rule, ',')) {
                 $array = array_pad(explode(',', $rule), 3, '');
@@ -1228,7 +1258,7 @@ class Validate
 
     public static function __callStatic($method, $params)
     {
-        $class = new static;
+        $class = self::make();
         if (method_exists($class, $method)) {
             return call_user_func_array([$class, $method], $params);
         } else {
