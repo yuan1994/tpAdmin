@@ -60,6 +60,9 @@ class AdminNode extends Controller
                         ->where("isdelete=0 AND level=2 AND pid='{$moduleId}'")
                         ->field('group_id')
                         ->select();
+                    if (!$node) {
+                        return ajax_return_error('该模块下没有任何节点');
+                    }
                     // 分组下菜单个数
                     $groupId = [];
                     foreach ($node as $vo) {
