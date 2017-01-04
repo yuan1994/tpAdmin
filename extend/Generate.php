@@ -493,7 +493,7 @@ class Generate
         $file = $path . "edit.html";
 
         //TODO 自定义模板路径
-        if ($this->module == Request::instance()->module()) {
+        if ($this->module == Request::instance()->module() || !$this->module) {
             $module = '';
         } else {
             $module = Request::instance()->module() . '@';
@@ -1190,7 +1190,8 @@ class Generate
      */
     private function parseCamelCase($name)
     {
-        return preg_replace_callback('/((^|\\' . quotemeta(DS) . ')([a-z]))/', function ($matches) {
+        $pattern = DS == '\\' ? '/((^|\\\\)([a-z]))/' : '/((^|\\/)([a-z]))/';
+        return preg_replace_callback($pattern, function ($matches) {
             return strtoupper($matches[3]);
         }, trim($name, DS));
     }
