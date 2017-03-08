@@ -939,12 +939,12 @@ class Generate
                         case "checkbox":
                             if ($form['type'] == "radio") {
                                 // radio类型的控件进行编辑状态赋值，checkbox类型控件请自行根据情况赋值
-                                $setChecked[] = tab(2) . '$("[name=\'' . $form['name'] . '\'][value=\'{$vo.' . $form['name'] . ' ?? \'' . $form['default'] . '\'}\']").attr("checked", true);';
+                                $setChecked[] = tab(2) . '$("[name=\'' . $form['name'] . '\'][value=\'{$vo.' . $form['name'] . ' ?? \'' . $form['default'] . '\'}\']").prop("checked", true);';
                             } else {
                                 $setChecked[] = tab(2) . 'var checks = \'' . $form['default'] . '\'.split(",");' . "\n"
                                     . tab(2) . 'if (checks.length > 0){' . "\n"
                                     . tab(3) . 'for (var i in checks){' . "\n"
-                                    . tab(4) . '$("[name=\'' . $form['name'] . '[]\'][value=\'"+checks[i]+"\']").attr("checked", true);' . "\n"
+                                    . tab(4) . '$("[name=\'' . $form['name'] . '[]\'][value=\'"+checks[i]+"\']").prop("checked", true);' . "\n"
                                     . tab(3) . '}' . "\n"
                                     . tab(2) . '}';
                             }

@@ -22,7 +22,7 @@ class Index
         $html = "";
         $generate = function ($list, $controller = "") use (&$html, &$generate) {
             $html .= "<li>";
-            if (isset($list['_child'])) {
+            if (isset($list['_child']) && $list['_child']) {
                 $controller .= $list['name'] . ".";
                 $html .= '<a class="sub-menu-title" data-title="' . $list['title'] . '" href="javascript:;"><b>+</b>' . $list['title'] . '</a>';
                 $html .= '<ul class="sub-menu-list">';

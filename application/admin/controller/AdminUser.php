@@ -35,13 +35,13 @@ class AdminUser extends Controller
             $map['realname'] = ["like", "%" . $this->request->param('realname') . "%"];
         }
         if ($this->request->param('account')) {
-            $map['realname'] = ["like", "%" . $this->request->param('account') . "%"];
+            $map['account'] = ["like", "%" . $this->request->param('account') . "%"];
         }
         if ($this->request->param('email')) {
-            $map['realname'] = ["like", "%" . $this->request->param('email') . "%"];
+            $map['email'] = ["like", "%" . $this->request->param('email') . "%"];
         }
         if ($this->request->param('mobile')) {
-            $map['realname'] = ["like", "%" . $this->request->param('mobile') . "%"];
+            $map['mobile'] = ["like", "%" . $this->request->param('mobile') . "%"];
         }
     }
 

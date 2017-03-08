@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2016 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -10,11 +10,6 @@
 // +----------------------------------------------------------------------
 
 namespace think;
-
-use think\Config;
-use think\Exception;
-use think\File;
-use think\Session;
 
 class Request
 {
@@ -25,7 +20,7 @@ class Request
 
     protected $method;
     /**
-     * @var string 域名
+     * @var string 域名（含协议和端口）
      */
     protected $domain;
 
@@ -125,7 +120,7 @@ class Request
     protected $isCheckCache;
 
     /**
-     * 架构函数
+     * 构造函数
      * @access protected
      * @param array $options 参数
      */
@@ -226,8 +221,9 @@ class Request
         if (!isset($info['path'])) {
             $info['path'] = '/';
         }
-        $options     = [];
-        $queryString = '';
+        $options                      = [];
+        $options[strtolower($method)] = $params;
+        $queryString                  = '';
         if (isset($info['query'])) {
             parse_str(html_entity_decode($info['query']), $query);
             if (!empty($params)) {
@@ -240,6 +236,11 @@ class Request
         } elseif (!empty($params)) {
             $queryString = http_build_query($params, '', '&');
         }
+        if ($queryString) {
+            parse_str($queryString, $get);
+            $options['get'] = isset($options['get']) ? array_merge($get, $options['get']) : $get;
+        }
+
         $server['REQUEST_URI']  = $info['path'] . ('' !== $queryString ? '?' . $queryString : '');
         $server['QUERY_STRING'] = $queryString;
         $options['cookie']      = $cookie;
@@ -632,7 +633,7 @@ class Request
         if (true === $name) {
             // 获取包含文件上传信息的数组
             $file = $this->file();
-            $data = array_merge($this->param, $file);
+            $data = is_array($file) ? array_merge($this->param, $file) : $this->param;
             return $this->input($data, '', $default, $filter);
         }
         return $this->input($this->param, $name, $default, $filter);
@@ -687,8 +688,8 @@ class Request
     {
         if (empty($this->post)) {
             $content = $this->input;
-            if (empty($_POST) && strpos($content, '":')) {
-                $this->post = json_decode($content, true);
+            if (empty($_POST) && false !== strpos($this->contentType(), 'application/json')) {
+                $this->post = (array) json_decode($content, true);
             } else {
                 $this->post = $_POST;
             }
@@ -712,8 +713,8 @@ class Request
     {
         if (is_null($this->put)) {
             $content = $this->input;
-            if (strpos($content, '":')) {
-                $this->put = json_decode($content, true);
+            if (false !== strpos($this->contentType(), 'application/json')) {
+                $this->put = (array) json_decode($content, true);
             } else {
                 parse_str($content, $this->put);
             }
@@ -885,7 +886,7 @@ class Request
                 return $array[$name];
             }
         }
-        return null;
+        return;
     }
 
     /**
@@ -1348,6 +1349,25 @@ class Request
     }
 
     /**
+     * 当前请求 HTTP_CONTENT_TYPE
+     * @access public
+     * @return string
+     */
+    public function contentType()
+    {
+        $contentType = $this->server('CONTENT_TYPE');
+        if ($contentType) {
+            if (strpos($contentType, ';')) {
+                list($type) = explode(';', $contentType);
+            } else {
+                $type = $contentType;
+            }
+            return trim($type);
+        }
+        return '';
+    }
+
+    /**
      * 获取当前请求的路由信息
      * @access public
      * @param array $route 路由名称
@@ -1486,9 +1506,10 @@ class Request
      * @access public
      * @param string $key 缓存标识，支持变量规则 ，例如 item/:name/:id
      * @param mixed  $expire 缓存有效期
+     * @param array  $except 缓存排除
      * @return void
      */
-    public function cache($key, $expire = null)
+    public function cache($key, $expire = null, $except = [])
     {
         if (false !== $key && $this->isGet() && !$this->isCheckCache) {
             // 标记请求缓存检查
@@ -1500,14 +1521,19 @@ class Request
             if ($key instanceof \Closure) {
                 $key = call_user_func_array($key, [$this]);
             } elseif (true === $key) {
+                foreach ($except as $rule) {
+                    if (0 === strpos($this->url(), $rule)) {
+                        return;
+                    }
+                }
                 // 自动缓存功能
-                $key = '__URL__';
+                $key = md5($this->host()) . '__URL__';
             } elseif (strpos($key, '|')) {
                 list($key, $fun) = explode('|', $key);
             }
             // 特殊规则替换
             if (false !== strpos($key, '__')) {
-                $key = str_replace(['__MODULE__', '__CONTROLLER__', '__ACTION__', '__URL__'], [$this->module, $this->controller, $this->action, md5($this->url())], $key);
+                $key = str_replace(['__MODULE__', '__CONTROLLER__', '__ACTION__', '__URL__', ''], [$this->module, $this->controller, $this->action, md5($this->url())], $key);
             }
 
             if (false !== strpos($key, ':')) {

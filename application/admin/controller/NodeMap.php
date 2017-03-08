@@ -31,7 +31,7 @@ class NodeMap extends Controller
     protected function filter(&$map)
     {
         if ($this->request->param("map")) {
-            $map['map'] = ["like", "%" . $this->request->param("map") . "%"];
+            $map['action|module|controller'] = ["like", "%" . $this->request->param("map") . "%"];
         }
         if ($this->request->param("comment")) {
             $map['comment'] = ["like", "%" . $this->request->param("comment") . "%"];

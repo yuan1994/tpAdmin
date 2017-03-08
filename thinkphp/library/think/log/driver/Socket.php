@@ -43,7 +43,7 @@ class Socket
     protected $allowForceClientIds = []; //配置强制推送且被授权的client_id
 
     /**
-     * 架构函数
+     * 构造函数
      * @param array $config 缓存参数
      * @access public
      */
@@ -209,19 +209,19 @@ class Socket
         }
 
         if (!isset($_SERVER[$key])) {
-            return null;
+            return;
         }
         if (empty($args)) {
             if (!preg_match('/SocketLog\((.*?)\)/', $_SERVER[$key], $match)) {
                 $args = ['tabid' => null];
-                return null;
+                return;
             }
             parse_str($match[1], $args);
         }
         if (isset($args[$name])) {
             return $args[$name];
         }
-        return null;
+        return;
     }
 
     /**

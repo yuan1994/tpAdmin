@@ -288,6 +288,7 @@ class Controller
      * $map['_order_by']    可强制设置排序字段(field asc|desc[,filed2 asc|desc...]或者false)
      * $map['_paginate']    是否开启分页，传入false可以关闭分页
      * $map['_model']       可强制指定模型
+     * $map['_func']        匿名函数，可以给模型设置属性，比如关联，alias，function ($model) {$model->alias('table')->join(...)}
      *
      * @param Model|Db $model    数据对象
      * @param array    $map      过滤条件
@@ -300,11 +301,15 @@ class Controller
     protected function datalist($model, $map, $field = null, $sortBy = '', $asc = false, $return = false, $paginate = true)
     {
         // 私有字段，指定特殊条件，查询时要删除
-        $protectField = ['_table', '_relation', '_field', '_order_by', '_paginate', '_model'];
+        $protectField = ['_table', '_relation', '_field', '_order_by', '_paginate', '_model', '_func'];
 
         // 通过过滤器指定模型
         if (isset($map['_model'])) {
             $model = $map['_model'];
+        }
+
+        if (isset($map['_func']) && ($map['_func'] instanceof \Closure)) {
+            call_user_func_array($map['_func'], [$model]);
         }
 
         // 排序字段 默认为主键名

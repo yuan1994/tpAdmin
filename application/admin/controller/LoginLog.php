@@ -17,6 +17,8 @@ namespace app\admin\controller;
 \think\Loader::import('controller/Controller', \think\Config::get('traits_path') , EXT);
 
 use app\admin\Controller;
+use app\common\model\LoginLog as ModelLoginLog;
+use app\common\model\AdminUser as ModelAdminUser;
 
 class LoginLog extends Controller
 {
@@ -42,7 +44,9 @@ class LoginLog extends Controller
 
         // 设置属性
         $map['_table'] = "login_log";
-        $map['_relation'] = "user";
         $map['_order_by'] = "login_log.id desc";
+        $map['_func'] = function (ModelLoginLog $model) use ($map) {
+            $model->alias($map['_table'])->join(ModelAdminUser::getTable() . ' user', 'login_log.uid = user.id');
+        };
     }
 }

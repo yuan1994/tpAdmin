@@ -104,8 +104,9 @@ $(function () {
     });
 
     // 绑定刷新事件
+    var baseUrl = location.href;
     $(document).on('click', '.btn-refresh', function () {
-        location.replace(location.href);
+        window.location.href = baseUrl;
     })
 });
 

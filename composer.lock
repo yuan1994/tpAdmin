@@ -117,23 +117,24 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.4",
+            "version": "v5.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756"
+                "reference": "81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/swiftmailer/swiftmailer/545ce9136690cea74f98f86fbb9c92dd9ab1a756.zip",
-                "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756",
+                "url": "https://files.phpcomposer.com/files/swiftmailer/swiftmailer/81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e.zip",
+                "reference": "81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9.1"
+                "mockery/mockery": "~0.9.1",
+                "symfony/phpunit-bridge": "~3.2"
             },
             "type": "library",
             "extra": {
@@ -166,20 +167,20 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2016-11-24 01:01:23"
+            "time": "2017-02-13 07:52:53"
         },
         {
             "name": "topthink/framework",
-            "version": "v5.0.4",
+            "version": "v5.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/top-think/framework.git",
-                "reference": "c695397733a707d4434fa8f8c070c9caf1f1f369"
+                "reference": "bcf64f19f4fadbff6c8503891689ff7e6f2fe9a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/top-think/framework/c695397733a707d4434fa8f8c070c9caf1f1f369.zip",
-                "reference": "c695397733a707d4434fa8f8c070c9caf1f1f369",
+                "url": "https://files.phpcomposer.com/files/top-think/framework/bcf64f19f4fadbff6c8503891689ff7e6f2fe9a3.zip",
+                "reference": "bcf64f19f4fadbff6c8503891689ff7e6f2fe9a3",
                 "shasum": ""
             },
             "require": {
@@ -192,8 +193,7 @@
                 "phpdocumentor/reflection-docblock": "^2.0",
                 "phploc/phploc": "2.*",
                 "phpunit/phpunit": "4.8.*",
-                "sebastian/phpcpd": "2.*",
-                "squizlabs/php_codesniffer": "2.*"
+                "sebastian/phpcpd": "2.*"
             },
             "type": "think-framework",
             "autoload": {
@@ -218,7 +218,7 @@
                 "orm",
                 "thinkphp"
             ],
-            "time": "2016-12-20 00:28:50"
+            "time": "2017-02-25 02:51:57"
         },
         {
             "name": "topthink/think-captcha",

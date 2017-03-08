@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2016 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -11,10 +11,7 @@
 
 namespace think;
 
-use think\File;
-use think\Lang;
-use think\Request;
-use think\Session;
+use think\exception\ClassNotFoundException;
 
 class Validate
 {
@@ -105,7 +102,7 @@ class Validate
     protected $batch = false;
 
     /**
-     * 架构函数
+     * 构造函数
      * @access public
      * @param array $rules 验证规则
      * @param array $message 验证提示信息
@@ -438,7 +435,7 @@ class Validate
                 $rule = $field . '_confirm';
             }
         }
-        return $this->getDataValue($data, $rule) == $value;
+        return $this->getDataValue($data, $rule) === $value;
     }
 
     /**
@@ -571,7 +568,7 @@ class Validate
                 break;
             case 'ip':
                 // 是否为IP地址
-                $result = $this->filter($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6);
+                $result = $this->filter($value, [FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6]);
                 break;
             case 'url':
                 // 是否为一个URL地址
@@ -594,7 +591,7 @@ class Validate
                 break;
             case 'boolean':
                 // 是否为布尔值
-                $result = in_array($value, [0, 1, true, false]);
+                $result = in_array($value, [true, false, 0, 1, '0', '1'], true);
                 break;
             case 'array':
                 // 是否为数组
@@ -659,7 +656,7 @@ class Validate
         if (!in_array($rule, ['ipv4', 'ipv6'])) {
             $rule = 'ipv4';
         }
-        return $this->filter($value, FILTER_VALIDATE_IP, 'ipv6' == $rule ? FILTER_FLAG_IPV6 : FILTER_FLAG_IPV4);
+        return $this->filter($value, [FILTER_VALIDATE_IP, 'ipv6' == $rule ? FILTER_FLAG_IPV6 : FILTER_FLAG_IPV4]);
     }
 
     /**
@@ -812,7 +809,16 @@ class Validate
         if (is_string($rule)) {
             $rule = explode(',', $rule);
         }
-        $db  = Db::name($rule[0]);
+        if (false !== strpos($rule[0], '\\')) {
+            // 指定模型类
+            $db = new $rule[0];
+        } else {
+            try {
+                $db = Loader::model($rule[0]);
+            } catch (ClassNotFoundException $e) {
+                $db = Db::name($rule[0]);
+            }
+        }
         $key = isset($rule[1]) ? $rule[1] : $field;
 
         if (strpos($key, '^')) {
@@ -866,6 +872,7 @@ class Validate
             list($rule, $param) = explode(',', $rule);
         } elseif (is_array($rule)) {
             $param = isset($rule[1]) ? $rule[1] : null;
+            $rule  = $rule[0];
         } else {
             $param = null;
         }
@@ -1216,9 +1223,9 @@ class Validate
             $msg = Lang::get(substr($msg, 2, -1));
         }
 
-        if (is_string($msg) && is_string($rule) && false !== strpos($msg, ':')) {
+        if (is_string($msg) && is_scalar($rule) && false !== strpos($msg, ':')) {
             // 变量替换
-            if (strpos($rule, ',')) {
+            if (is_string($rule) && strpos($rule, ',')) {
                 $array = array_pad(explode(',', $rule), 3, '');
             } else {
                 $array = array_pad([], 3, '');

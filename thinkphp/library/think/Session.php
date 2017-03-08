@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2016 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -11,7 +11,6 @@
 
 namespace think;
 
-use think\App;
 use think\exception\ClassNotFoundException;
 
 class Session
@@ -78,7 +77,12 @@ class Session
             ini_set('session.gc_maxlifetime', $config['expire']);
             ini_set('session.cookie_lifetime', $config['expire']);
         }
-
+        if (isset($config['secure'])) {
+            ini_set('session.cookie_secure', $config['secure']);
+        }
+        if (isset($config['httponly'])) {
+            ini_set('session.cookie_httponly', $config['httponly']);
+        }
         if (isset($config['use_cookies'])) {
             ini_set('session.use_cookies', $config['use_cookies'] ? 1 : 0);
         }
@@ -193,7 +197,7 @@ class Session
             self::delete($name, $prefix);
             return $result;
         } else {
-            return null;
+            return;
         }
     }
 

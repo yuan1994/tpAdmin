@@ -36,7 +36,7 @@
         {volist name="list" id="vo"}
         <tr class="text-c">
             <td><input type="checkbox" name="id[]" value="{$vo.id}"></td>
-            <td>{$vo.module}</td>
+            <td>{$vo.module|high_light=$Request.param.map}</td>
             <td>{$vo.controller|high_light=$Request.param.map}</td>
             <td>{$vo.action|high_light=$Request.param.map}</td>
             <td>{$vo.method}</td>

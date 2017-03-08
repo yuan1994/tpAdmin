@@ -1,6 +1,7 @@
 ThinkPHP 5.0
 ===============
 
+[![StyleCI](https://styleci.io/repos/48530411/shield?style=flat&branch=master)](https://styleci.io/repos/48530411)
 [![Build Status](https://travis-ci.org/top-think/framework.svg?branch=master)](https://travis-ci.org/top-think/framework)
 [![codecov.io](http://codecov.io/github/top-think/framework/coverage.svg?branch=master)](http://codecov.io/github/github/top-think/framework?branch=master)
 [![Total Downloads](https://poser.pugx.org/topthink/framework/downloads)](https://packagist.org/packages/topthink/framework)
@@ -27,10 +28,11 @@ ThinkPHP5在保持快速开发和大道至简的核心理念不变的同时，PH
  + 真正惰性加载
  + 分布式环境支持
  + 支持Composer
+ + 支持MongoDb
 
 > ThinkPHP5的运行环境要求PHP5.4以上。
 
-详细开发文档参考 [ThinkPHP5完全开发手册](http://www.kancloud.cn/manual/thinkphp5)
+详细开发文档参考 [ThinkPHP5完全开发手册](http://www.kancloud.cn/manual/thinkphp5) 以及[ThinkPHP5入门系列教程](http://www.kancloud.cn/special/thinkphp5_quickstart)
 
 ## 目录结构
 

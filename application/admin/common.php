@@ -240,11 +240,13 @@ function reset_by_key($arr, $key)
 
 /**
  * 节点遍历
- * @param $list
+ *
+ * @param        $list
  * @param string $pk
  * @param string $pid
  * @param string $child
- * @param int $root
+ * @param int    $root
+ *
  * @return array
  */
 function list_to_tree($list, $pk = 'id', $pid = 'pid', $child = '_child', $root = 0)
@@ -255,10 +257,16 @@ function list_to_tree($list, $pk = 'id', $pid = 'pid', $child = '_child', $root 
         // 创建基于主键的数组引用
         $refer = [];
         foreach ($list as $key => $data) {
+            if ($data instanceof \think\Model) {
+                $list[$key] = $data->toArray();
+            }
             $refer[$data[$pk]] =& $list[$key];
         }
         foreach ($list as $key => $data) {
             // 判断是否存在parent
+            if (!isset($list[$key][$child])) {
+                $list[$key][$child] = [];
+            }
             $parentId = $data[$pid];
             if ($root == $parentId) {
                 $tree[] =& $list[$key];
@@ -418,3 +426,79 @@ function format_bytes($size, $delimiter = '')
 
     return round($size, 2) . $delimiter . $units[$i];
 }
+
+/**
+ * 生成一定长度的UUID
+ *
+ * @param int $length
+ *
+ * @return string
+ */
+function get_uuid($length = 16)
+{
+    mt_srand((double)microtime()*10000);
+    $uuid = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
+    $str = base64_encode($uuid);
+    return substr($str,  mt_rand(0, strlen($str) - $length), $length);
+}
+
+/**
+ * 根据模型名称获取模型
+ *
+ * @param $modelName
+ *
+ * @return \think\Model|\think\db\Query
+ */
+function get_model($modelName)
+{
+    if (false !== strpos($modelName, '\\')) {
+        // 指定模型类
+        $db = new $modelName;
+    } else {
+        try {
+            $db = \think\Loader::model($modelName);
+        } catch (\think\exception\ClassNotFoundException $e) {
+            $db = \think\Db::name($modelName);
+        }
+    }
+
+    return $db;
+}
+
+/**
+ * 验证规则扩展
+ */
+\think\Validate::extend([
+    // 验证字段是否在模型中存在
+    'checkExist' => function($value, $rule, $data, $field) {
+        if (is_string($rule)) {
+            $rule = explode(',', $rule);
+        }
+        $db = get_model($rule[0]);
+        $key = isset($rule[1]) ? $rule[1] : $field;
+
+        if (strpos($key, '^')) {
+            // 支持多个字段验证
+            $fields = explode('^', $key);
+            foreach ($fields as $key) {
+                $map[$key] = $data[$key];
+            }
+        } elseif (strpos($key, '=')) {
+            parse_str($key, $map);
+        } else {
+            $map[$key] = $data[$field];
+        }
+
+        $pk = strval(isset($rule[3]) ? $rule[3] : $db->getPk());
+        if (isset($rule[2])) {
+            $map[$pk] = ['neq', $rule[2]];
+        } elseif (isset($data[$pk])) {
+            $map[$pk] = ['neq', $data[$pk]];
+        }
+
+        if ($db->where($map)->field($pk)->find()) {
+            return true;
+        }
+        return false;
+    }
+]);

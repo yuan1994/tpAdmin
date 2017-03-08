@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2016 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -12,9 +12,6 @@
 namespace think\db;
 
 use PDO;
-use think\Db;
-use think\db\Connection;
-use think\db\Query;
 use think\Exception;
 
 abstract class Builder
@@ -35,7 +32,7 @@ abstract class Builder
     protected $deleteSql    = 'DELETE FROM %TABLE% %USING% %JOIN% %WHERE% %ORDER%%LIMIT% %LOCK%%COMMENT%';
 
     /**
-     * 架构函数
+     * 构造函数
      * @access public
      * @param Connection    $connection 数据库连接对象实例
      * @param Query         $query      数据库查询对象实例
@@ -115,9 +112,12 @@ abstract class Builder
                     $result[$item] = $val;
                 } else {
                     $key = str_replace('.', '_', $key);
-                    $this->query->bind($key, $val, isset($bind[$key]) ? $bind[$key] : PDO::PARAM_STR);
-                    $result[$item] = ':' . $key;
+                    $this->query->bind('__data__' . $key, $val, isset($bind[$key]) ? $bind[$key] : PDO::PARAM_STR);
+                    $result[$item] = ':__data__' . $key;
                 }
+            } elseif (is_object($val) && method_exists($val, '__toString')) {
+                // 对象数据写入
+                $result[$item] = $val->__toString();
             }
         }
         return $result;
@@ -250,7 +250,10 @@ abstract class Builder
                     // 使用闭包查询
                     $query = new Query($this->connection);
                     call_user_func_array($value, [ & $query]);
-                    $str[] = ' ' . $key . ' ( ' . $this->buildWhere($query->getOptions('where'), $options) . ' )';
+                    $whereClause = $this->buildWhere($query->getOptions('where'), $options);
+                    if (!empty($whereClause)) {
+                        $str[] = ' ' . $key . ' ( ' . $whereClause . ' )';
+                    }
                 } elseif (strpos($field, '|')) {
                     // 不同字段使用相同查询条件（OR）
                     $array = explode('|', $field);
@@ -316,7 +319,12 @@ abstract class Builder
                 throw new Exception('where express error:' . $exp);
             }
         }
-        $bindName = $bindName ?: 'where_' . str_replace('.', '_', $field);
+        $bindName = $bindName ?: 'where_' . str_replace(['.', '-'], '_', $field);
+        if (preg_match('/\W/', $bindName)) {
+            // 处理带非单词字符的字段名
+            $bindName = md5($bindName);
+        }
+
         $bindType = isset($binds[$field]) ? $binds[$field] : PDO::PARAM_STR;
         if (is_scalar($value) && array_key_exists($field, $binds) && !in_array($exp, ['EXP', 'NOT NULL', 'NULL', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN']) && strpos($exp, 'TIME') === false) {
             if (strpos($value, ':') !== 0 || !$this->query->isBind(substr($value, 1))) {
@@ -329,9 +337,19 @@ abstract class Builder
         }
 
         $whereStr = '';
-        if (in_array($exp, ['=', '<>', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE'])) {
+        if (in_array($exp, ['=', '<>', '>', '>=', '<', '<='])) {
             // 比较运算 及 模糊匹配
             $whereStr .= $key . ' ' . $exp . ' ' . $this->parseValue($value, $field);
+        } elseif ('LIKE' == $exp || 'NOT LIKE' == $exp) {
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    $array[] = $key . ' ' . $exp . ' ' . $this->parseValue($item, $field);
+                }
+                $logic = isset($val[2]) ? $val[2] : 'AND';
+                $whereStr .= '(' . implode($array, ' ' . strtoupper($logic) . ' ') . ')';
+            } else {
+                $whereStr .= $key . ' ' . $exp . ' ' . $this->parseValue($value, $field);
+            }
         } elseif ('EXP' == $exp) {
             // 表达式查询
             $whereStr .= '( ' . $key . ' ' . $value . ' )';
@@ -361,7 +379,7 @@ abstract class Builder
                 } else {
                     $zone = implode(',', $this->parseValue($value, $field));
                 }
-                $whereStr .= $key . ' ' . $exp . ' (' . $zone . ')';
+                $whereStr .= $key . ' ' . $exp . ' (' . (empty($zone) ? "''" : $zone) . ')';
             }
         } elseif (in_array($exp, ['NOT BETWEEN', 'BETWEEN'])) {
             // BETWEEN 查询
@@ -508,10 +526,12 @@ abstract class Builder
             $array = [];
             foreach ($order as $key => $val) {
                 if (is_numeric($key)) {
-                    if (false === strpos($val, '(')) {
-                        $array[] = $this->parseKey($val, $options);
-                    } elseif ('[rand]' == $val) {
+                    if ('[rand]' == $val) {
                         $array[] = $this->parseRand();
+                    } elseif (false === strpos($val, '(')) {
+                        $array[] = $this->parseKey($val, $options);
+                    } else {
+                        $array[] = $val;
                     }
                 } else {
                     $sort    = in_array(strtolower(trim($val)), ['asc', 'desc']) ? ' ' . $val : '';
@@ -702,8 +722,13 @@ abstract class Builder
                         throw new Exception('fields not exists:[' . $key . ']');
                     }
                     unset($data[$key]);
+                } elseif (is_null($val)) {
+                    $data[$key] = 'NULL';
                 } elseif (is_scalar($val)) {
                     $data[$key] = $this->parseValue($val, $key);
+                } elseif (is_object($val) && method_exists($val, '__toString')) {
+                    // 对象数据写入
+                    $data[$key] = $val->__toString();
                 } else {
                     // 过滤掉非标量数据
                     unset($data[$key]);
